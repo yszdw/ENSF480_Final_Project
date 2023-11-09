@@ -84,7 +84,3 @@ CREATE TABLE IF NOT EXISTS Promotions (
     FOREIGN KEY (UserID) REFERENCES Users(UserID)
 );
 
--- You can now insert some sample data into these tables for testing
--- INSERT INTO statements would go here
-
--- Add any necessary indexes, triggers, stored procedures, and views
