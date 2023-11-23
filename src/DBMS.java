@@ -1,4 +1,6 @@
+package src;
 import java.sql.*;
+
 
 /**
  * Database Management System, handles any interaction between the program and the database
