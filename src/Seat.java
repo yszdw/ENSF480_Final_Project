@@ -1,6 +1,7 @@
 package src;
 
 public class Seat {
+    // Assuming seat number is in format "A1", "B2", etc.
     final String SEATNUMBER;
     final String CLASS;
     boolean isAvailable;
