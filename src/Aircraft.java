@@ -3,13 +3,19 @@ package src;
 public class Aircraft {
     final String AIRCRAFTID;
     final String AIRCRAFMODEL;
-    int numSeats;
+    int numEconomySeats;
+    int numComfortSeats;
+    int numBusinessSeats;
+
     boolean inUse;
 
-    public Aircraft(String aircraftID, String aircraftModel, int numSeats) {
+    public Aircraft(String aircraftID, String aircraftModel, int numEconomySeats, int numComfortSeats,
+                    int numBusinessSeats) {
         this.AIRCRAFTID = aircraftID;
         this.AIRCRAFMODEL = aircraftModel;
-        this.numSeats = numSeats;
+        this.numEconomySeats = numEconomySeats;
+        this.numComfortSeats = numComfortSeats;
+        this.numBusinessSeats = numBusinessSeats;
         this.inUse = false;
     }
 
