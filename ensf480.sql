@@ -82,6 +82,34 @@ CREATE TABLE IF NOT EXISTS Promotions (
     FOREIGN KEY (UserID) REFERENCES Users(UserID)
 );
 -- Inserting Data
+
+INSERT INTO Users (
+        Name,
+        Address,
+        Email,
+        UserType,
+        MembershipStatus,
+        CreditCardInfo
+    )
+VALUES (
+        'John Doe',
+        '1234 5th Ave, Calgary, AB',
+        'johnDoe@gmail.com',
+        'passenger',
+        FALSE,
+        '1234-5678-9012-3456'
+    ),
+    (
+        'Jane Doe',
+        '1234 5th Ave, Calgary, AB',
+        'janeDoe@gmail.com',
+        'passenger',
+        FALSE,
+        '1234-5678-9012-3456'
+     );
+
+
+
 INSERT INTO Flights (
         Origin,
         Destination,
