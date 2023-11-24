@@ -1,16 +1,21 @@
-
-
+DROP DATABASE IF EXISTS ENSF480;
+CREATE DATABASE ENSF480;
+USE ENSF480;
 -- Users Table
 CREATE TABLE IF NOT EXISTS Users (
     UserID INT AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(255) NOT NULL,
     Address VARCHAR(255),
     Email VARCHAR(255) UNIQUE NOT NULL,
-    UserType ENUM('passenger', 'tourism_agent', 'airline_agent', 'admin') NOT NULL,
+    UserType ENUM(
+        'passenger',
+        'tourism_agent',
+        'airline_agent',
+        'admin'
+    ) NOT NULL,
     MembershipStatus BOOLEAN DEFAULT FALSE,
     CreditCardInfo VARCHAR(255)
 );
-
 -- Flights Table
 CREATE TABLE IF NOT EXISTS Flights (
     FlightID INT AUTO_INCREMENT PRIMARY KEY,
@@ -19,7 +24,6 @@ CREATE TABLE IF NOT EXISTS Flights (
     DepartureDateTime DATETIME NOT NULL,
     ArrivalDateTime DATETIME NOT NULL
 );
-
 -- Seats Table
 CREATE TABLE IF NOT EXISTS Seats (
     SeatID INT AUTO_INCREMENT PRIMARY KEY,
@@ -30,7 +34,6 @@ CREATE TABLE IF NOT EXISTS Seats (
     IsBooked BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (FlightID) REFERENCES Flights(FlightID)
 );
-
 -- Bookings Table
 CREATE TABLE IF NOT EXISTS Bookings (
     BookingID INT AUTO_INCREMENT PRIMARY KEY,
@@ -43,7 +46,6 @@ CREATE TABLE IF NOT EXISTS Bookings (
     FOREIGN KEY (FlightID) REFERENCES Flights(FlightID),
     FOREIGN KEY (SeatID) REFERENCES Seats(SeatID)
 );
-
 -- Payments Table
 CREATE TABLE IF NOT EXISTS Payments (
     PaymentID INT AUTO_INCREMENT PRIMARY KEY,
@@ -53,28 +55,24 @@ CREATE TABLE IF NOT EXISTS Payments (
     CreditCardUsed VARCHAR(255) NOT NULL,
     FOREIGN KEY (BookingID) REFERENCES Bookings(BookingID)
 );
-
 -- Crews Table
 CREATE TABLE IF NOT EXISTS Crews (
     CrewID INT AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(255) NOT NULL,
     Position ENUM('pilot', 'flight_attendant', 'engineer') NOT NULL
 );
-
 -- Aircrafts Table
 CREATE TABLE IF NOT EXISTS Aircrafts (
     AircraftID INT AUTO_INCREMENT PRIMARY KEY,
     Model VARCHAR(255) NOT NULL,
     Capacity INT NOT NULL
 );
-
 -- Destinations Table
 CREATE TABLE IF NOT EXISTS Destinations (
     DestinationID INT AUTO_INCREMENT PRIMARY KEY,
     City VARCHAR(255) NOT NULL,
     Country VARCHAR(255) NOT NULL
 );
-
 -- Promotions Table
 CREATE TABLE IF NOT EXISTS Promotions (
     PromotionID INT AUTO_INCREMENT PRIMARY KEY,
@@ -83,4 +81,34 @@ CREATE TABLE IF NOT EXISTS Promotions (
     ValidUntil DATETIME NOT NULL,
     FOREIGN KEY (UserID) REFERENCES Users(UserID)
 );
-
+-- Inserting Data
+INSERT INTO Flights (
+        Origin,
+        Destination,
+        DepartureDateTime,
+        ArrivalDateTime
+    )
+VALUES (
+        'Calgary',
+        'Toronto',
+        '2024-04-01 12:00:00',
+        '2024-04-01 16:00:00'
+    ),
+    (
+        'Calgary',
+        'Vancouver',
+        '2024-05-01 1:00:00',
+        '2024-05-01 2:00:00'
+    ),
+    (
+        'Vancouver',
+        'Toronto',
+        '2024-06-01 16:00:00',
+        '2024-06-01 20:00:00'
+    ),
+    (
+        'Vancouver',
+        'Calgary',
+        '2024-07-01 11:00:00',
+        '2024-07-01 15:00:00'
+    );

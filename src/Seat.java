@@ -20,15 +20,19 @@ public class Seat {
     public String getSeatNumber() {
         return SEATNUMBER;
     }
+
     public String getSeatClass() {
         return CLASS;
     }
+
     public boolean getIsAvailable() {
         return isAvailable;
     }
+
     public int getPrice() {
         return price;
     }
+
     public User getPassenger() {
         return passenger;
     }
@@ -37,6 +41,7 @@ public class Seat {
     public void bookSeat() {
         this.isAvailable = false;
     }
+
     public void cancelSeat() {
         this.isAvailable = true;
     }
@@ -49,5 +54,9 @@ public class Seat {
     public void removePassenger() {
         this.passenger = null;
         cancelSeat();
+    }
+
+    public void setAvailablibility(boolean isAvailable) {
+        this.isAvailable = isAvailable;
     }
 }
