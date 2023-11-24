@@ -1,7 +1,7 @@
 package src;
 
 public class Aircraft {
-    final String AIRCRAFTID;
+    final int AIRCRAFTID;
     final String AIRCRAFMODEL;
     int numEconomySeats;
     int numComfortSeats;
@@ -9,8 +9,8 @@ public class Aircraft {
 
     boolean inUse;
 
-    public Aircraft(String aircraftID, String aircraftModel, int numEconomySeats, int numComfortSeats,
-                    int numBusinessSeats) {
+    public Aircraft(int aircraftID, String aircraftModel, int numEconomySeats, int numComfortSeats,
+            int numBusinessSeats) {
         this.AIRCRAFTID = aircraftID;
         this.AIRCRAFMODEL = aircraftModel;
         this.numEconomySeats = numEconomySeats;
@@ -20,12 +20,14 @@ public class Aircraft {
     }
 
     /* Getters and Setters */
-    public String getAircraftID() {
+    public int getAircraftID() {
         return AIRCRAFTID;
     }
+
     public String getAircraftModel() {
         return AIRCRAFMODEL;
     }
+
     public boolean getInUse() {
         return inUse;
     }
@@ -34,6 +36,7 @@ public class Aircraft {
     public void setInUse() {
         this.inUse = true;
     }
+
     public void setNotInUse() {
         this.inUse = false;
     }

@@ -79,11 +79,11 @@ public class DBMS {
         Statement myStmt = dbConnect.createStatement();
         results = myStmt.executeQuery("SELECT * FROM Aircrafts");
         while (results.next()) {
-            String aircraftID = results.getString("AircraftID");
-            String aircraftModel = results.getString("AircraftModel");
-            int numEconomySeats = results.getInt("NumEconomySeats");
-            int numComfortSeats = results.getInt("NumComfortSeats");
-            int numBusinessSeats = results.getInt("NumBusinessSeats");
+            int aircraftID = results.getInt("AircraftID");
+            String aircraftModel = results.getString("Model");
+            int numEconomySeats = results.getInt("Ordinary");
+            int numComfortSeats = results.getInt("Comfort");
+            int numBusinessSeats = results.getInt("Business");
             Aircraft aircraft = new Aircraft(aircraftID, aircraftModel, numEconomySeats, numComfortSeats,
                     numBusinessSeats);
             aircrafts.add(aircraft);
@@ -96,12 +96,20 @@ public class DBMS {
      */
     public ArrayList<Flight> getFlights() throws SQLException {
         ArrayList<Flight> flights = new ArrayList<Flight>();
+        ArrayList<Aircraft> aircrafts = getAircrafts();
         Statement myStmt = dbConnect.createStatement();
         results = myStmt.executeQuery("SELECT * FROM Flights");
         while (results.next()) {
             LocalDateTime departureDateTime = results.getTimestamp("DepartureDateTime").toLocalDateTime();
             LocalDateTime arrivalDateTime = results.getTimestamp("ArrivalDateTime").toLocalDateTime();
-            Aircraft aircraft = new Aircraft("AA123", "Boeing780", 100, 50, 20);
+            String aircraftModel = results.getString("AircraftModel");
+            Aircraft aircraft = null;
+            for (Aircraft a : aircrafts) {
+                if (a.getAircraftModel().equals(aircraftModel)) {
+                    aircraft = a;
+                }
+            }
+
             Flight flight = new Flight(aircraft, results.getInt("FlightID"), results.getString("Origin"),
                     results.getString("Destination"), departureDateTime.toLocalDate(),
 
@@ -211,7 +219,7 @@ public class DBMS {
         // }
 
         // create a new booking
-        testFlight.bookSeat(new Seat("1", "economy", 100), testObject);
+        testFlight.bookSeat(new Seat("1", "economy", 80), testObject);
         System.out.println("Available seats: ");
         for (Seat seat : testFlight.getSeats().values()) {
             if (seat.getIsAvailable()) {

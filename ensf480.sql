@@ -22,7 +22,8 @@ CREATE TABLE IF NOT EXISTS Flights (
     Origin VARCHAR(255) NOT NULL,
     Destination VARCHAR(255) NOT NULL,
     DepartureDateTime DATETIME NOT NULL,
-    ArrivalDateTime DATETIME NOT NULL
+    ArrivalDateTime DATETIME NOT NULL,
+    AircraftModel VARCHAR(255) NOT NULL
 );
 -- Seats Table
 CREATE TABLE IF NOT EXISTS Seats (
@@ -65,8 +66,43 @@ CREATE TABLE IF NOT EXISTS Crews (
 CREATE TABLE IF NOT EXISTS Aircrafts (
     AircraftID INT AUTO_INCREMENT PRIMARY KEY,
     Model VARCHAR(255) NOT NULL,
-    Capacity INT NOT NULL
+    Ordinary INT NOT NULL,
+    Comfort INT NOT NULL,
+    Business INT NOT NULL
 );
+INSERT INTO Aircrafts (
+        Model,
+        Ordinary,
+        Comfort,
+        Business
+    )
+VALUES (
+        'Boeing 737',
+        50,
+        20,
+        10
+    ),
+    (
+        'Boeing 717',
+
+        40,
+        10,
+        5
+    ),
+    (
+        'Boeing 757',
+	
+        60,
+        30,
+        15
+    ),
+    (
+        'Airbus A320',
+	
+        80,
+        40,
+        20
+    );
 -- Destinations Table
 CREATE TABLE IF NOT EXISTS Destinations (
     DestinationID INT AUTO_INCREMENT PRIMARY KEY,
@@ -82,7 +118,6 @@ CREATE TABLE IF NOT EXISTS Promotions (
     FOREIGN KEY (UserID) REFERENCES Users(UserID)
 );
 -- Inserting Data
-
 INSERT INTO Users (
         Name,
         Address,
@@ -106,37 +141,39 @@ VALUES (
         'passenger',
         FALSE,
         '1234-5678-9012-3456'
-     );
-
-
-
+    );
 INSERT INTO Flights (
         Origin,
         Destination,
         DepartureDateTime,
-        ArrivalDateTime
+        ArrivalDateTime,
+        AircraftModel
     )
 VALUES (
         'Calgary',
         'Toronto',
         '2024-04-01 12:00:00',
-        '2024-04-01 16:00:00'
+        '2024-04-01 16:00:00',
+        'Boeing 737'
     ),
     (
         'Calgary',
         'Vancouver',
         '2024-05-01 1:00:00',
-        '2024-05-01 2:00:00'
+        '2024-05-01 2:00:00',
+        'Boeing 717'
     ),
     (
         'Vancouver',
         'Toronto',
         '2024-06-01 16:00:00',
-        '2024-06-01 20:00:00'
+        '2024-06-01 20:00:00',
+        'Boeing 757'
     ),
     (
         'Vancouver',
         'Calgary',
         '2024-07-01 11:00:00',
-        '2024-07-01 15:00:00'
+        '2024-07-01 15:00:00',
+        'Airbus A320'
     );
