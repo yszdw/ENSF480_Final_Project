@@ -131,13 +131,14 @@ public class DBMS {
         Statement myStmt = dbConnect.createStatement();
         results = myStmt.executeQuery("SELECT * FROM Users");
         while (results.next()) {
+            int userID = results.getInt("UserID");
             String username = results.getString("Name");
             String address = results.getString("Address");
             String email = results.getString("Email");
             String userType = results.getString("UserType");
             boolean isMember = results.getBoolean("MembershipStatus");
             String creditCard = results.getString("CreditCardInfo");
-            User user = new User(username, email, address, creditCard, userType);
+            User user = new User(userID, username, email, address, creditCard, userType);
             user.setIsMember(isMember);
             users.add(user);
         }
@@ -192,6 +193,46 @@ public class DBMS {
     // return seats;
     // }
 
+    /*
+     * getBooking list from database
+     */
+
+    public ArrayList<Booking> getBookings() throws SQLException {
+        ArrayList<Booking> bookings = new ArrayList<Booking>();
+        ArrayList<User> users = getUsers();
+        ArrayList<Flight> flights = getFlights();
+        Statement myStmt = dbConnect.createStatement();
+        results = myStmt.executeQuery("SELECT * FROM Bookings");
+        while (results.next()) {
+            int bookingID = results.getInt("BookingID");
+            int userID = results.getInt("UserID");
+            User user = null;
+            for (User u : users) {
+                if (u.getUserID() == userID) {
+                    user = u;
+                }
+            }
+            int flightID = results.getInt("FlightID");
+            Flight flight = null;
+            for (Flight f : flights) {
+                if (f.getFlightID() == flightID) {
+                    flight = f;
+                }
+            }
+
+            int seatID = results.getInt("SeatID");
+
+            boolean cancellationInsurance = results.getBoolean("CancellationInsurance");
+            LocalDateTime bookingDateTime = results.getTimestamp("BookingDateTime").toLocalDateTime();
+
+            // TODO: Need to replace dummieSeat with actual seat
+            Booking booking = new Booking(bookingID, flight, user, seatID, cancellationInsurance, bookingDateTime);
+            bookings.add(booking);
+        }
+        results.close();
+        return bookings;
+    }
+
     public static void main(String args[]) throws SQLException {
 
         DBMS connect = getDBMS();
@@ -202,6 +243,26 @@ public class DBMS {
         // This is a list of all user information in the database
         // - can use all user getter methods for user info
         ArrayList<User> userList = connect.getUsers();
+
+        ArrayList<Booking> bookingList = connect.getBookings();
+        for (Booking booking : bookingList) {
+            System.out.println(booking.getBookingID());
+            int flightID = booking.getFlight().getFlightID();
+            for (Flight flight : flightList) {
+                if (flight.getFlightID() == flightID) {
+                    System.out.println(flight.getDepartureLocation());
+                    System.out.println(flight.getArrivalLocation());
+                    System.out.println(flight.getDepartureDate());
+                    System.out.println(flight.getArrivalDate());
+                    System.out.println(flight.getDepartureTime());
+                    System.out.println(flight.getArrivalTime());
+                }
+            }
+            System.out.println(booking.getUser().getUsername());
+            System.out.println(booking.getBookedSeats());
+            System.out.println(booking.getCancellationInsurance());
+            System.out.println(booking.getBookingDateTime());
+        }
 
         // for (Flight flight : flightList) {
         // System.out.println(flight.getAircraft().getAircraftModel());
