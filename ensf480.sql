@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS Flights (
     Destination VARCHAR(255) NOT NULL,
     DepartureDateTime DATETIME NOT NULL,
     ArrivalDateTime DATETIME NOT NULL,
-    AircraftModel VARCHAR(255) NOT NULL
+    AircraftID INT NOT NULL
 );
 -- Seats Table
 CREATE TABLE IF NOT EXISTS Seats (
@@ -83,32 +83,35 @@ VALUES (
         10
     ),
     (
+        'Boeing 737',
+        50,
+        20,
+        10
+    ),
+    (
         'Boeing 717',
-
         40,
-        10,
+        15,
+        5
+    ),
+    (
+        'Boeing 717',
+        40,
+        15,
         5
     ),
     (
         'Boeing 757',
-	
         60,
         30,
-        15
+        10
     ),
     (
         'Airbus A320',
-	
-        80,
-        40,
-        20
+        50,
+        30,
+        10
     );
--- Destinations Table
-CREATE TABLE IF NOT EXISTS Destinations (
-    DestinationID INT AUTO_INCREMENT PRIMARY KEY,
-    City VARCHAR(255) NOT NULL,
-    Country VARCHAR(255) NOT NULL
-);
 -- Promotions Table
 CREATE TABLE IF NOT EXISTS Promotions (
     PromotionID INT AUTO_INCREMENT PRIMARY KEY,
@@ -147,33 +150,33 @@ INSERT INTO Flights (
         Destination,
         DepartureDateTime,
         ArrivalDateTime,
-        AircraftModel
+        AircraftID
     )
 VALUES (
         'Calgary',
         'Toronto',
         '2024-04-01 12:00:00',
         '2024-04-01 16:00:00',
-        'Boeing 737'
+        1
     ),
     (
         'Calgary',
         'Vancouver',
         '2024-05-01 1:00:00',
         '2024-05-01 2:00:00',
-        'Boeing 717'
+        2
     ),
     (
         'Vancouver',
         'Toronto',
         '2024-06-01 16:00:00',
         '2024-06-01 20:00:00',
-        'Boeing 757'
+        1
     ),
     (
         'Vancouver',
         'Calgary',
         '2024-07-01 11:00:00',
         '2024-07-01 15:00:00',
-        'Airbus A320'
+        4
     );
