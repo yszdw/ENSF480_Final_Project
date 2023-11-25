@@ -9,7 +9,6 @@ CREATE TABLE IF NOT EXISTS Users (
     Email VARCHAR(255) UNIQUE NOT NULL,
     UserType ENUM(
         'passenger',
-        'tourism_agent',
         'airline_agent',
         'admin'
     ) NOT NULL,
