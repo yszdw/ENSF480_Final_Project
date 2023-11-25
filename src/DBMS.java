@@ -60,20 +60,9 @@ public class DBMS {
 
     }
 
-    /**
-     * A sample test to verify connection
+    /*
+     * getAircraft list from database
      */
-    public void test_SQL() throws SQLException {
-
-        Statement myStmt = dbConnect.createStatement();
-        results = myStmt.executeQuery("SELECT * FROM Users");
-
-        while (results.next()) {
-            System.out.println(results.getString("Address"));
-        }
-
-    }
-
     public ArrayList<Aircraft> getAircrafts() throws SQLException {
         ArrayList<Aircraft> aircrafts = new ArrayList<Aircraft>();
         Statement myStmt = dbConnect.createStatement();
@@ -88,11 +77,12 @@ public class DBMS {
                     numBusinessSeats);
             aircrafts.add(aircraft);
         }
+        results.close();
         return aircrafts;
     }
 
     /*
-     * getFlight list
+     * getFlight list from database
      */
     public ArrayList<Flight> getFlights() throws SQLException {
         ArrayList<Flight> flights = new ArrayList<Flight>();
@@ -102,10 +92,10 @@ public class DBMS {
         while (results.next()) {
             LocalDateTime departureDateTime = results.getTimestamp("DepartureDateTime").toLocalDateTime();
             LocalDateTime arrivalDateTime = results.getTimestamp("ArrivalDateTime").toLocalDateTime();
-            String aircraftModel = results.getString("AircraftModel");
+            int aircraftID = results.getInt("AircraftID");
             Aircraft aircraft = null;
             for (Aircraft a : aircrafts) {
-                if (a.getAircraftModel().equals(aircraftModel)) {
+                if (a.getAircraftID() == aircraftID) {
                     aircraft = a;
                 }
             }
@@ -116,10 +106,12 @@ public class DBMS {
                     departureDateTime.toLocalTime(), arrivalDateTime.toLocalDate(), arrivalDateTime.toLocalTime());
             flights.add(flight);
         }
+        results.close();
         return flights;
     }
 
     /*
+     * TODO: bookFlight - THIS DOESNT WORK YET
      * Books a flight and insert into database
      */
 
@@ -128,6 +120,30 @@ public class DBMS {
         String sql = "INSERT INTO Bookings (UserID, FlightID, SeatID, CancellationInsurance, BookingDateTime) VALUES ("
                 + userID + flightID + seatID + "0" + DateTime + ")";
         myStmt.executeUpdate(sql);
+    }
+
+    /*
+     * getUser List from database
+     */
+
+    public ArrayList<User> getUsers() throws SQLException {
+        ArrayList<User> users = new ArrayList<User>();
+        Statement myStmt = dbConnect.createStatement();
+        results = myStmt.executeQuery("SELECT * FROM Users");
+        while (results.next()) {
+            int userID = results.getInt("UserID");
+            String username = results.getString("Name");
+            String address = results.getString("Address");
+            String email = results.getString("Email");
+            String userType = results.getString("UserType");
+            boolean isMember = results.getBoolean("MembershipStatus");
+            String creditCard = results.getString("CreditCardInfo");
+            User user = new User(userID, username, email, address, creditCard, userType);
+            user.setIsMember(isMember);
+            users.add(user);
+        }
+        results.close();
+        return users;
     }
 
     /*
@@ -177,19 +193,80 @@ public class DBMS {
     // return seats;
     // }
 
+    /*
+     * getBooking list from database
+     */
+
+    public ArrayList<Booking> getBookings() throws SQLException {
+        ArrayList<Booking> bookings = new ArrayList<Booking>();
+        ArrayList<User> users = getUsers();
+        ArrayList<Flight> flights = getFlights();
+        Statement myStmt = dbConnect.createStatement();
+        results = myStmt.executeQuery("SELECT * FROM Bookings");
+        while (results.next()) {
+            int bookingID = results.getInt("BookingID");
+            int userID = results.getInt("UserID");
+            User user = null;
+            for (User u : users) {
+                if (u.getUserID() == userID) {
+                    user = u;
+                }
+            }
+            int flightID = results.getInt("FlightID");
+            Flight flight = null;
+            for (Flight f : flights) {
+                if (f.getFlightID() == flightID) {
+                    flight = f;
+                }
+            }
+
+            int seatID = results.getInt("SeatID");
+
+            boolean cancellationInsurance = results.getBoolean("CancellationInsurance");
+            LocalDateTime bookingDateTime = results.getTimestamp("BookingDateTime").toLocalDateTime();
+
+            // TODO: Need to replace dummieSeat with actual seat
+            Booking booking = new Booking(bookingID, flight, user, seatID, cancellationInsurance, bookingDateTime);
+            bookings.add(booking);
+        }
+        results.close();
+        return bookings;
+    }
+
     public static void main(String args[]) throws SQLException {
 
         DBMS connect = getDBMS();
 
         // This is a list of all flight information in the database
+        // - can use all flight getter methods for flight info
         ArrayList<Flight> flightList = connect.getFlights();
+        // This is a list of all user information in the database
+        // - can use all user getter methods for user info
+        ArrayList<User> userList = connect.getUsers();
+
+        ArrayList<Booking> bookingList = connect.getBookings();
+        for (Booking booking : bookingList) {
+            System.out.println(booking.getBookingID());
+            int flightID = booking.getFlight().getFlightID();
+            for (Flight flight : flightList) {
+                if (flight.getFlightID() == flightID) {
+                    System.out.println(flight.getDepartureLocation());
+                    System.out.println(flight.getArrivalLocation());
+                    System.out.println(flight.getDepartureDate());
+                    System.out.println(flight.getArrivalDate());
+                    System.out.println(flight.getDepartureTime());
+                    System.out.println(flight.getArrivalTime());
+                }
+            }
+            System.out.println(booking.getUser().getUsername());
+            System.out.println(booking.getBookedSeats());
+            System.out.println(booking.getCancellationInsurance());
+            System.out.println(booking.getBookingDateTime());
+        }
+
         // for (Flight flight : flightList) {
-        // System.out.println("Departure: " + flight.getDepartureLocation());
-        // System.out.println("Arrival: " + flight.getArrivalLocation());
-        // System.out.println("Departure Date: " + flight.getDepartureDate());
-        // System.out.println("Departure Time: " + flight.getDepartureTime());
-        // System.out.println("Arrival Date: " + flight.getArrivalDate());
-        // System.out.println("Arrival Time: " + flight.getArrivalTime());
+        // System.out.println(flight.getAircraft().getAircraftModel());
+        // System.out.println(flight.getAircraft().getAircraftID());
         // }
 
         /*
@@ -206,26 +283,23 @@ public class DBMS {
          * this is a test object
          */
 
-        User testObject = new User("test", "test st", "test@email", "test", "passenger");
-        connect.addUser(testObject);
+        // User testObject = new User("test", "test st", "test@email", "test",
+        // "passenger");
+
+        User testObject = userList.get(0);
+
+        // connect.addUser(testObject);
 
         // Upon selecting a flight, display seat availability
 
+        // create a new booking
+        // testFlight.bookSeat(new Seat("1", "economy", 80), testObject);
         // System.out.println("Available seats: ");
         // for (Seat seat : testFlight.getSeats().values()) {
         // if (seat.getIsAvailable()) {
         // System.out.println(seat.getSeatNumber());
         // }
         // }
-
-        // create a new booking
-        testFlight.bookSeat(new Seat("1", "economy", 80), testObject);
-        System.out.println("Available seats: ");
-        for (Seat seat : testFlight.getSeats().values()) {
-            if (seat.getIsAvailable()) {
-                System.out.println(seat.getSeatNumber());
-            }
-        }
         // connect.bookFlight(testFlight.getFlightID(), testObject);
 
         /*

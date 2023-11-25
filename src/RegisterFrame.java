@@ -2,6 +2,12 @@ package src;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 public class RegisterFrame extends JFrame {
 
@@ -9,6 +15,11 @@ public class RegisterFrame extends JFrame {
     private static final Font INPUT_FONT = new Font("Segoe UI", Font.PLAIN, 14);
     private static final Color BACKGROUND_COLOR = new Color(245, 245, 245); // Light Gray
     private static final Color INPUT_COLOR = new Color(255, 255, 255); // White
+
+    // Input fields
+    private JTextField userTextField;
+    private JPasswordField passField;
+    private JTextField emailTextField;
 
     public RegisterFrame() {
         setTitle("User Registration");
@@ -32,21 +43,21 @@ public class RegisterFrame extends JFrame {
         // Username
         JLabel userLabel = new JLabel("Username:");
         userLabel.setFont(INPUT_FONT);
-        JTextField userTextField = new JTextField(20);
+        userTextField = new JTextField(20);
         userTextField.setFont(INPUT_FONT);
         userTextField.setBackground(INPUT_COLOR);
 
         // Password
         JLabel passLabel = new JLabel("Password:");
         passLabel.setFont(INPUT_FONT);
-        JPasswordField passField = new JPasswordField(20);
+        passField = new JPasswordField(20);
         passField.setFont(INPUT_FONT);
         passField.setBackground(INPUT_COLOR);
 
         // Email
         JLabel emailLabel = new JLabel("Email:");
         emailLabel.setFont(INPUT_FONT);
-        JTextField emailTextField = new JTextField(20);
+        emailTextField = new JTextField(20);
         emailTextField.setFont(INPUT_FONT);
         emailTextField.setBackground(INPUT_COLOR);
 
@@ -77,10 +88,61 @@ public class RegisterFrame extends JFrame {
         registerButton.setBorderPainted(false);
         buttonPanel.add(registerButton);
 
+        // Action listener for the register button
+        registerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                registerUser();
+            }
+        });
+
         // Add panels to frame
         add(titlePanel, BorderLayout.NORTH);
         add(inputPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
+
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+    }
+
+    private void registerUser() {
+        String username = userTextField.getText();
+        String password = new String(passField.getPassword()); // In real application, hash the password
+        String email = emailTextField.getText();
+
+        // Input validation
+        if (username.isEmpty() || password.isEmpty() || email.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill in all fields", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Database operation
+        try {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/ensf480", "root",
+                    "ensf480");
+            String sql = "INSERT INTO users (Name, Email, PasswordHash) VALUES (?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, email);
+            preparedStatement.setString(3, password); // Password should be hashed + salted
+
+            int rowsInserted = preparedStatement.executeUpdate();
+            if (rowsInserted > 0) {
+                JOptionPane.showMessageDialog(this, "Registration successful!");
+                this.dispose();
+                // Optionally, open the login window or main app window here
+                LoginFrame loginFrame = new LoginFrame();
+                loginFrame.setVisible(true);
+                // Or if there's a main application window that should be shown after
+                // registration, instantiate and display it here instead.
+            }
+
+            preparedStatement.close();
+            connection.close();
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Database error: " + sqlException.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     public static void main(String[] args) {
