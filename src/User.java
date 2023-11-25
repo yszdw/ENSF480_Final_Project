@@ -1,6 +1,7 @@
 package src;
 
 public class User {
+    int userID;
     String username;
     String email;
     String address;
@@ -9,7 +10,8 @@ public class User {
     boolean hasInsurance;
     String userType;
 
-    public User(String username, String email, String address, String creditCard, String userType) {
+    public User(int userID, String username, String email, String address, String creditCard, String userType) {
+        this.userID = userID;
         this.username = username;
         this.email = email;
         this.address = address;
@@ -79,6 +81,10 @@ public class User {
 
     public String getUserType() {
         return userType;
+    }
+
+    public int getUserID() {
+        return userID;
     }
 
     /* Methods */

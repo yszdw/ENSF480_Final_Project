@@ -16,6 +16,31 @@ CREATE TABLE IF NOT EXISTS Users (
     MembershipStatus BOOLEAN DEFAULT FALSE,
     CreditCardInfo VARCHAR(255)
 );
+-- Inserting Data
+INSERT INTO Users (
+        Name,
+        Address,
+        Email,
+        UserType,
+        MembershipStatus,
+        CreditCardInfo
+    )
+VALUES (
+        'John Doe',
+        '1234 5th Ave, Calgary, AB',
+        'johnDoe@gmail.com',
+        'passenger',
+        FALSE,
+        '1234-5678-9012-3456'
+    ),
+    (
+        'Jane Doe',
+        '1234 5th Ave, Calgary, AB',
+        'janeDoe@gmail.com',
+        'passenger',
+        FALSE,
+        '1234-5678-9012-3456'
+    );
 -- Flights Table
 CREATE TABLE IF NOT EXISTS Flights (
     FlightID INT AUTO_INCREMENT PRIMARY KEY,
@@ -25,16 +50,42 @@ CREATE TABLE IF NOT EXISTS Flights (
     ArrivalDateTime DATETIME NOT NULL,
     AircraftID INT NOT NULL
 );
--- Seats Table
-CREATE TABLE IF NOT EXISTS Seats (
-    SeatID INT AUTO_INCREMENT PRIMARY KEY,
-    FlightID INT NOT NULL,
-    SeatNumber VARCHAR(10) NOT NULL,
-    SeatType ENUM('ordinary', 'comfort', 'business_class') NOT NULL,
-    Price DECIMAL(10, 2) NOT NULL,
-    IsBooked BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (FlightID) REFERENCES Flights(FlightID)
-);
+INSERT INTO Flights (
+        Origin,
+        Destination,
+        DepartureDateTime,
+        ArrivalDateTime,
+        AircraftID
+    )
+VALUES (
+        'Calgary',
+        'Toronto',
+        '2024-04-01 12:00:00',
+        '2024-04-01 16:00:00',
+        1
+    ),
+    (
+        'Calgary',
+        'Vancouver',
+        '2024-05-01 1:00:00',
+        '2024-05-01 2:00:00',
+        2
+    ),
+    (
+        'Vancouver',
+        'Toronto',
+        '2024-06-01 16:00:00',
+        '2024-06-01 20:00:00',
+        1
+    ),
+    (
+        'Vancouver',
+        'Calgary',
+        '2024-07-01 11:00:00',
+        '2024-07-01 15:00:00',
+        4
+    );
+
 -- Bookings Table
 CREATE TABLE IF NOT EXISTS Bookings (
     BookingID INT AUTO_INCREMENT PRIMARY KEY,
@@ -44,9 +95,21 @@ CREATE TABLE IF NOT EXISTS Bookings (
     CancellationInsurance BOOLEAN DEFAULT FALSE,
     BookingDateTime DATETIME NOT NULL,
     FOREIGN KEY (UserID) REFERENCES Users(UserID),
-    FOREIGN KEY (FlightID) REFERENCES Flights(FlightID),
-    FOREIGN KEY (SeatID) REFERENCES Seats(SeatID)
+    FOREIGN KEY (FlightID) REFERENCES Flights(FlightID)
+    
 );
+
+INSERT INTO Bookings (
+        UserID,
+        FlightID,
+        SeatID,
+        CancellationInsurance,
+        BookingDateTime
+    )
+VALUES (1, 1, 1, TRUE, '2024-03-01 12:00:00'),
+    (2, 2, 2, FALSE, '2024-04-01 12:00:00'),
+    (1, 3, 3, FALSE, '2024-05-01 12:00:00'),
+    (2, 1, 1, TRUE, '2024-03-03 12:00:00');
 -- Payments Table
 CREATE TABLE IF NOT EXISTS Payments (
     PaymentID INT AUTO_INCREMENT PRIMARY KEY,
@@ -120,63 +183,3 @@ CREATE TABLE IF NOT EXISTS Promotions (
     ValidUntil DATETIME NOT NULL,
     FOREIGN KEY (UserID) REFERENCES Users(UserID)
 );
--- Inserting Data
-INSERT INTO Users (
-        Name,
-        Address,
-        Email,
-        UserType,
-        MembershipStatus,
-        CreditCardInfo
-    )
-VALUES (
-        'John Doe',
-        '1234 5th Ave, Calgary, AB',
-        'johnDoe@gmail.com',
-        'passenger',
-        FALSE,
-        '1234-5678-9012-3456'
-    ),
-    (
-        'Jane Doe',
-        '1234 5th Ave, Calgary, AB',
-        'janeDoe@gmail.com',
-        'passenger',
-        FALSE,
-        '1234-5678-9012-3456'
-    );
-INSERT INTO Flights (
-        Origin,
-        Destination,
-        DepartureDateTime,
-        ArrivalDateTime,
-        AircraftID
-    )
-VALUES (
-        'Calgary',
-        'Toronto',
-        '2024-04-01 12:00:00',
-        '2024-04-01 16:00:00',
-        1
-    ),
-    (
-        'Calgary',
-        'Vancouver',
-        '2024-05-01 1:00:00',
-        '2024-05-01 2:00:00',
-        2
-    ),
-    (
-        'Vancouver',
-        'Toronto',
-        '2024-06-01 16:00:00',
-        '2024-06-01 20:00:00',
-        1
-    ),
-    (
-        'Vancouver',
-        'Calgary',
-        '2024-07-01 11:00:00',
-        '2024-07-01 15:00:00',
-        4
-    );
