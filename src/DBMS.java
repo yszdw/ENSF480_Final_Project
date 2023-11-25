@@ -30,7 +30,7 @@ public class DBMS {
      */
     private DBMS() throws SQLException {
         // the connection info here will need to be changed depending on the user
-        dbConnect = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/ENSF480", "root", "password");
+        dbConnect = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/ENSF480", "root", "AbXy219!");
     }
 
     /**

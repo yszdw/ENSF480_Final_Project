@@ -6,7 +6,7 @@ public class CrewMember extends User{
 
     public CrewMember(String username, String email, String address, String creditCard, String crewMemberID,
                       String crewMemberPos) {
-        super(username, email, address, creditCard, "crew");
+        //super(username, email, address, creditCard, "crew");
         this.crewMemberID = crewMemberID;
         this.crewMemberPos = crewMemberPos;
     }

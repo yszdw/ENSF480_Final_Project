@@ -8,15 +8,16 @@ import java.util.Properties;
 public class Email_Controller {
 
 
-    private static String programEmail = "infernocygas@gmail.com";
-    private static String emailPassword = "!Valorant!423";
+    private static String programEmail = "ensf480flightsystem@gmail.com";
+    private static String emailPassword = "ggcw dwhn hjvd cdpr";
 
 
     public static void sendReceipt(User user, Flight flight){
 
-        //String userEmail = user.getEmail();
-        //For testing
-        String userEmail = "aaron.dalbroi2002@gmail.com";
+        String userEmail = user.getEmail();
+
+        //For testing, place your own email in the line below
+        //String userEmail = "aaron.dalbroi2002@gmail.com";
 
         Properties properties = new Properties();
         properties.put("mail.smtp.auth", "true");
@@ -55,7 +56,7 @@ public class Email_Controller {
                            +"Departure: %s\n"
                            +"Arrival: %s\n"
                            +"Cost: %s\n",
-                           flight.getDepartureTime(),user.getUsername(),flight.getDepartureLocation(),flight.getArrivalLocation(),"100"));
+                           flight.getDepartureDate(),flight.getDepartureTime(),user.getUsername(),flight.getDepartureLocation(),flight.getArrivalLocation(),"100"));
 
             // Send the email
             Transport.send(message);
