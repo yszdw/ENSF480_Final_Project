@@ -7,8 +7,8 @@ import java.util.Date;
 
 public class Admin extends User {
 
-    public Admin(int userID,String username, String email, String address, String creditCard) {
-        super(userID,username, email, address, creditCard, "admin");
+    public Admin(int userID,String username, String email, String address) {
+        super(userID,username, email, address);
     }
 
     /* Methods */
@@ -44,9 +44,9 @@ public class Admin extends User {
     }
 
     // This method is used to add a crew member to the database
-    public void addCrewMember(String username, String email, String address, String creditCard, String crewMemberID,
+    public void addCrewMember(int crewMemberID, String username, String email, String address,
                               String crewMemberPos) {
-        CrewMember crewMember = new CrewMember(username, email, address, creditCard, crewMemberID, crewMemberPos);
+        CrewMember crewMember = new CrewMember(crewMemberID, username, email, address, crewMemberPos);
         // TODO: Add crew member to database. Call overloaded method
     }
 
