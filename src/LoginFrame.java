@@ -152,17 +152,17 @@ public class LoginFrame extends JFrame {
         public WelcomeFrame() {
             setTitle("Welcome");
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            setLayout(new BorderLayout()); // 使用 BorderLayout 作为主布局
-            setExtendedState(JFrame.MAXIMIZED_BOTH); // 窗口最大化
+            setLayout(new BorderLayout()); 
+            setExtendedState(JFrame.MAXIMIZED_BOTH); 
 
             // 欢迎信息
             JLabel welcomeLabel = new JLabel("Welcome to our Flight Reservation System", SwingConstants.CENTER);
             welcomeLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
             add(welcomeLabel, BorderLayout.NORTH);
 
-            // 按钮面板，使用 GridBagLayout 来居中按钮
+
             JPanel buttonPanel = new JPanel(new GridBagLayout());
-            buttonPanel.setBackground(BACKGROUND_COLOR); // 使用与登录界面相同的背景色
+            buttonPanel.setBackground(BACKGROUND_COLOR); 
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.gridwidth = GridBagConstraints.REMAINDER;
             gbc.fill = GridBagConstraints.NONE;
@@ -175,19 +175,18 @@ public class LoginFrame extends JFrame {
             buyTicketsButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    createTicketPurchasePanel(); // 调用方法以创建购票界面
+                    createTicketPurchasePanel(); 
                 }
             });
 
             // "Cancel Flight" 按钮
             JButton cancelFlightButton = createStyledButton("Cancel Flight");
-            gbc.insets = new Insets(0, 0, 10, 0); // 仅底部的间距
+            gbc.insets = new Insets(0, 0, 10, 0); 
             buttonPanel.add(cancelFlightButton, gbc);
 
-            // 将按钮面板添加到框架的中心位置
             add(buttonPanel, BorderLayout.CENTER);
 
-            // 调整窗口大小以适应组件
+
             pack();
             setVisible(true);
             setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -273,7 +272,7 @@ public class LoginFrame extends JFrame {
         JFrame ticketFrame = new JFrame("Purchase Tickets");
         ticketFrame.setSize(400, 300);
         ticketFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        ticketFrame.setLayout(new GridLayout(5, 2, 10, 10)); // 使用 GridLayout 布局
+        ticketFrame.setLayout(new GridLayout(5, 2, 10, 10)); 
 
         // 创建标签和下拉框
         JLabel fromLabel = new JLabel("Select Departure:");
@@ -281,7 +280,7 @@ public class LoginFrame extends JFrame {
         JLabel toLabel = new JLabel("Select Destination:");
         JComboBox<String> toComboBox = new JComboBox<>();
 
-        // 从数据库获取始发地和目的地列表并添加到下拉框
+
         try {
             DBMS dbms = DBMS.getDBMS();
             ArrayList<String> origins = dbms.getOrigins();
@@ -330,7 +329,7 @@ public class LoginFrame extends JFrame {
             }
         });
 
-        ticketFrame.add(new JLabel()); // 用于填充空格
+        ticketFrame.add(new JLabel()); 
         ticketFrame.add(confirmButton);
 
         // 显示窗口
@@ -378,9 +377,7 @@ public class LoginFrame extends JFrame {
             confirmButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    // ... 确定价格等其他操作 ...
 
-                    // 根据选择的舱位类别显示座位选择界面
                     SeatSelectionFrame seatSelectionFrame = new SeatSelectionFrame(
                             economyClassButton.isSelected() ? economySeats : businessSeats,
                             economyClassButton.isSelected());
@@ -412,7 +409,7 @@ public class LoginFrame extends JFrame {
             setTitle("Flight Information");
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             setLayout(new BorderLayout());
-            setSize(600, 400); // 设置窗口大小，根据需要调整
+            setSize(600, 400);
 
             // 创建表格模型以展示航班信息
             String[] columnNames = { "Flight ID", "Origin", "Destination", "Departure Time", "Arrival Time" };
@@ -434,7 +431,7 @@ public class LoginFrame extends JFrame {
             JScrollPane scrollPane = new JScrollPane(table);
             add(scrollPane, BorderLayout.CENTER);
 
-            // 创建选择航班的按钮
+  
             JButton selectFlightButton = new JButton("Select Flight");
             selectFlightButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
             selectFlightButton.setBackground(new Color(100, 149, 237)); // Cornflower Blue
@@ -442,14 +439,14 @@ public class LoginFrame extends JFrame {
             selectFlightButton.setFocusPainted(false);
             selectFlightButton.setBorderPainted(false);
 
-            // 添加按钮到一个新的面板上
+
             JPanel selectFlightPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
             selectFlightPanel.add(selectFlightButton);
 
-            // 添加面板到框架的南部
+
             add(selectFlightPanel, BorderLayout.SOUTH);
 
-            // 为按钮添加事件监听器
+
             selectFlightButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -487,7 +484,7 @@ public class LoginFrame extends JFrame {
                 }
             });
 
-            // 显示窗口
+
             setVisible(true);
         }
     }
