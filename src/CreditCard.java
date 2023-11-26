@@ -1,12 +1,12 @@
 package src;
 
 public class CreditCard {
-    final int CARDNUMBER;
+    final long CARDNUMBER;
     final String CARDHOLDERNAME;
     final int EXPIRY;
     final int CVV;
 
-    public CreditCard(int cardNumber, String cardHolderName, int expiry, int cvv) {
+    public CreditCard(long cardNumber, String cardHolderName, int expiry, int cvv) {
         this.CARDNUMBER = cardNumber;
         this.CARDHOLDERNAME = cardHolderName;
         this.EXPIRY = expiry;
@@ -14,7 +14,7 @@ public class CreditCard {
     }
 
     /* Getters and Setters */
-    public int getCardNumber() {
+    public long getCardNumber() {
         return CARDNUMBER;
     }
     public String getCardHolderName() {

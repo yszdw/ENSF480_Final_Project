@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS Users (
         'admin',
         'crew'
     ) NOT NULL,
-    CreditCardNumber INT,
+    CreditCardNumber BIGINT,
     -- in format MMYY
     CreditCardExpiry INT,
     CreditCardCVV INT

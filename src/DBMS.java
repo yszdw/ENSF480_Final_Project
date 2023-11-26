@@ -195,7 +195,7 @@ public class DBMS {
             // get credit card from user object if passenger
             if (user instanceof RegisteredUser) {
                 CreditCard card = ((RegisteredUser) user).getCreditCard();
-                preparedStatement.setInt(5, card.getCardNumber());
+                preparedStatement.setLong(5, card.getCardNumber());
                 preparedStatement.setInt(6, card.getExpiryDate());
                 preparedStatement.setInt(7, card.getCVV());
             }
