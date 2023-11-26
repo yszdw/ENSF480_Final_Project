@@ -136,11 +136,33 @@ public class DBMS {
             String address = results.getString("Address");
             String email = results.getString("Email");
             String userType = results.getString("UserType");
-            boolean isMember = results.getBoolean("MembershipStatus");
-            String creditCard = results.getString("CreditCardInfo");
-            User user = new User(userID, username, email, address, creditCard, userType);
-            user.setIsMember(isMember);
-            users.add(user);
+            int creditCardNumber = results.getInt("CreditCardNumber");
+            int creditCardExpiry = results.getInt("CreditCardExpiry");
+            int creditCardCVV = results.getInt("CreditCardCVV");
+            switch (userType) {
+                case "admin":
+                    Admin admin = new Admin(userID, username, email, address);
+                    users.add(admin);
+                    break;
+                case "crew":
+                    String crewMemberPos = results.getString("CrewMemberPos");
+                    CrewMember crewMember = new CrewMember(userID, username, email, address, crewMemberPos);
+                    users.add(crewMember);
+                    break;
+                case "passenger":
+                    CreditCard card = new CreditCard(creditCardNumber, username,creditCardExpiry, creditCardCVV);
+                    RegisteredUser passenger = new RegisteredUser(userID, username, email, address, card);
+                    users.add(passenger);
+                    break;
+                case "agent":
+                    Agent agent = new Agent(userID, username, email, address);
+                    users.add(agent);
+                    break;
+
+                default:
+                    System.out.println("Invalid user type");
+                    break;
+            }
         }
         results.close();
         return users;
@@ -151,7 +173,8 @@ public class DBMS {
      */
     public void addUser(User user) throws SQLException {
         // SQL query for insertion using a prepared statement
-        String insertQuery = "INSERT INTO Users (Name, Address, Email, UserType, MembershipStatus, CreditCardInfo) VALUES (?, ?, ?, ?, ?, ?)";
+        String insertQuery = "INSERT INTO Users (Name, Address, Email, UserType, CreditCardNumber, CreditCardExpiry," +
+                "CreditCardCVV) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         // Create a prepared statement
         try (PreparedStatement preparedStatement = dbConnect.prepareStatement(insertQuery)) {
@@ -159,9 +182,23 @@ public class DBMS {
             preparedStatement.setString(1, user.getUsername());
             preparedStatement.setString(2, user.getAddress());
             preparedStatement.setString(3, user.getEmail());
-            preparedStatement.setString(4, user.getUserType());
-            preparedStatement.setBoolean(5, user.getIsMember());
-            preparedStatement.setString(6, user.getCreditCard());
+            // get user type from user object
+            if (user instanceof Admin) {
+                preparedStatement.setString(4, "admin");
+            } else if (user instanceof CrewMember) {
+                preparedStatement.setString(4, "crew");
+            } else if (user instanceof RegisteredUser) {
+                preparedStatement.setString(4, "passenger");
+            } else {
+                System.out.println("Invalid user type");
+            }
+            // get credit card from user object if passenger
+            if (user instanceof RegisteredUser) {
+                CreditCard card = ((RegisteredUser) user).getCreditCard();
+                preparedStatement.setLong(5, card.getCardNumber());
+                preparedStatement.setInt(6, card.getExpiryDate());
+                preparedStatement.setInt(7, card.getCVV());
+            }
 
             // Execute the insertion
             int rowsAffected = preparedStatement.executeUpdate();
