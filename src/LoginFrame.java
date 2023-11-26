@@ -152,47 +152,41 @@ public class LoginFrame extends JFrame {
         public WelcomeFrame() {
             setTitle("Welcome");
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            setLayout(new BorderLayout()); 
-            setExtendedState(JFrame.MAXIMIZED_BOTH); 
+            setLayout(new BorderLayout());
+            setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-            // 欢迎信息
             JLabel welcomeLabel = new JLabel("Welcome to our Flight Reservation System", SwingConstants.CENTER);
             welcomeLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
             add(welcomeLabel, BorderLayout.NORTH);
 
-
             JPanel buttonPanel = new JPanel(new GridBagLayout());
-            buttonPanel.setBackground(BACKGROUND_COLOR); 
+            buttonPanel.setBackground(BACKGROUND_COLOR);
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.gridwidth = GridBagConstraints.REMAINDER;
             gbc.fill = GridBagConstraints.NONE;
 
-            // "Buy Tickets" 按钮
             JButton buyTicketsButton = createStyledButton("Buy Tickets");
-            gbc.insets = new Insets(10, 0, 10, 0); // 顶部和底部的间距
+            gbc.insets = new Insets(10, 0, 10, 0);
             buttonPanel.add(buyTicketsButton, gbc);
 
             buyTicketsButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    createTicketPurchasePanel(); 
+                    createTicketPurchasePanel();
                 }
             });
 
-            // "Cancel Flight" 按钮
             JButton cancelFlightButton = createStyledButton("Cancel Flight");
-            gbc.insets = new Insets(0, 0, 10, 0); 
+            gbc.insets = new Insets(0, 0, 10, 0);
             buttonPanel.add(cancelFlightButton, gbc);
 
             add(buttonPanel, BorderLayout.CENTER);
-
 
             pack();
             setVisible(true);
             setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
 
-        // 创建风格化的按钮
         private JButton createStyledButton(String text) {
             JButton button = new JButton(text);
             button.setFont(MAIN_FONT);
@@ -268,18 +262,16 @@ public class LoginFrame extends JFrame {
     }
 
     private void createTicketPurchasePanel() {
-        // 创建新的窗口
+
         JFrame ticketFrame = new JFrame("Purchase Tickets");
         ticketFrame.setSize(400, 300);
         ticketFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        ticketFrame.setLayout(new GridLayout(5, 2, 10, 10)); 
+        ticketFrame.setLayout(new GridLayout(5, 2, 10, 10));
 
-        // 创建标签和下拉框
         JLabel fromLabel = new JLabel("Select Departure:");
         JComboBox<String> fromComboBox = new JComboBox<>();
         JLabel toLabel = new JLabel("Select Destination:");
         JComboBox<String> toComboBox = new JComboBox<>();
-
 
         try {
             DBMS dbms = DBMS.getDBMS();
@@ -298,27 +290,23 @@ public class LoginFrame extends JFrame {
                     "Database Error", JOptionPane.ERROR_MESSAGE);
         }
 
-        // 添加组件到窗口
         ticketFrame.add(fromLabel);
         ticketFrame.add(fromComboBox);
         ticketFrame.add(toLabel);
         ticketFrame.add(toComboBox);
 
-        // 确认按钮
         JButton confirmButton = new JButton("Confirm");
         confirmButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    // 获取用户选择的始发地和目的地
+
                     String origin = (String) fromComboBox.getSelectedItem();
                     String destination = (String) toComboBox.getSelectedItem();
 
-                    // 从数据库获取航班信息
                     DBMS dbms = DBMS.getDBMS(); // This will not create a new instance but will return the existing one.
                     ArrayList<Flight> flights = dbms.getFlights(origin, destination);
 
-                    // 创建并显示航班信息界面
                     FlightInfoFrame flightInfoFrame = new FlightInfoFrame(flights);
                     flightInfoFrame.setVisible(true);
                 } catch (SQLException ex) {
@@ -329,10 +317,9 @@ public class LoginFrame extends JFrame {
             }
         });
 
-        ticketFrame.add(new JLabel()); 
+        ticketFrame.add(new JLabel());
         ticketFrame.add(confirmButton);
 
-        // 显示窗口
         ticketFrame.setVisible(true);
     }
 
@@ -348,6 +335,16 @@ public class LoginFrame extends JFrame {
         private double economyPrice;
         private double businessPrice;
         private double insurancePrice;
+
+        private double totalPrice; // Class variable to store the total price
+
+        private void updatePrice() {
+            totalPrice = economyClassButton.isSelected() ? economyPrice : businessPrice;
+            if (insuranceCheckbox.isSelected()) {
+                totalPrice += insurancePrice;
+            }
+            totalPriceLabel.setText("Total Price: $" + String.format("%.2f", totalPrice));
+        }
 
         public BookingFrame(Aircraft aircraft, double economyPrice, double businessPrice, double insurancePrice) {
             // Use the Aircraft object to set the number of seats
@@ -377,10 +374,10 @@ public class LoginFrame extends JFrame {
             confirmButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-
                     SeatSelectionFrame seatSelectionFrame = new SeatSelectionFrame(
                             economyClassButton.isSelected() ? economySeats : businessSeats,
-                            economyClassButton.isSelected());
+                            economyClassButton.isSelected(),
+                            totalPrice); // Pass the totalPrice as a new argument
                     seatSelectionFrame.setVisible(true);
                 }
             });
@@ -390,6 +387,21 @@ public class LoginFrame extends JFrame {
             add(insuranceCheckbox);
             add(totalPriceLabel);
             add(confirmButton);
+
+            ActionListener priceChangeListener = new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    updatePrice();
+                }
+            };
+
+            // Add the ActionListener to the radio buttons and checkbox
+            economyClassButton.addActionListener(priceChangeListener);
+            businessClassButton.addActionListener(priceChangeListener);
+            insuranceCheckbox.addActionListener(priceChangeListener);
+
+            // Initialize the price based on default selected values
+            updatePrice();
         }
     }
 
@@ -411,11 +423,9 @@ public class LoginFrame extends JFrame {
             setLayout(new BorderLayout());
             setSize(600, 400);
 
-            // 创建表格模型以展示航班信息
             String[] columnNames = { "Flight ID", "Origin", "Destination", "Departure Time", "Arrival Time" };
             DefaultTableModel model = new DefaultTableModel(columnNames, 0);
 
-            // 为表格添加数据
             for (Flight flight : flights) {
                 Object[] row = new Object[5];
                 row[0] = flight.getFlightID();
@@ -426,12 +436,10 @@ public class LoginFrame extends JFrame {
                 model.addRow(row);
             }
 
-            // 创建表格并将其添加到滚动面板
             JTable table = new JTable(model);
             JScrollPane scrollPane = new JScrollPane(table);
             add(scrollPane, BorderLayout.CENTER);
 
-  
             JButton selectFlightButton = new JButton("Select Flight");
             selectFlightButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
             selectFlightButton.setBackground(new Color(100, 149, 237)); // Cornflower Blue
@@ -439,13 +447,10 @@ public class LoginFrame extends JFrame {
             selectFlightButton.setFocusPainted(false);
             selectFlightButton.setBorderPainted(false);
 
-
             JPanel selectFlightPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
             selectFlightPanel.add(selectFlightButton);
 
-
             add(selectFlightPanel, BorderLayout.SOUTH);
-
 
             selectFlightButton.addActionListener(new ActionListener() {
                 @Override
@@ -484,44 +489,136 @@ public class LoginFrame extends JFrame {
                 }
             });
 
-
+            // 显示窗口
             setVisible(true);
         }
     }
 
     public class SeatSelectionFrame extends JFrame {
-        private static final int ECONOMY_SEATS = 70; // Assuming 50 economy seats
-        private static final int BUSINESS_SEATS = 30; // Assuming 20 business seats
+        private static final int ECONOMY_SEATS = 70;
+        private static final int BUSINESS_SEATS = 30;
+        private double totalPrice;
+        private JButton confirmButton;
+        private JButton selectedSeatButton;
 
-        // Updated constructor to accept a total seat count
-        // Updated constructor to accept a total seat count and class type
-        public SeatSelectionFrame(int totalSeats, boolean isEconomy) {
+        public SeatSelectionFrame(int totalSeats, boolean isEconomy, double totalPrice) {
+            this.totalPrice = totalPrice;
             setTitle("Select Seats");
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             setLayout(new BorderLayout());
 
-            JPanel seatPanel = new JPanel(new GridLayout(0, isEconomy ? 6 : 4, 2, 2)); // Adjust columns based on class
+            int numRows = (int) Math.ceil((totalSeats - 5) / 5.0) + 1;
+            JPanel seatPanel = new JPanel(new GridLayout(numRows, 5, 10, 10));
             seatPanel.setBorder(BorderFactory.createTitledBorder(isEconomy ? "Economy Class" : "Business Class"));
 
-            // Create seats
-            for (int i = 1; i <= totalSeats; i++) {
-                String seatLabel = (isEconomy ? "E" : "B") + i;
-                JButton seatButton = createSeatButton(seatLabel);
-                seatPanel.add(seatButton);
+            for (int row = 0; row < numRows; row++) {
+                for (int col = 0; col < 5; col++) {
+
+                    if (row > 0 && (col == 0 || col == 4)) {
+                        seatPanel.add(Box.createRigidArea(new Dimension(50, 50)));
+                    } else {
+                        String seatLabel = ((row == 0) ? "P" : (isEconomy ? "E" : "B")) + ((row * 5) + col);
+                        JButton seatButton = createSeatButton(seatLabel);
+                        seatPanel.add(seatButton);
+                    }
+                }
             }
+
+            confirmButton = new JButton("Confirm Selection");
+            confirmButton.setEnabled(false);
+            confirmButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+
+                    PaymentFrame paymentFrame = new PaymentFrame(totalPrice);
+                    paymentFrame.setVisible(true);
+                }
+            });
+
+            add(confirmButton, BorderLayout.SOUTH);
 
             JScrollPane scrollPane = new JScrollPane(seatPanel);
             add(scrollPane, BorderLayout.CENTER);
 
-            pack(); // Adjust window to fit content
+            pack();
             setVisible(true);
         }
 
         private JButton createSeatButton(String seatText) {
             JButton button = new JButton(seatText);
-            button.setPreferredSize(new Dimension(40, 40)); // Smaller buttons for compact layout
-            // Optionally set button styles and add action listeners here
+            button.setPreferredSize(new Dimension(50, 50));
+            button.setBackground(Color.LIGHT_GRAY);
+            button.setBorder(BorderFactory.createRaisedBevelBorder());
+
+            button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (selectedSeatButton != null) {
+                        selectedSeatButton.setBackground(Color.LIGHT_GRAY);
+                    }
+
+                    selectedSeatButton = (JButton) e.getSource();
+                    selectedSeatButton.setBackground(Color.RED);
+                    confirmButton.setEnabled(true);
+                }
+            });
+
             return button;
+        }
+    }
+
+    class PaymentFrame extends JFrame {
+        private double totalPrice;
+
+        public PaymentFrame(double totalPrice) {
+            this.totalPrice = totalPrice;
+
+            setTitle("Make Payment");
+            setLayout(new BorderLayout());
+            setSize(350, 200);
+            setLocationRelativeTo(null);
+            setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+            // Panel for the total price
+            JPanel pricePanel = new JPanel();
+            pricePanel.add(new JLabel("Total Price: "));
+            JTextField priceField = new JTextField(10);
+            priceField.setText(String.format("$%.2f", totalPrice));
+            priceField.setEditable(false);
+            pricePanel.add(priceField);
+
+            // Panel for card information
+            JPanel cardPanel = new JPanel(new GridLayout(3, 2, 5, 5));
+            cardPanel.add(new JLabel("Card Number:"));
+            JTextField cardNumberField = new JTextField();
+            cardPanel.add(cardNumberField);
+            cardPanel.add(new JLabel("Expiry Date (MM/YY):"));
+            JTextField expiryField = new JTextField();
+            cardPanel.add(expiryField);
+            cardPanel.add(new JLabel("CVV:"));
+            JTextField cvvField = new JTextField();
+            cardPanel.add(cvvField);
+
+            // Confirm button to submit payment
+            JButton confirmButton = new JButton("Confirm Payment");
+            confirmButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    // Implement the payment processing logic here
+                    // For example, validate the card information, process the payment, etc.
+                    JOptionPane.showMessageDialog(PaymentFrame.this, "Payment submitted!", "Payment",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    // TODO: Add actual payment processing code here
+                }
+            });
+
+            // Adding components to the frame
+            add(pricePanel, BorderLayout.NORTH);
+            add(cardPanel, BorderLayout.CENTER);
+            add(confirmButton, BorderLayout.SOUTH);
+
+            pack();
+            setVisible(true);
         }
     }
 
