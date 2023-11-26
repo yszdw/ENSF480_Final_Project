@@ -1,5 +1,3 @@
-package src;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -7,8 +5,8 @@ import java.util.Date;
 
 public class Admin extends User {
 
-    public Admin(int userID,String username, String email, String address, String creditCard) {
-        super(userID,username, email, address, creditCard, "admin");
+    public Admin(int userID, String username, String email, String address, String creditCard) {
+        super(userID, username, email, address, creditCard, "admin");
     }
 
     /* Methods */
@@ -31,10 +29,10 @@ public class Admin extends User {
 
     // This method is used to add a flight to the database
     public void addFlight(Aircraft aircraft, int flightID, LocalTime departureTime, LocalTime arrivalTime,
-                          String departureLocation, String arrivalLocation, LocalDate departureDate, LocalDate arrivalDate) {
+            String departureLocation, String arrivalLocation, LocalDate departureDate, LocalDate arrivalDate) {
 
         Flight flight = new Flight(aircraft, flightID, departureLocation, arrivalLocation, departureDate, departureTime,
-                                   arrivalDate, arrivalTime);
+                arrivalDate, arrivalTime);
         // TODO: Add flight to database
     }
 
@@ -45,12 +43,13 @@ public class Admin extends User {
 
     // This method is used to add a crew member to the database
     public void addCrewMember(String username, String email, String address, String creditCard, String crewMemberID,
-                              String crewMemberPos) {
+            String crewMemberPos) {
         CrewMember crewMember = new CrewMember(username, email, address, creditCard, crewMemberID, crewMemberPos);
         // TODO: Add crew member to database. Call overloaded method
     }
 
-    // This method is used to return a list of all crew members from a specific flight
+    // This method is used to return a list of all crew members from a specific
+    // flight
     public ArrayList<CrewMember> getCrewMembers(String flightID) {
         // TODO: Get crew members from database
         return null;
@@ -73,7 +72,7 @@ public class Admin extends User {
 
     // This method is used to add an aircraft to the database
     public void addAircraft(int aircraftID, String aircraftModel, int numEconomySeats, int numComfortSeats,
-                            int numBusinessSeats ) {
+            int numBusinessSeats) {
         Aircraft aircraft = new Aircraft(aircraftID, aircraftModel, numEconomySeats, numComfortSeats, numBusinessSeats);
         // TODO: Add aircraft to database
     }
@@ -121,7 +120,8 @@ public class Admin extends User {
         }
     }
 
-    // This method returns a list of all users from the database if the userType is "passenger" in the database
+    // This method returns a list of all users from the database if the userType is
+    // "passenger" in the database
     public ArrayList<User> getPassengers() {
         // TODO: Get passengers from database
         return null;
