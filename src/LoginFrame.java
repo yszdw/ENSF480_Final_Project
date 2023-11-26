@@ -1,6 +1,6 @@
-package src;
-
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,6 +9,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class LoginFrame extends JFrame {
 
@@ -151,15 +152,56 @@ public class LoginFrame extends JFrame {
         public WelcomeFrame() {
             setTitle("Welcome");
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            setLayout(new BorderLayout());
-            setExtendedState(JFrame.MAXIMIZED_BOTH); // Maximize the window
+            setLayout(new BorderLayout()); // 使用 BorderLayout 作为主布局
+            setExtendedState(JFrame.MAXIMIZED_BOTH); // 窗口最大化
 
-            // Welcome message
+            // 欢迎信息
             JLabel welcomeLabel = new JLabel("Welcome to our Flight Reservation System", SwingConstants.CENTER);
             welcomeLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
+            add(welcomeLabel, BorderLayout.NORTH);
 
-            // Add the label to the frame
-            add(welcomeLabel, BorderLayout.CENTER);
+            // 按钮面板，使用 GridBagLayout 来居中按钮
+            JPanel buttonPanel = new JPanel(new GridBagLayout());
+            buttonPanel.setBackground(BACKGROUND_COLOR); // 使用与登录界面相同的背景色
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.gridwidth = GridBagConstraints.REMAINDER;
+            gbc.fill = GridBagConstraints.NONE;
+
+            // "Buy Tickets" 按钮
+            JButton buyTicketsButton = createStyledButton("Buy Tickets");
+            gbc.insets = new Insets(10, 0, 10, 0); // 顶部和底部的间距
+            buttonPanel.add(buyTicketsButton, gbc);
+
+            buyTicketsButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    createTicketPurchasePanel(); // 调用方法以创建购票界面
+                }
+            });
+
+            // "Cancel Flight" 按钮
+            JButton cancelFlightButton = createStyledButton("Cancel Flight");
+            gbc.insets = new Insets(0, 0, 10, 0); // 仅底部的间距
+            buttonPanel.add(cancelFlightButton, gbc);
+
+            // 将按钮面板添加到框架的中心位置
+            add(buttonPanel, BorderLayout.CENTER);
+
+            // 调整窗口大小以适应组件
+            pack();
+            setVisible(true);
+            setExtendedState(JFrame.MAXIMIZED_BOTH);
+        }
+
+        // 创建风格化的按钮
+        private JButton createStyledButton(String text) {
+            JButton button = new JButton(text);
+            button.setFont(MAIN_FONT);
+            button.setBackground(BUTTON_COLOR);
+            button.setForeground(BUTTON_TEXT_COLOR);
+            button.setFocusPainted(false);
+            button.setBorderPainted(false);
+            return button;
         }
     }
 
@@ -226,6 +268,134 @@ public class LoginFrame extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
 
+    private void createTicketPurchasePanel() {
+        // 创建新的窗口
+        JFrame ticketFrame = new JFrame("Purchase Tickets");
+        ticketFrame.setSize(400, 300);
+        ticketFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        ticketFrame.setLayout(new GridLayout(5, 2, 10, 10)); // 使用 GridLayout 布局
+
+        // 创建标签和下拉框
+        JLabel fromLabel = new JLabel("Select Departure:");
+        JComboBox<String> fromComboBox = new JComboBox<>();
+        JLabel toLabel = new JLabel("Select Destination:");
+        JComboBox<String> toComboBox = new JComboBox<>();
+
+        // 从数据库获取始发地和目的地列表并添加到下拉框
+        try {
+            DBMS dbms = DBMS.getDBMS();
+            ArrayList<String> origins = dbms.getOrigins();
+            for (String origin : origins) {
+                fromComboBox.addItem(origin);
+            }
+
+            ArrayList<String> destinations = dbms.getDestinations();
+            for (String destination : destinations) {
+                toComboBox.addItem(destination);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(ticketFrame, "Error fetching locations: " + ex.getMessage(),
+                    "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        // 添加组件到窗口
+        ticketFrame.add(fromLabel);
+        ticketFrame.add(fromComboBox);
+        ticketFrame.add(toLabel);
+        ticketFrame.add(toComboBox);
+
+        // 确认按钮
+        JButton confirmButton = new JButton("Confirm");
+        confirmButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    // 获取用户选择的始发地和目的地
+                    String origin = (String) fromComboBox.getSelectedItem();
+                    String destination = (String) toComboBox.getSelectedItem();
+
+                    // 从数据库获取航班信息
+                    DBMS dbms = DBMS.getDBMS(); // This will not create a new instance but will return the existing one.
+                    ArrayList<Flight> flights = dbms.getFlights(origin, destination);
+
+                    // 创建并显示航班信息界面
+                    FlightInfoFrame flightInfoFrame = new FlightInfoFrame(flights);
+                    flightInfoFrame.setVisible(true);
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(ticketFrame, "Error fetching flight data: " + ex.getMessage(),
+                            "Database Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        ticketFrame.add(new JLabel()); // 用于填充空格
+        ticketFrame.add(confirmButton);
+
+        // 显示窗口
+        ticketFrame.setVisible(true);
+    }
+
+    public class BookingFrame extends JFrame {
+        private JRadioButton economyClassButton;
+        private JRadioButton businessClassButton;
+        private JCheckBox insuranceCheckbox;
+        private JLabel totalPriceLabel;
+
+        private int economySeats; // Number of economy seats
+        private int businessSeats; // Number of business seats
+
+        private double economyPrice;
+        private double businessPrice;
+        private double insurancePrice;
+
+        public BookingFrame(Aircraft aircraft, double economyPrice, double businessPrice, double insurancePrice) {
+            // Use the Aircraft object to set the number of seats
+            this.economySeats = aircraft.getNumEconomySeats();
+            this.businessSeats = aircraft.getNumBusinessSeats();
+            this.economyPrice = economyPrice;
+            this.businessPrice = businessPrice;
+            this.insurancePrice = insurancePrice;
+
+            setTitle("Booking Options");
+            setSize(300, 200); // Set size
+            setLayout(new FlowLayout()); // Set layout
+
+            economyClassButton = new JRadioButton("Economy Class", true);
+            businessClassButton = new JRadioButton("Business Class");
+
+            // Group the radio buttons.
+            ButtonGroup group = new ButtonGroup();
+            group.add(economyClassButton);
+            group.add(businessClassButton);
+
+            insuranceCheckbox = new JCheckBox("Cancellation Insurance");
+
+            totalPriceLabel = new JLabel("Total Price: $" + economyPrice);
+
+            JButton confirmButton = new JButton("Confirm");
+            confirmButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    // ... 确定价格等其他操作 ...
+
+                    // 根据选择的舱位类别显示座位选择界面
+                    SeatSelectionFrame seatSelectionFrame = new SeatSelectionFrame(
+                            economyClassButton.isSelected() ? economySeats : businessSeats,
+                            economyClassButton.isSelected());
+                    seatSelectionFrame.setVisible(true);
+                }
+            });
+
+            add(economyClassButton);
+            add(businessClassButton);
+            add(insuranceCheckbox);
+            add(totalPriceLabel);
+            add(confirmButton);
+        }
+    }
+
     private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
         button.setFont(BUTTON_FONT);
@@ -234,6 +404,128 @@ public class LoginFrame extends JFrame {
         button.setFocusPainted(false);
         button.setBorderPainted(false);
         return button;
+    }
+
+    // DBMS dbms = DBMS.getDBMS(); // Singleton instance
+    public class FlightInfoFrame extends JFrame {
+        public FlightInfoFrame(ArrayList<Flight> flights) {
+            setTitle("Flight Information");
+            setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            setLayout(new BorderLayout());
+            setSize(600, 400); // 设置窗口大小，根据需要调整
+
+            // 创建表格模型以展示航班信息
+            String[] columnNames = { "Flight ID", "Origin", "Destination", "Departure Time", "Arrival Time" };
+            DefaultTableModel model = new DefaultTableModel(columnNames, 0);
+
+            // 为表格添加数据
+            for (Flight flight : flights) {
+                Object[] row = new Object[5];
+                row[0] = flight.getFlightID();
+                row[1] = flight.getDepartureLocation();
+                row[2] = flight.getArrivalLocation();
+                row[3] = flight.getDepartureDate().toString() + " " + flight.getDepartureTime().toString();
+                row[4] = flight.getArrivalDate().toString() + " " + flight.getArrivalTime().toString();
+                model.addRow(row);
+            }
+
+            // 创建表格并将其添加到滚动面板
+            JTable table = new JTable(model);
+            JScrollPane scrollPane = new JScrollPane(table);
+            add(scrollPane, BorderLayout.CENTER);
+
+            // 创建选择航班的按钮
+            JButton selectFlightButton = new JButton("Select Flight");
+            selectFlightButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+            selectFlightButton.setBackground(new Color(100, 149, 237)); // Cornflower Blue
+            selectFlightButton.setForeground(Color.WHITE);
+            selectFlightButton.setFocusPainted(false);
+            selectFlightButton.setBorderPainted(false);
+
+            // 添加按钮到一个新的面板上
+            JPanel selectFlightPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            selectFlightPanel.add(selectFlightButton);
+
+            // 添加面板到框架的南部
+            add(selectFlightPanel, BorderLayout.SOUTH);
+
+            // 为按钮添加事件监听器
+            selectFlightButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    int selectedRow = table.getSelectedRow();
+                    if (selectedRow >= 0) {
+                        try {
+                            int flightID = (Integer) table.getValueAt(selectedRow, 0);
+                            Flight selectedFlight = Flight.getFlightByID(flights, flightID);
+                            Aircraft aircraft = selectedFlight.getAircraft(); // Get the Aircraft object
+
+                            DBMS dbms = DBMS.getDBMS(); // Singleton instance
+                            double economyPrice = dbms.getEconomyPrice(aircraft.getAircraftID());
+                            double businessPrice = dbms.getBusinessPrice(aircraft.getAircraftID());
+                            double insurancePrice = 50; // This can be a fixed value or also retrieved from the database
+
+                            FlightInfoFrame.this.dispose(); // Close the current frame
+
+                            BookingFrame bookingFrame = new BookingFrame(aircraft, economyPrice, businessPrice,
+                                    insurancePrice);
+                            bookingFrame.setVisible(true); // Display the booking frame
+
+                        } catch (SQLException ex) {
+                            ex.printStackTrace();
+                            JOptionPane.showMessageDialog(FlightInfoFrame.this,
+                                    "Error accessing database: " + ex.getMessage(),
+                                    "Database Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(FlightInfoFrame.this,
+                                "Please select a flight to continue.",
+                                "No Flight Selected",
+                                JOptionPane.WARNING_MESSAGE);
+                    }
+                }
+            });
+
+            // 显示窗口
+            setVisible(true);
+        }
+    }
+
+    public class SeatSelectionFrame extends JFrame {
+        private static final int ECONOMY_SEATS = 70; // Assuming 50 economy seats
+        private static final int BUSINESS_SEATS = 30; // Assuming 20 business seats
+
+        // Updated constructor to accept a total seat count
+        // Updated constructor to accept a total seat count and class type
+        public SeatSelectionFrame(int totalSeats, boolean isEconomy) {
+            setTitle("Select Seats");
+            setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            setLayout(new BorderLayout());
+
+            JPanel seatPanel = new JPanel(new GridLayout(0, isEconomy ? 6 : 4, 2, 2)); // Adjust columns based on class
+            seatPanel.setBorder(BorderFactory.createTitledBorder(isEconomy ? "Economy Class" : "Business Class"));
+
+            // Create seats
+            for (int i = 1; i <= totalSeats; i++) {
+                String seatLabel = (isEconomy ? "E" : "B") + i;
+                JButton seatButton = createSeatButton(seatLabel);
+                seatPanel.add(seatButton);
+            }
+
+            JScrollPane scrollPane = new JScrollPane(seatPanel);
+            add(scrollPane, BorderLayout.CENTER);
+
+            pack(); // Adjust window to fit content
+            setVisible(true);
+        }
+
+        private JButton createSeatButton(String seatText) {
+            JButton button = new JButton(seatText);
+            button.setPreferredSize(new Dimension(40, 40)); // Smaller buttons for compact layout
+            // Optionally set button styles and add action listeners here
+            return button;
+        }
     }
 
     public static void main(String[] args) {
