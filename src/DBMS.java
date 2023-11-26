@@ -1,4 +1,3 @@
-package src;
 
 import java.sql.*;
 import java.util.*;
@@ -30,7 +29,7 @@ public class DBMS {
      */
     private DBMS() throws SQLException {
         // the connection info here will need to be changed depending on the user
-        dbConnect = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/ENSF480", "root", "AbXy219!");
+        dbConnect = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/ENSF480", "root", "ensf480");
     }
 
     /**
@@ -84,11 +83,15 @@ public class DBMS {
     /*
      * getFlight list from database
      */
-    public ArrayList<Flight> getFlights() throws SQLException {
+    public ArrayList<Flight> getFlights(String origin, String destination) throws SQLException {
         ArrayList<Flight> flights = new ArrayList<Flight>();
         ArrayList<Aircraft> aircrafts = getAircrafts();
         Statement myStmt = dbConnect.createStatement();
-        results = myStmt.executeQuery("SELECT * FROM Flights");
+        String query = "SELECT * FROM Flights WHERE Origin = ? AND Destination = ?";
+        PreparedStatement pstmt = dbConnect.prepareStatement(query);
+        pstmt.setString(1, origin);
+        pstmt.setString(2, destination);
+        ResultSet results = pstmt.executeQuery();
         while (results.next()) {
             LocalDateTime departureDateTime = results.getTimestamp("DepartureDateTime").toLocalDateTime();
             LocalDateTime arrivalDateTime = results.getTimestamp("ArrivalDateTime").toLocalDateTime();
@@ -97,17 +100,40 @@ public class DBMS {
             for (Aircraft a : aircrafts) {
                 if (a.getAircraftID() == aircraftID) {
                     aircraft = a;
+                    break; // 找到匹配的飞机后即可退出循环
                 }
             }
-
             Flight flight = new Flight(aircraft, results.getInt("FlightID"), results.getString("Origin"),
                     results.getString("Destination"), departureDateTime.toLocalDate(),
-
                     departureDateTime.toLocalTime(), arrivalDateTime.toLocalDate(), arrivalDateTime.toLocalTime());
             flights.add(flight);
         }
         results.close();
         return flights;
+    }
+
+    public ArrayList<String> getOrigins() throws SQLException {
+        ArrayList<String> origins = new ArrayList<>();
+        Statement statement = dbConnect.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT DISTINCT Origin FROM Flights");
+        while (resultSet.next()) {
+            origins.add(resultSet.getString("Origin"));
+        }
+        resultSet.close();
+        statement.close();
+        return origins;
+    }
+
+    public ArrayList<String> getDestinations() throws SQLException {
+        ArrayList<String> destinations = new ArrayList<>();
+        Statement statement = dbConnect.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT DISTINCT Destination FROM Flights");
+        while (resultSet.next()) {
+            destinations.add(resultSet.getString("Destination"));
+        }
+        resultSet.close();
+        statement.close();
+        return destinations;
     }
 
     /*
@@ -176,6 +202,30 @@ public class DBMS {
         }
     }
 
+    public double getEconomyPrice(int aircraftID) throws SQLException {
+        String query = "SELECT EconomyPrice FROM Aircrafts WHERE AircraftID = ?";
+        try (PreparedStatement stmt = dbConnect.prepareStatement(query)) {
+            stmt.setInt(1, aircraftID);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getDouble("EconomyPrice");
+            }
+        }
+        return -1; // Or throw an exception
+    }
+
+    public double getBusinessPrice(int aircraftID) throws SQLException {
+        String query = "SELECT BusinessPrice FROM Aircrafts WHERE AircraftID = ?";
+        try (PreparedStatement stmt = dbConnect.prepareStatement(query)) {
+            stmt.setInt(1, aircraftID);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getDouble("BusinessPrice");
+            }
+        }
+        return -1; // Or throw an exception
+    }
+
     /*
      * getSeating list
      */
@@ -197,116 +247,118 @@ public class DBMS {
      * getBooking list from database
      */
 
-    public ArrayList<Booking> getBookings() throws SQLException {
-        ArrayList<Booking> bookings = new ArrayList<Booking>();
-        ArrayList<User> users = getUsers();
-        ArrayList<Flight> flights = getFlights();
-        Statement myStmt = dbConnect.createStatement();
-        results = myStmt.executeQuery("SELECT * FROM Bookings");
-        while (results.next()) {
-            int bookingID = results.getInt("BookingID");
-            int userID = results.getInt("UserID");
-            User user = null;
-            for (User u : users) {
-                if (u.getUserID() == userID) {
-                    user = u;
-                }
-            }
-            int flightID = results.getInt("FlightID");
-            Flight flight = null;
-            for (Flight f : flights) {
-                if (f.getFlightID() == flightID) {
-                    flight = f;
-                }
-            }
+    // public ArrayList<Booking> getBookings() throws SQLException {
+    // ArrayList<Booking> bookings = new ArrayList<Booking>();
+    // ArrayList<User> users = getUsers();
+    // ArrayList<Flight> flights = getFlights();
+    // Statement myStmt = dbConnect.createStatement();
+    // results = myStmt.executeQuery("SELECT * FROM Bookings");
+    // while (results.next()) {
+    // int bookingID = results.getInt("BookingID");
+    // int userID = results.getInt("UserID");
+    // User user = null;
+    // for (User u : users) {
+    // if (u.getUserID() == userID) {
+    // user = u;
+    // }
+    // }
+    // int flightID = results.getInt("FlightID");
+    // Flight flight = null;
+    // for (Flight f : flights) {
+    // if (f.getFlightID() == flightID) {
+    // flight = f;
+    // }
+    // }
 
-            int seatID = results.getInt("SeatID");
+    // int seatID = results.getInt("SeatID");
 
-            boolean cancellationInsurance = results.getBoolean("CancellationInsurance");
-            LocalDateTime bookingDateTime = results.getTimestamp("BookingDateTime").toLocalDateTime();
+    // boolean cancellationInsurance = results.getBoolean("CancellationInsurance");
+    // LocalDateTime bookingDateTime =
+    // results.getTimestamp("BookingDateTime").toLocalDateTime();
 
-            // TODO: Need to replace dummieSeat with actual seat
-            Booking booking = new Booking(bookingID, flight, user, seatID, cancellationInsurance, bookingDateTime);
-            bookings.add(booking);
-        }
-        results.close();
-        return bookings;
-    }
+    // // TODO: Need to replace dummieSeat with actual seat
+    // Booking booking = new Booking(bookingID, flight, user, seatID,
+    // cancellationInsurance, bookingDateTime);
+    // bookings.add(booking);
+    // }
+    // results.close();
+    // return bookings;
+    // }
 
-    public static void main(String args[]) throws SQLException {
+    // public static void main(String args[]) throws SQLException {
 
-        DBMS connect = getDBMS();
+    // DBMS connect = getDBMS();
 
-        // This is a list of all flight information in the database
-        // - can use all flight getter methods for flight info
-        ArrayList<Flight> flightList = connect.getFlights();
-        // This is a list of all user information in the database
-        // - can use all user getter methods for user info
-        ArrayList<User> userList = connect.getUsers();
+    // // This is a list of all flight information in the database
+    // // - can use all flight getter methods for flight info
+    // ArrayList<Flight> flightList = connect.getFlights();
+    // // This is a list of all user information in the database
+    // // - can use all user getter methods for user info
+    // ArrayList<User> userList = connect.getUsers();
 
-        ArrayList<Booking> bookingList = connect.getBookings();
-        for (Booking booking : bookingList) {
-            System.out.println(booking.getBookingID());
-            int flightID = booking.getFlight().getFlightID();
-            for (Flight flight : flightList) {
-                if (flight.getFlightID() == flightID) {
-                    System.out.println(flight.getDepartureLocation());
-                    System.out.println(flight.getArrivalLocation());
-                    System.out.println(flight.getDepartureDate());
-                    System.out.println(flight.getArrivalDate());
-                    System.out.println(flight.getDepartureTime());
-                    System.out.println(flight.getArrivalTime());
-                }
-            }
-            System.out.println(booking.getUser().getUsername());
-            System.out.println(booking.getBookedSeats());
-            System.out.println(booking.getCancellationInsurance());
-            System.out.println(booking.getBookingDateTime());
-        }
+    // ArrayList<Booking> bookingList = connect.getBookings();
+    // for (Booking booking : bookingList) {
+    // System.out.println(booking.getBookingID());
+    // int flightID = booking.getFlight().getFlightID();
+    // for (Flight flight : flightList) {
+    // if (flight.getFlightID() == flightID) {
+    // System.out.println(flight.getDepartureLocation());
+    // System.out.println(flight.getArrivalLocation());
+    // System.out.println(flight.getDepartureDate());
+    // System.out.println(flight.getArrivalDate());
+    // System.out.println(flight.getDepartureTime());
+    // System.out.println(flight.getArrivalTime());
+    // }
+    // }
+    // System.out.println(booking.getUser().getUsername());
+    // System.out.println(booking.getBookedSeats());
+    // System.out.println(booking.getCancellationInsurance());
+    // System.out.println(booking.getBookingDateTime());
+    // }
 
-        // for (Flight flight : flightList) {
-        // System.out.println(flight.getAircraft().getAircraftModel());
-        // System.out.println(flight.getAircraft().getAircraftID());
-        // }
+    // // for (Flight flight : flightList) {
+    // // System.out.println(flight.getAircraft().getAircraftModel());
+    // // System.out.println(flight.getAircraft().getAircraftID());
+    // // }
 
-        /*
-         * TODO: with no login, customer can browse flights and book a flight
-         * can search for flights by date, origin, destination
-         * - use flight class getter methods to get info from flightList
-         */
+    // /*
+    // * TODO: with no login, customer can browse flights and book a flight
+    // * can search for flights by date, origin, destination
+    // * - use flight class getter methods to get info from flightList
+    // */
 
-        // selected a flight
-        Flight testFlight = flightList.get(0);
+    // // selected a flight
+    // Flight testFlight = flightList.get(0);
 
-        /*
-         * TODO: prompt user to login or create an account
-         * this is a test object
-         */
+    // /*
+    // * TODO: prompt user to login or create an account
+    // * this is a test object
+    // */
 
-        // User testObject = new User("test", "test st", "test@email", "test",
-        // "passenger");
+    // // User testObject = new User("test", "test st", "test@email", "test",
+    // // "passenger");
 
-        User testObject = userList.get(0);
+    // User testObject = userList.get(0);
 
-        // connect.addUser(testObject);
+    // // connect.addUser(testObject);
 
-        // Upon selecting a flight, display seat availability
+    // // Upon selecting a flight, display seat availability
 
-        // create a new booking
-        // testFlight.bookSeat(new Seat("1", "economy", 80), testObject);
-        // System.out.println("Available seats: ");
-        // for (Seat seat : testFlight.getSeats().values()) {
-        // if (seat.getIsAvailable()) {
-        // System.out.println(seat.getSeatNumber());
-        // }
-        // }
-        // connect.bookFlight(testFlight.getFlightID(), testObject);
+    // // create a new booking
+    // // testFlight.bookSeat(new Seat("1", "economy", 80), testObject);
+    // // System.out.println("Available seats: ");
+    // // for (Seat seat : testFlight.getSeats().values()) {
+    // // if (seat.getIsAvailable()) {
+    // // System.out.println(seat.getSeatNumber());
+    // // }
+    // // }
+    // // connect.bookFlight(testFlight.getFlightID(), testObject);
 
-        /*
-         * TODO: with login, customer can view booked flights and cancel a flight
-         * do they need to login? or they can view by bookingID?
-         */
+    // /*
+    // * TODO: with login, customer can view booked flights and cancel a flight
+    // * do they need to login? or they can view by bookingID?
+    // */
 
-        connect.closeConnection();
-    }
+    // connect.closeConnection();
+    // }
 }
