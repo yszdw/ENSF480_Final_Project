@@ -1,12 +1,14 @@
 package src;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 
 public class Admin extends User {
 
-    public Admin(String username, String email, String address, String creditCard) {
-        super(username, email, address, creditCard, "admin");
+    public Admin(int userID,String username, String email, String address, String creditCard) {
+        super(userID,username, email, address, creditCard, "admin");
     }
 
     /* Methods */
@@ -17,10 +19,10 @@ public class Admin extends User {
         return null;
     }
 
-    public Flight flightExists(String flightID) {
+    public Flight flightExists(int flightID) {
         Flight flight = null;
         for (Flight f : getFlights()) {
-            if (f.getFlightID().equals(flightID)) {
+            if (f.getFlightID() == (flightID)) {
                 flight = f;
             }
         }
@@ -28,10 +30,11 @@ public class Admin extends User {
     }
 
     // This method is used to add a flight to the database
-    public void addFlight(Aircraft aircraft, String flightID, int departureTime, int arrivalTime,
-                          String departureLocation, String arrivalLocation, Date departureDate, Date arrivalDate) {
-        Flight flight = new Flight(aircraft, flightID, departureTime, arrivalTime, departureLocation, arrivalLocation,
-                                   departureDate, arrivalDate);
+    public void addFlight(Aircraft aircraft, int flightID, LocalTime departureTime, LocalTime arrivalTime,
+                          String departureLocation, String arrivalLocation, LocalDate departureDate, LocalDate arrivalDate) {
+
+        Flight flight = new Flight(aircraft, flightID, departureLocation, arrivalLocation, departureDate, departureTime,
+                                   arrivalDate, arrivalTime);
         // TODO: Add flight to database
     }
 
@@ -69,7 +72,7 @@ public class Admin extends User {
     }
 
     // This method is used to add an aircraft to the database
-    public void addAircraft(String aircraftID, String aircraftModel, int numEconomySeats, int numComfortSeats,
+    public void addAircraft(int aircraftID, String aircraftModel, int numEconomySeats, int numComfortSeats,
                             int numBusinessSeats ) {
         Aircraft aircraft = new Aircraft(aircraftID, aircraftModel, numEconomySeats, numComfortSeats, numBusinessSeats);
         // TODO: Add aircraft to database
@@ -81,7 +84,7 @@ public class Admin extends User {
     }
 
     // this method is used to modify flight information
-    public void modifyFlight(String flightID, String toModify) {
+    public void modifyFlight(int flightID, String toModify) {
         Flight flight = flightExists(flightID);
         if (flight == null) {
             System.out.println("Flight does not exist");
