@@ -10,10 +10,13 @@ CREATE TABLE IF NOT EXISTS Users (
     UserType ENUM(
         'passenger',
         'airline_agent',
-        'admin'
+        'admin',
+        'crew'
     ) NOT NULL,
-    MembershipStatus BOOLEAN DEFAULT FALSE,
-    CreditCardInfo VARCHAR(255)
+    CreditCardNumber INT,
+    -- in format MMYY
+    CreditCardExpiry INT,
+    CreditCardCVV INT
 );
 -- Inserting Data
 INSERT INTO Users (
@@ -21,24 +24,27 @@ INSERT INTO Users (
         Address,
         Email,
         UserType,
-        MembershipStatus,
-        CreditCardInfo
+        CreditCardNumber,
+        CreditCardExpiry,
+        CreditCardCVV
     )
 VALUES (
         'John Doe',
         '1234 5th Ave, Calgary, AB',
         'johnDoe@gmail.com',
         'passenger',
-        FALSE,
-        '1234-5678-9012-3456'
+        1234567890123456,
+        1224,
+        123
     ),
     (
         'Jane Doe',
         '1234 5th Ave, Calgary, AB',
         'janeDoe@gmail.com',
         'passenger',
-        FALSE,
-        '1234-5678-9012-3456'
+        1234567890123456,
+        1224,
+        123
     );
 -- Flights Table
 CREATE TABLE IF NOT EXISTS Flights (

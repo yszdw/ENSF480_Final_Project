@@ -1,23 +1,17 @@
 package src;
 
-public class User {
+public abstract class User {
     int userID;
     String username;
     String email;
     String address;
-    String creditCard;
-    boolean isMember;
     boolean hasInsurance;
-    String userType;
 
-    public User(int userID, String username, String email, String address, String creditCard, String userType) {
+    public User(int userID, String username, String email, String address) {
         this.userID = userID;
         this.username = username;
         this.email = email;
         this.address = address;
-        this.creditCard = creditCard;
-        this.userType = userType;
-        this.isMember = false;
         this.hasInsurance = false;
     }
 
@@ -55,32 +49,8 @@ public class User {
         this.address = address;
     }
 
-    public void setCreditCard(String creditCard) {
-        this.creditCard = creditCard;
-    }
-
-    public void setIsMember(boolean isMember) {
-        this.isMember = isMember;
-    }
-
-    public void setUserType(String userType) {
-        this.userType = userType;
-    }
-
     public String getAddress() {
         return address;
-    }
-
-    public String getCreditCard() {
-        return creditCard;
-    }
-
-    public boolean getIsMember() {
-        return isMember;
-    }
-
-    public String getUserType() {
-        return userType;
     }
 
     public int getUserID() {
