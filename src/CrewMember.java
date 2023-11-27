@@ -1,35 +1,27 @@
 
-public class CrewMember extends User {
-    String crewMemberID;
+public class CrewMember {
+    int crewMemberID;
+    String crewName;
     String crewMemberPos;
 
-    public CrewMember(String username, String email, String address, String creditCard, String crewMemberID,
-            String crewMemberPos) {
+    public CrewMember(int crewMemberID,
+            String crewName, String crewMemberPos) {
         // super(username, email, address, creditCard, "crew");
         this.crewMemberID = crewMemberID;
+        this.crewName = crewName;
         this.crewMemberPos = crewMemberPos;
-    }
-
-    public CrewMember() {
-        super();
-        this.crewMemberID = "";
-        this.crewMemberPos = "";
     }
 
     /* Getters and Setters */
-    public void setCrewMemberID(String crewMemberID) {
-        this.crewMemberID = crewMemberID;
-    }
-
-    public void setCrewMemberPos(String crewMemberPos) {
-        this.crewMemberPos = crewMemberPos;
-    }
-
-    public String getCrewMemberID() {
+    public int getCrewID() {
         return crewMemberID;
     }
 
-    public String getCrewMemberPos() {
+    public String getCrewName() {
+        return crewName;
+    }
+
+    public String getCrewPos() {
         return crewMemberPos;
     }
 

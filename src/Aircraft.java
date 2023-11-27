@@ -11,12 +11,14 @@ public class Aircraft {
     boolean inUse;
 
     public Aircraft(int aircraftID, String aircraftModel, int numEconomySeats, int numComfortSeats,
-            int numBusinessSeats) {
+            int numBusinessSeats, double economyPrice, double businessPrice) {
         this.AIRCRAFTID = aircraftID;
         this.AIRCRAFMODEL = aircraftModel;
         this.numEconomySeats = numEconomySeats;
         this.numComfortSeats = numComfortSeats;
         this.numBusinessSeats = numBusinessSeats;
+        this.economyPrice = economyPrice;
+        this.businessPrice = businessPrice;
         this.inUse = false;
     }
 
@@ -71,6 +73,10 @@ public class Aircraft {
 
     public int getNumBusinessSeats() {
         return this.numBusinessSeats;
+    }
+
+    public int getNumComfortSeats() {
+        return this.numComfortSeats;
     }
 
 }
