@@ -9,6 +9,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalTime;
 import java.util.ArrayList;
 
 public class LoginFrame extends JFrame {
@@ -492,7 +493,6 @@ public class LoginFrame extends JFrame {
 
                             FlightInfoFrame.this.dispose(); // Close the current frame
 
-                            // 此处修改，将 FlightInfoFrame.this 作为第一个参数传递
                             BookingFrame bookingFrame = new BookingFrame(FlightInfoFrame.this, aircraft, economyPrice,
                                     businessPrice,
                                     insurancePrice);
@@ -528,6 +528,14 @@ public class LoginFrame extends JFrame {
                 }
             }
             return null; // Or handle appropriately if no flight is selected
+        }
+
+        public LocalTime getDepartureTime() {
+            return getSelectedFlight().getDepartureTime();
+        }
+
+        public LocalTime getArrivalTime() {
+            return getSelectedFlight().getArrivalTime();
         }
     }
 
@@ -697,6 +705,8 @@ public class LoginFrame extends JFrame {
                         System.err.println("1");
                         // Retrieve the selected flight and other booking details
                         Flight selectedFlight = seatSelectionFrame.flightInfoFrame.getSelectedFlight();// flightInfoFrame.getSelectedFlight();
+                        LocalTime departureTime = seatSelectionFrame.flightInfoFrame.getDepartureTime();
+                        LocalTime arrivaltime = seatSelectionFrame.flightInfoFrame.getArrivalTime();
                         System.err.println("2");
                         boolean isEconomy = seatSelectionFrame.bookingFrame.isEconomyClassSelected();
 
@@ -709,7 +719,7 @@ public class LoginFrame extends JFrame {
                         PaymentFrame.this.dispose();
 
                         ConfirmationFrame confirmationFrame = new ConfirmationFrame(selectedFlight, isEconomy,
-                                isBusiness, hasInsurance, seatNumber);
+                                isBusiness, hasInsurance, seatNumber, totalPrice, departureTime, arrivaltime);
                         confirmationFrame.setVisible(true);
                     } else {
                         // Handle failed payment case
@@ -725,22 +735,24 @@ public class LoginFrame extends JFrame {
 
     public class ConfirmationFrame extends JFrame {
         public ConfirmationFrame(Flight selectedFlight, boolean isEconomy, boolean isBusiness, boolean hasInsurance,
-                String seatNumber) {
+                String seatNumber, double totalprice, LocalTime departurTime, LocalTime arrivalTime) {
             setTitle("Booking Confirmation");
             setSize(300, 200); // Adjust the size as needed
             setLayout(new BorderLayout());
 
             JPanel infoPanel = new JPanel(new GridLayout(0, 1)); // Use GridLayout for listing the information
-            infoPanel.add(new JLabel("Flight Details:"));
+            infoPanel.add(new JLabel("This is your receipt:"));
 
             infoPanel.add(new JLabel("Flight ID: " + selectedFlight.getFlightID()));
             infoPanel.add(new JLabel("Aircraft: " + selectedFlight.getAircraft()));
             infoPanel.add(new JLabel("From: " + selectedFlight.getDepartureLocation()));
             infoPanel.add(new JLabel("To: " + selectedFlight.getArrivalLocation()));
+            infoPanel.add(new JLabel("Departure time: " + departurTime));
+            infoPanel.add(new JLabel("Arrival time: " + arrivalTime));
             infoPanel.add(new JLabel("Class: " + (isEconomy ? "Economy" : isBusiness ? "Business" : "Comfort")));
             infoPanel.add(new JLabel("Seat: " + seatNumber));
             infoPanel.add(new JLabel("Insurance: " + (hasInsurance ? "Yes" : "No")));
-
+            infoPanel.add(new JLabel("total price: " + totalprice));
             add(infoPanel, BorderLayout.CENTER);
 
             JButton closeButton = new JButton("Close");
