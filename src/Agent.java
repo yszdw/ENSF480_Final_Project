@@ -1,4 +1,3 @@
-package src;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,10 +12,12 @@ public class Agent extends User {
     /* Methods */
 
     /*
-    * This method is used to return a list of all passengers in a flight
-    * @param flight The flight to get passengers from
-    * @return A HashMap of passenger email, seat number
-    */
+     * This method is used to return a list of all passengers in a flight
+     * 
+     * @param flight The flight to get passengers from
+     * 
+     * @return A HashMap of passenger email, seat number
+     */
     public HashMap<String, String> getPassengers(Flight flight) {
         HashMap<String, String> passengers = new HashMap<String, String>();
         for (Map.Entry<String, Seat> entry : flight.getSeats().entrySet()) {

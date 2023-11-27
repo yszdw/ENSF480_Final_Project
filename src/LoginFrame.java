@@ -9,7 +9,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
+import java.time.LocalTime
+import java.time.LocalDate
 import java.util.ArrayList;
 
 public class LoginFrame extends JFrame {
@@ -94,7 +95,7 @@ public class LoginFrame extends JFrame {
                     // Login successful
                     SwingUtilities.invokeLater(() -> {
                         loginFrame.dispose(); // Close the login window
-                        WelcomeFrame welcomeFrame = new WelcomeFrame(); // Create the welcome window
+                        WelcomeFrame welcomeFrame = new WelcomeFrame(username); // Pass the username to WelcomeFrame
                         welcomeFrame.setVisible(true); // Show the welcome window
                     });
                 } else {
@@ -805,20 +806,19 @@ public class LoginFrame extends JFrame {
             setLayout(new BorderLayout());
             setSize(600, 400);
 
-            String[] columnNames = { "User ID", "Username", "Email", "Address", "Credit Card", };
+            String[] columnNames = { "User ID", "Username", "Email", "Address", "Has Insurance", };
             DefaultTableModel model = new DefaultTableModel(columnNames, 0);
 
             for (User u : users) {
-                if (u.isMember) {
-                    Object[] row = new Object[7]; // Adjusted to match the number of columns
-                    row[0] = u.getUserID();
-                    row[1] = u.getUsername();
-                    row[2] = u.getEmail();
-                    row[3] = u.getAddress();
-                    row[4] = u.getCreditCard();
-                    model.addRow(row);
-                }
 
+                Object[] row = new Object[5]; // Adjusted to match the number of columns
+                row[0] = u.getUserID();
+                row[1] = u.getUsername();
+                row[2] = u.getEmail();
+                row[3] = u.getAddress();
+                row[4] = u.getHasInsurance();
+
+                model.addRow(row);
             }
 
             JTable table = new JTable(model);
@@ -928,7 +928,10 @@ public class LoginFrame extends JFrame {
     }
 
     public class WelcomeFrame extends JFrame {
-        public WelcomeFrame() {
+        private String username;
+
+        public WelcomeFrame(String username) {
+            this.username = username;
             setTitle("Welcome");
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             setLayout(new BorderLayout());
@@ -951,7 +954,7 @@ public class LoginFrame extends JFrame {
             buyTicketsButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    createTicketPurchasePanel();
+                    createTicketPurchasePanel(username); // Pass the username to createTicketPurchasePanel
                 }
             });
 
@@ -1047,7 +1050,7 @@ public class LoginFrame extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
 
-    private void createTicketPurchasePanel() {
+    private void createTicketPurchasePanel(String username) {
 
         JFrame ticketFrame = new JFrame("Purchase Tickets");
         ticketFrame.setSize(400, 300);
@@ -1094,7 +1097,7 @@ public class LoginFrame extends JFrame {
                                                 // one.
                     ArrayList<Flight> flights = dbms.getFlights(origin, destination);
 
-                    FlightInfoFrame flightInfoFrame = new FlightInfoFrame(flights);
+                    FlightInfoFrame flightInfoFrame = new FlightInfoFrame(flights, username); // Pass the username here
                     flightInfoFrame.setVisible(true);
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -1111,13 +1114,16 @@ public class LoginFrame extends JFrame {
     }
 
     public class BookingFrame extends JFrame {
+
+        private FlightInfoFrame flightInfoFrame;
         private JRadioButton economyClassButton;
         private JRadioButton businessClassButton;
         private JCheckBox insuranceCheckbox;
         private JLabel totalPriceLabel;
+        private String username;
 
-        private int economySeats; // Number of economy seats
-        private int businessSeats; // Number of business seats
+        private int economySeats;
+        private int businessSeats;
 
         private double economyPrice;
         private double businessPrice;
@@ -1133,13 +1139,27 @@ public class LoginFrame extends JFrame {
             totalPriceLabel.setText("Total Price: $" + String.format("%.2f", totalPrice));
         }
 
-        public BookingFrame(Aircraft aircraft, double economyPrice, double businessPrice, double insurancePrice) {
-            // Use the Aircraft object to set the number of seats
+        public boolean isEconomyClassSelected() {
+            return economyClassButton.isSelected();
+        }
+
+        public boolean isBusinessClassSelected() {
+            return businessClassButton.isSelected();
+        }
+
+        public boolean isInsuranceSelected() {
+            return insuranceCheckbox.isSelected();
+        }
+
+        public BookingFrame(FlightInfoFrame flightInfoFrame, Aircraft aircraft, double economyPrice,
+                double businessPrice, double insurancePrice, String username) {
+            this.flightInfoFrame = flightInfoFrame; // Store the FlightInfoFrame reference
             this.economySeats = aircraft.getNumEconomySeats();
             this.businessSeats = aircraft.getNumBusinessSeats();
             this.economyPrice = economyPrice;
             this.businessPrice = businessPrice;
             this.insurancePrice = insurancePrice;
+            this.username = username;
 
             setTitle("Booking Options");
             setSize(300, 200); // Set size
@@ -1158,13 +1178,16 @@ public class LoginFrame extends JFrame {
             totalPriceLabel = new JLabel("Total Price: $" + economyPrice);
 
             JButton confirmButton = new JButton("Confirm");
+            // 在BookingFrame类中
             confirmButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     SeatSelectionFrame seatSelectionFrame = new SeatSelectionFrame(
                             economyClassButton.isSelected() ? economySeats : businessSeats,
                             economyClassButton.isSelected(),
-                            totalPrice); // Pass the totalPrice as a new argument
+                            totalPrice,
+                            flightInfoFrame, // 这里假设你是在FlightInfoFrame内部创建BookingFrame
+                            BookingFrame.this, username);
                     seatSelectionFrame.setVisible(true);
                 }
             });
@@ -1189,6 +1212,7 @@ public class LoginFrame extends JFrame {
 
             // Initialize the price based on default selected values
             updatePrice();
+
         }
     }
 
@@ -1232,17 +1256,25 @@ public class LoginFrame extends JFrame {
     }
 
     // DBMS dbms = DBMS.getDBMS(); // Singleton instance
+
     public class FlightInfoFrame extends JFrame {
-        public FlightInfoFrame(ArrayList<Flight> flights) {
+
+        private JTable table;
+        private ArrayList<Flight> flights;
+        private String username;
+
+        public FlightInfoFrame(ArrayList<Flight> flights, String username) {
+            this.username = username;
             setTitle("Flight Information");
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             setLayout(new BorderLayout());
             setSize(600, 400);
+            this.flights = flights; // Save the flights to the class variable
 
             String[] columnNames = { "Flight ID", "Origin", "Destination", "Departure Time", "Arrival Time" };
             DefaultTableModel model = new DefaultTableModel(columnNames, 0);
 
-            for (Flight flight : flights) {
+            for (Flight flight : this.flights) {
                 Object[] row = new Object[5];
                 row[0] = flight.getFlightID();
                 row[1] = flight.getDepartureLocation();
@@ -1252,8 +1284,8 @@ public class LoginFrame extends JFrame {
                 model.addRow(row);
             }
 
-            JTable table = new JTable(model);
-            JScrollPane scrollPane = new JScrollPane(table);
+            this.table = new JTable(model); // Use the class variable instead of a local variable
+            JScrollPane scrollPane = new JScrollPane(this.table);
             add(scrollPane, BorderLayout.CENTER);
 
             JButton selectFlightButton = new JButton("Select Flight");
@@ -1271,11 +1303,11 @@ public class LoginFrame extends JFrame {
             selectFlightButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    int selectedRow = table.getSelectedRow();
+                    int selectedRow = FlightInfoFrame.this.table.getSelectedRow();
                     if (selectedRow >= 0) {
                         try {
-                            int flightID = (Integer) table.getValueAt(selectedRow, 0);
-                            Flight selectedFlight = Flight.getFlightByID(flights, flightID);
+                            int flightID = (Integer) FlightInfoFrame.this.table.getValueAt(selectedRow, 0);
+                            Flight selectedFlight = Flight.getFlightByID(FlightInfoFrame.this.flights, flightID);
                             Aircraft aircraft = selectedFlight.getAircraft(); // Get the Aircraft object
 
                             DBMS dbms = DBMS.getDBMS(); // Singleton instance
@@ -1286,8 +1318,9 @@ public class LoginFrame extends JFrame {
 
                             FlightInfoFrame.this.dispose(); // Close the current frame
 
-                            BookingFrame bookingFrame = new BookingFrame(aircraft, economyPrice, businessPrice,
-                                    insurancePrice);
+                            BookingFrame bookingFrame = new BookingFrame(FlightInfoFrame.this, aircraft, economyPrice,
+                                    businessPrice,
+                                    insurancePrice, username);
                             bookingFrame.setVisible(true); // Display the booking frame
 
                         } catch (SQLException ex) {
@@ -1306,19 +1339,54 @@ public class LoginFrame extends JFrame {
                 }
             });
 
-            // 显示窗口
             setVisible(true);
+        }
+
+        public Flight getSelectedFlight() {
+            int selectedRow = this.table.getSelectedRow();
+            if (selectedRow >= 0) {
+                int flightID = (Integer) this.table.getValueAt(selectedRow, 0);
+                for (Flight flight : this.flights) {
+                    if (flight.getFlightID() == flightID) {
+                        return flight;
+                    }
+                }
+            }
+            return null; // Or handle appropriately if no flight is selected
+        }
+
+        public LocalTime getDepartureTime() {
+            return getSelectedFlight().getDepartureTime();
+        }
+
+        public LocalTime getArrivalTime() {
+            return getSelectedFlight().getArrivalTime();
         }
     }
 
     public class SeatSelectionFrame extends JFrame {
+        private FlightInfoFrame flightInfoFrame;
+        private BookingFrame bookingFrame;
         private static final int ECONOMY_SEATS = 70;
         private static final int BUSINESS_SEATS = 30;
         private double totalPrice;
         private JButton confirmButton;
         private JButton selectedSeatButton;
+        private String username;
 
-        public SeatSelectionFrame(int totalSeats, boolean isEconomy, double totalPrice) {
+        public String getSelectedSeatNumber() {
+            if (selectedSeatButton != null) {
+                return selectedSeatButton.getText();
+            } else {
+                return "";
+            }
+        }
+
+        public SeatSelectionFrame(int totalSeats, boolean isEconomy, double totalPrice, FlightInfoFrame flightInfoFrame,
+                BookingFrame bookingFrame, String username) {
+            this.totalPrice = totalPrice;
+            this.flightInfoFrame = flightInfoFrame;
+            this.bookingFrame = bookingFrame;
             this.totalPrice = totalPrice;
             setTitle("Select Seats");
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -1347,7 +1415,7 @@ public class LoginFrame extends JFrame {
                 @Override
                 public void actionPerformed(ActionEvent e) {
 
-                    PaymentFrame paymentFrame = new PaymentFrame(totalPrice);
+                    PaymentFrame paymentFrame = new PaymentFrame(totalPrice, SeatSelectionFrame.this, username);
                     paymentFrame.setVisible(true);
                 }
             });
@@ -1359,6 +1427,7 @@ public class LoginFrame extends JFrame {
 
             pack();
             setVisible(true);
+
         }
 
         private JButton createSeatButton(String seatText) {
@@ -1386,9 +1455,31 @@ public class LoginFrame extends JFrame {
 
     class PaymentFrame extends JFrame {
         private double totalPrice;
+        private String username;
 
-        public PaymentFrame(double totalPrice) {
+        private FlightInfoFrame flightInfoFrame;
+        private BookingFrame bookingFrame;
+        private SeatSelectionFrame seatSelectionFrame;
+
+        public void setFlightInfoFrame(FlightInfoFrame flightInfoFrame) {
+            this.flightInfoFrame = flightInfoFrame;
+        }
+
+        public void setBookingFrame(BookingFrame bookingFrame) {
+            this.bookingFrame = bookingFrame;
+        }
+
+        public void setSeatSelectionFrame(SeatSelectionFrame seatSelectionFrame) {
+            this.seatSelectionFrame = seatSelectionFrame;
+        }
+
+        public PaymentFrame(double totalPrice, SeatSelectionFrame seatSelectionFrame, String username) {
+            // Initialize variables
             this.totalPrice = totalPrice;
+            setSeatSelectionFrame(seatSelectionFrame);
+            this.flightInfoFrame = flightInfoFrame;
+            this.bookingFrame = bookingFrame;
+            this.seatSelectionFrame = seatSelectionFrame;
 
             setTitle("Make Payment");
             setLayout(new BorderLayout());
@@ -1418,17 +1509,6 @@ public class LoginFrame extends JFrame {
 
             // Confirm button to submit payment
             JButton confirmButton = new JButton("Confirm Payment");
-            confirmButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    // Implement the payment processing logic here
-                    // For example, validate the card information, process the payment, etc.
-                    JOptionPane.showMessageDialog(PaymentFrame.this, "Payment submitted!", "Payment",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    // TODO: Add actual payment processing code here
-                }
-            });
-
             // Adding components to the frame
             add(pricePanel, BorderLayout.NORTH);
             add(cardPanel, BorderLayout.CENTER);
@@ -1436,7 +1516,128 @@ public class LoginFrame extends JFrame {
 
             pack();
             setVisible(true);
+            confirmButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    // Implement the payment processing logic here
+                    // For example, validate the card information, process the payment, etc.
+
+                    // Let's assume the payment is processed successfully here
+                    boolean paymentSuccess = true; // This should be the result of your payment processing logic
+
+                    if (paymentSuccess) {
+                        JOptionPane.showMessageDialog(PaymentFrame.this, "Payment successful!", "Payment",
+                                JOptionPane.INFORMATION_MESSAGE);
+
+                        System.err.println("1");
+                        // Retrieve the selected flight and other booking details
+                        Flight selectedFlight = seatSelectionFrame.flightInfoFrame.getSelectedFlight();// flightInfoFrame.getSelectedFlight();
+                        LocalTime departureTime = seatSelectionFrame.flightInfoFrame.getDepartureTime();
+                        LocalTime arrivaltime = seatSelectionFrame.flightInfoFrame.getArrivalTime();
+                        System.err.println("2");
+                        boolean isEconomy = seatSelectionFrame.bookingFrame.isEconomyClassSelected();
+
+                        System.err.println(isEconomy);
+                        boolean isBusiness = seatSelectionFrame.bookingFrame.isBusinessClassSelected();
+                        boolean hasInsurance = seatSelectionFrame.bookingFrame.isInsuranceSelected();
+                        String seatNumber = seatSelectionFrame.getSelectedSeatNumber();
+
+                        // Close the payment frame and open the confirmation frame
+                        PaymentFrame.this.dispose();
+
+                        ConfirmationFrame confirmationFrame = new ConfirmationFrame(username, selectedFlight, isEconomy,
+                                isBusiness, hasInsurance, seatNumber, totalPrice, departureTime, arrivaltime);
+                        confirmationFrame.setVisible(true);
+                    } else {
+                        // Handle failed payment case
+                        JOptionPane.showMessageDialog(PaymentFrame.this, "Payment failed. Please try again.",
+                                "Payment Error",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            });
+
         }
+    }
+
+    public class ConfirmationFrame extends JFrame {
+        public ConfirmationFrame(String username, Flight selectedFlight, boolean isEconomy, boolean isBusiness,
+                boolean hasInsurance,
+                String seatNumber, double totalprice, LocalTime departurTime, LocalTime arrivalTime) {
+            setTitle("Booking Confirmation");
+            setSize(300, 200); // Adjust the size as needed
+            setLayout(new BorderLayout());
+
+            JPanel infoPanel = new JPanel(new GridLayout(0, 1)); // Use GridLayout for listing the information
+            infoPanel.add(new JLabel("This is your receipt:"));
+            infoPanel.add(new JLabel("Passenger name: " + username));
+            infoPanel.add(new JLabel("Flight ID: " + selectedFlight.getFlightID()));
+            infoPanel.add(new JLabel("Aircraft: " + selectedFlight.getAircraft().getAircraftModel()));
+            infoPanel.add(new JLabel("From: " + selectedFlight.getDepartureLocation()));
+            infoPanel.add(new JLabel("To: " + selectedFlight.getArrivalLocation()));
+            infoPanel.add(new JLabel("Departure time: " + departurTime));
+            infoPanel.add(new JLabel("Arrival time: " + arrivalTime));
+            infoPanel.add(new JLabel("Class: " + (isEconomy ? "Economy" : isBusiness ? "Business" : "Comfort")));
+            infoPanel.add(new JLabel("Seat: " + seatNumber));
+            infoPanel.add(new JLabel("Insurance: " + (hasInsurance ? "Yes" : "No")));
+            infoPanel.add(new JLabel("total price: " + totalprice));
+            add(infoPanel, BorderLayout.CENTER);
+
+            JButton closeButton = new JButton("Close");
+            closeButton.addActionListener(e -> dispose());
+            add(closeButton, BorderLayout.SOUTH);
+
+            pack();
+            setLocationRelativeTo(null);
+            setVisible(true);
+            // Example of calling the updateDatabase method.
+            updateDatabase(username, selectedFlight.getFlightID(), selectedFlight.getAircraft().getAircraftModel(),
+                    selectedFlight.getDepartureLocation(), selectedFlight.getArrivalLocation(), departurTime,
+                    arrivalTime,
+                    (isEconomy ? "Economy" : isBusiness ? "Business" : "Comfort"), seatNumber, hasInsurance,
+                    totalprice);
+
+        }
+
+        public void updateDatabase(String username, int flightID, String aircraftModel, String departureLocation,
+                String arrivalLocation, LocalTime departureTime, LocalTime arrivalTime, String seatClass,
+                String seatNumber, boolean hasInsurance, double totalprice) {
+
+            // Define the JDBC URL.
+            String jdbcURL = "jdbc:mysql://localhost:3306/ensf480";
+            String dbUser = "root"; // Replace with your database username.
+            String dbPassword = "ensf480"; // Replace with your database password.
+
+            // SQL query to insert a new order.
+            String sql = "INSERT INTO orders (Username, FlightID, AircraftModel, DepartureLocation, ArrivalLocation, DepartureTime, ArrivalTime, Class, SeatNumber, Insurance, TotalPrice) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            try (Connection connection = DriverManager.getConnection(jdbcURL, dbUser, dbPassword);
+                    PreparedStatement statement = connection.prepareStatement(sql)) {
+
+                // Set the parameters for the prepared statement.
+                statement.setString(1, username);
+                statement.setInt(2, flightID);
+                statement.setString(3, aircraftModel);
+                statement.setString(4, departureLocation);
+                statement.setString(5, arrivalLocation);
+                statement.setTime(6, java.sql.Time.valueOf(departureTime));
+                statement.setTime(7, java.sql.Time.valueOf(arrivalTime));
+                statement.setString(8, seatClass);
+                statement.setString(9, seatNumber);
+                statement.setBoolean(10, hasInsurance);
+                statement.setDouble(11, totalprice);
+
+                // Execute the insert SQL statement.
+                int rowsInserted = statement.executeUpdate();
+                if (rowsInserted > 0) {
+                    System.out.println("A new order was inserted successfully!");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("Database update error: " + e.getMessage());
+            }
+        }
+
     }
 
     public static void main(String[] args) {
