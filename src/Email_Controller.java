@@ -28,8 +28,8 @@ public class Email_Controller {
             //Get next user
             User currentUser = promoUsers.get(i);
 
-            //String userEmail = currentUser.getEmail();
-            String userEmail = "aaron.dalbroi2002@gmail.com";
+            String userEmail = currentUser.getEmail();
+
 
             Properties properties = new Properties();
             properties.put("mail.smtp.auth", "true");
@@ -109,10 +109,7 @@ public class Email_Controller {
             // Set the email subject and body
             message.setSubject(String.format("Receipt for your flight to %s!",flight.getArrivalLocation()));
 
-
-
-
-
+            
 
             message.setText(String.format("Hello,\n\nThis is an email receipt for your flight on %s at %s\n\n"
                            +"User name: %s\n"
