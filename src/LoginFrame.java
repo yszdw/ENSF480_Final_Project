@@ -324,6 +324,8 @@ public class LoginFrame extends JFrame {
     }
 
     public class BookingFrame extends JFrame {
+
+        private FlightInfoFrame flightInfoFrame;
         private JRadioButton economyClassButton;
         private JRadioButton businessClassButton;
         private JCheckBox insuranceCheckbox;
@@ -346,8 +348,21 @@ public class LoginFrame extends JFrame {
             totalPriceLabel.setText("Total Price: $" + String.format("%.2f", totalPrice));
         }
 
-        public BookingFrame(Aircraft aircraft, double economyPrice, double businessPrice, double insurancePrice) {
-            // Use the Aircraft object to set the number of seats
+        public boolean isEconomyClassSelected() {
+            return economyClassButton.isSelected();
+        }
+
+        public boolean isBusinessClassSelected() {
+            return businessClassButton.isSelected();
+        }
+
+        public boolean isInsuranceSelected() {
+            return insuranceCheckbox.isSelected();
+        }
+
+        public BookingFrame(FlightInfoFrame flightInfoFrame, Aircraft aircraft, double economyPrice,
+                double businessPrice, double insurancePrice) {
+            this.flightInfoFrame = flightInfoFrame; // Store the FlightInfoFrame reference
             this.economySeats = aircraft.getNumEconomySeats();
             this.businessSeats = aircraft.getNumBusinessSeats();
             this.economyPrice = economyPrice;
@@ -371,13 +386,16 @@ public class LoginFrame extends JFrame {
             totalPriceLabel = new JLabel("Total Price: $" + economyPrice);
 
             JButton confirmButton = new JButton("Confirm");
+            // 在BookingFrame类中
             confirmButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     SeatSelectionFrame seatSelectionFrame = new SeatSelectionFrame(
                             economyClassButton.isSelected() ? economySeats : businessSeats,
                             economyClassButton.isSelected(),
-                            totalPrice); // Pass the totalPrice as a new argument
+                            totalPrice,
+                            flightInfoFrame, // 这里假设你是在FlightInfoFrame内部创建BookingFrame
+                            BookingFrame.this);
                     seatSelectionFrame.setVisible(true);
                 }
             });
@@ -402,6 +420,7 @@ public class LoginFrame extends JFrame {
 
             // Initialize the price based on default selected values
             updatePrice();
+
         }
     }
 
@@ -415,18 +434,22 @@ public class LoginFrame extends JFrame {
         return button;
     }
 
-    // DBMS dbms = DBMS.getDBMS(); // Singleton instance
     public class FlightInfoFrame extends JFrame {
+
+        private JTable table;
+        private ArrayList<Flight> flights;
+
         public FlightInfoFrame(ArrayList<Flight> flights) {
             setTitle("Flight Information");
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             setLayout(new BorderLayout());
             setSize(600, 400);
+            this.flights = flights; // Save the flights to the class variable
 
             String[] columnNames = { "Flight ID", "Origin", "Destination", "Departure Time", "Arrival Time" };
             DefaultTableModel model = new DefaultTableModel(columnNames, 0);
 
-            for (Flight flight : flights) {
+            for (Flight flight : this.flights) {
                 Object[] row = new Object[5];
                 row[0] = flight.getFlightID();
                 row[1] = flight.getDepartureLocation();
@@ -436,8 +459,8 @@ public class LoginFrame extends JFrame {
                 model.addRow(row);
             }
 
-            JTable table = new JTable(model);
-            JScrollPane scrollPane = new JScrollPane(table);
+            this.table = new JTable(model); // Use the class variable instead of a local variable
+            JScrollPane scrollPane = new JScrollPane(this.table);
             add(scrollPane, BorderLayout.CENTER);
 
             JButton selectFlightButton = new JButton("Select Flight");
@@ -455,11 +478,11 @@ public class LoginFrame extends JFrame {
             selectFlightButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    int selectedRow = table.getSelectedRow();
+                    int selectedRow = FlightInfoFrame.this.table.getSelectedRow();
                     if (selectedRow >= 0) {
                         try {
-                            int flightID = (Integer) table.getValueAt(selectedRow, 0);
-                            Flight selectedFlight = Flight.getFlightByID(flights, flightID);
+                            int flightID = (Integer) FlightInfoFrame.this.table.getValueAt(selectedRow, 0);
+                            Flight selectedFlight = Flight.getFlightByID(FlightInfoFrame.this.flights, flightID);
                             Aircraft aircraft = selectedFlight.getAircraft(); // Get the Aircraft object
 
                             DBMS dbms = DBMS.getDBMS(); // Singleton instance
@@ -469,7 +492,9 @@ public class LoginFrame extends JFrame {
 
                             FlightInfoFrame.this.dispose(); // Close the current frame
 
-                            BookingFrame bookingFrame = new BookingFrame(aircraft, economyPrice, businessPrice,
+                            // 此处修改，将 FlightInfoFrame.this 作为第一个参数传递
+                            BookingFrame bookingFrame = new BookingFrame(FlightInfoFrame.this, aircraft, economyPrice,
+                                    businessPrice,
                                     insurancePrice);
                             bookingFrame.setVisible(true); // Display the booking frame
 
@@ -489,19 +514,45 @@ public class LoginFrame extends JFrame {
                 }
             });
 
-            // 显示窗口
             setVisible(true);
+        }
+
+        public Flight getSelectedFlight() {
+            int selectedRow = this.table.getSelectedRow();
+            if (selectedRow >= 0) {
+                int flightID = (Integer) this.table.getValueAt(selectedRow, 0);
+                for (Flight flight : this.flights) {
+                    if (flight.getFlightID() == flightID) {
+                        return flight;
+                    }
+                }
+            }
+            return null; // Or handle appropriately if no flight is selected
         }
     }
 
     public class SeatSelectionFrame extends JFrame {
+        private FlightInfoFrame flightInfoFrame;
+        private BookingFrame bookingFrame;
         private static final int ECONOMY_SEATS = 70;
         private static final int BUSINESS_SEATS = 30;
         private double totalPrice;
         private JButton confirmButton;
         private JButton selectedSeatButton;
 
-        public SeatSelectionFrame(int totalSeats, boolean isEconomy, double totalPrice) {
+        public String getSelectedSeatNumber() {
+            if (selectedSeatButton != null) {
+                return selectedSeatButton.getText();
+            } else {
+                return "";
+            }
+        }
+
+        public SeatSelectionFrame(int totalSeats, boolean isEconomy, double totalPrice, FlightInfoFrame flightInfoFrame,
+                BookingFrame bookingFrame) {
+            this.totalPrice = totalPrice;
+            this.flightInfoFrame = flightInfoFrame;
+            this.bookingFrame = bookingFrame;
             this.totalPrice = totalPrice;
             setTitle("Select Seats");
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -530,7 +581,7 @@ public class LoginFrame extends JFrame {
                 @Override
                 public void actionPerformed(ActionEvent e) {
 
-                    PaymentFrame paymentFrame = new PaymentFrame(totalPrice);
+                    PaymentFrame paymentFrame = new PaymentFrame(totalPrice, SeatSelectionFrame.this);
                     paymentFrame.setVisible(true);
                 }
             });
@@ -542,6 +593,7 @@ public class LoginFrame extends JFrame {
 
             pack();
             setVisible(true);
+
         }
 
         private JButton createSeatButton(String seatText) {
@@ -570,8 +622,29 @@ public class LoginFrame extends JFrame {
     class PaymentFrame extends JFrame {
         private double totalPrice;
 
-        public PaymentFrame(double totalPrice) {
+        private FlightInfoFrame flightInfoFrame;
+        private BookingFrame bookingFrame;
+        private SeatSelectionFrame seatSelectionFrame;
+
+        public void setFlightInfoFrame(FlightInfoFrame flightInfoFrame) {
+            this.flightInfoFrame = flightInfoFrame;
+        }
+
+        public void setBookingFrame(BookingFrame bookingFrame) {
+            this.bookingFrame = bookingFrame;
+        }
+
+        public void setSeatSelectionFrame(SeatSelectionFrame seatSelectionFrame) {
+            this.seatSelectionFrame = seatSelectionFrame;
+        }
+
+        public PaymentFrame(double totalPrice, SeatSelectionFrame seatSelectionFrame) {
+            // Initialize variables
             this.totalPrice = totalPrice;
+            setSeatSelectionFrame(seatSelectionFrame);
+            this.flightInfoFrame = flightInfoFrame;
+            this.bookingFrame = bookingFrame;
+            this.seatSelectionFrame = seatSelectionFrame;
 
             setTitle("Make Payment");
             setLayout(new BorderLayout());
@@ -601,23 +674,81 @@ public class LoginFrame extends JFrame {
 
             // Confirm button to submit payment
             JButton confirmButton = new JButton("Confirm Payment");
-            confirmButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    // Implement the payment processing logic here
-                    // For example, validate the card information, process the payment, etc.
-                    JOptionPane.showMessageDialog(PaymentFrame.this, "Payment submitted!", "Payment",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    // TODO: Add actual payment processing code here
-                }
-            });
-
             // Adding components to the frame
             add(pricePanel, BorderLayout.NORTH);
             add(cardPanel, BorderLayout.CENTER);
             add(confirmButton, BorderLayout.SOUTH);
 
             pack();
+            setVisible(true);
+            confirmButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    // Implement the payment processing logic here
+                    // For example, validate the card information, process the payment, etc.
+
+                    // Let's assume the payment is processed successfully here
+                    boolean paymentSuccess = true; // This should be the result of your payment processing logic
+
+                    if (paymentSuccess) {
+                        JOptionPane.showMessageDialog(PaymentFrame.this, "Payment successful!", "Payment",
+                                JOptionPane.INFORMATION_MESSAGE);
+
+                        System.err.println("1");
+                        // Retrieve the selected flight and other booking details
+                        Flight selectedFlight = seatSelectionFrame.flightInfoFrame.getSelectedFlight();// flightInfoFrame.getSelectedFlight();
+                        System.err.println("2");
+                        boolean isEconomy = seatSelectionFrame.bookingFrame.isEconomyClassSelected();
+
+                        System.err.println(isEconomy);
+                        boolean isBusiness = seatSelectionFrame.bookingFrame.isBusinessClassSelected();
+                        boolean hasInsurance = seatSelectionFrame.bookingFrame.isInsuranceSelected();
+                        String seatNumber = seatSelectionFrame.getSelectedSeatNumber();
+
+                        // Close the payment frame and open the confirmation frame
+                        PaymentFrame.this.dispose();
+
+                        ConfirmationFrame confirmationFrame = new ConfirmationFrame(selectedFlight, isEconomy,
+                                isBusiness, hasInsurance, seatNumber);
+                        confirmationFrame.setVisible(true);
+                    } else {
+                        // Handle failed payment case
+                        JOptionPane.showMessageDialog(PaymentFrame.this, "Payment failed. Please try again.",
+                                "Payment Error",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            });
+
+        }
+    }
+
+    public class ConfirmationFrame extends JFrame {
+        public ConfirmationFrame(Flight selectedFlight, boolean isEconomy, boolean isBusiness, boolean hasInsurance,
+                String seatNumber) {
+            setTitle("Booking Confirmation");
+            setSize(300, 200); // Adjust the size as needed
+            setLayout(new BorderLayout());
+
+            JPanel infoPanel = new JPanel(new GridLayout(0, 1)); // Use GridLayout for listing the information
+            infoPanel.add(new JLabel("Flight Details:"));
+
+            infoPanel.add(new JLabel("Flight ID: " + selectedFlight.getFlightID()));
+            infoPanel.add(new JLabel("Aircraft: " + selectedFlight.getAircraft()));
+            infoPanel.add(new JLabel("From: " + selectedFlight.getDepartureLocation()));
+            infoPanel.add(new JLabel("To: " + selectedFlight.getArrivalLocation()));
+            infoPanel.add(new JLabel("Class: " + (isEconomy ? "Economy" : isBusiness ? "Business" : "Comfort")));
+            infoPanel.add(new JLabel("Seat: " + seatNumber));
+            infoPanel.add(new JLabel("Insurance: " + (hasInsurance ? "Yes" : "No")));
+
+            add(infoPanel, BorderLayout.CENTER);
+
+            JButton closeButton = new JButton("Close");
+            closeButton.addActionListener(e -> dispose());
+            add(closeButton, BorderLayout.SOUTH);
+
+            pack();
+            setLocationRelativeTo(null);
             setVisible(true);
         }
     }
