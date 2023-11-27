@@ -1029,6 +1029,19 @@ public class LoginFrame extends JFrame {
             }
         });
 
+        guestLoginButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Hide the login frame
+                LoginFrame.this.setVisible(false);
+                LoginFrame.this.dispose(); // Optionally, you can dispose the LoginFrame
+
+                // Create and show the welcome frame
+                WelcomeFrame welcomeFrame = new WelcomeFrame("guest");
+                welcomeFrame.setVisible(true);
+            }
+        });
+
         gbc.gridy = 0;
         buttonPanel.add(userLoginButton, gbc);
         gbc.gridy = 1;
