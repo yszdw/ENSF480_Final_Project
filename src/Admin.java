@@ -1,5 +1,3 @@
-package src;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -31,10 +29,10 @@ public class Admin extends User {
 
     // This method is used to add a flight to the database
     public void addFlight(Aircraft aircraft, int flightID, LocalTime departureTime, LocalTime arrivalTime,
-                          String departureLocation, String arrivalLocation, LocalDate departureDate, LocalDate arrivalDate) {
+            String departureLocation, String arrivalLocation, LocalDate departureDate, LocalDate arrivalDate) {
 
         Flight flight = new Flight(aircraft, flightID, departureLocation, arrivalLocation, departureDate, departureTime,
-                                   arrivalDate, arrivalTime);
+                arrivalDate, arrivalTime);
         // TODO: Add flight to database
     }
 
@@ -50,7 +48,8 @@ public class Admin extends User {
         // TODO: Add crew member to database. Call overloaded method
     }
 
-    // This method is used to return a list of all crew members from a specific flight
+    // This method is used to return a list of all crew members from a specific
+    // flight
     public ArrayList<CrewMember> getCrewMembers(String flightID) {
         // TODO: Get crew members from database
         return null;
@@ -73,8 +72,9 @@ public class Admin extends User {
 
     // This method is used to add an aircraft to the database
     public void addAircraft(int aircraftID, String aircraftModel, int numEconomySeats, int numComfortSeats,
-                            int numBusinessSeats ) {
-        Aircraft aircraft = new Aircraft(aircraftID, aircraftModel, numEconomySeats, numComfortSeats, numBusinessSeats);
+            int numBusinessSeats, double economyPrice, double businessPrice) {
+        Aircraft aircraft = new Aircraft(aircraftID, aircraftModel, numEconomySeats, numComfortSeats, numBusinessSeats,
+                economyPrice, businessPrice);
         // TODO: Add aircraft to database
     }
 
@@ -121,7 +121,8 @@ public class Admin extends User {
         }
     }
 
-    // This method returns a list of all users from the database if the userType is "passenger" in the database
+    // This method returns a list of all users from the database if the userType is
+    // "passenger" in the database
     public ArrayList<User> getPassengers() {
         // TODO: Get passengers from database
         return null;

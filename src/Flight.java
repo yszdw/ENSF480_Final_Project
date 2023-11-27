@@ -1,4 +1,3 @@
-package src;
 
 import java.util.HashMap;
 import java.time.*;
@@ -144,6 +143,16 @@ public class Flight {
 
     public ArrayList<CrewMember> getCrew() {
         return crew;
+    }
+
+    // Static method to find a Flight by its ID
+    public static Flight getFlightByID(ArrayList<Flight> flights, int flightID) {
+        for (Flight flight : flights) {
+            if (flight.getFlightID() == flightID) {
+                return flight;
+            }
+        }
+        return null; // Or handle the case where the flight isn't found
     }
 
 }
