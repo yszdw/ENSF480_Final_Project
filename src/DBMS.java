@@ -244,25 +244,73 @@ public class DBMS {
      * edit flight in database
      */
 
-    // public void editFlight(int flightID, String origin, String destination,
-    // LocalDate departureDate,
-    // LocalTime departureTime, LocalDate arrivalDate, LocalTime arrivalTime) throws
-    // SQLException {
-    // String sql = "UPDATE Flights SET Origin = ?, Destination = ?,
-    // DepartureDateTime = ?, ArrivalDateTime = ? WHERE FlightID = ?";
+    public void editFlightLocation(int flightID, String indicator, String data) {
+        if ("Origin".equals(indicator)) {
+            updateLocation(flightID, "Origin", data);
+        } else if ("Destination".equals(indicator)) {
+            updateLocation(flightID, "Destination", data);
+        } else if ("DepartureDateTime".equals(indicator)) {
+            updateDateTime(flightID, "DepartureDateTime", data);
+        } else if ("ArrivalDateTime".equals(indicator)) {
+            updateDateTime(flightID, "ArrivalDateTime", data);
+        }
 
-    // try (PreparedStatement pstmt = dbConnect.prepareStatement(sql)) {
-    // pstmt.setString(1, origin);
-    // pstmt.setString(2, destination);
-    // pstmt.setTimestamp(3, Timestamp.valueOf(LocalDateTime.of(departureDate,
-    // departureTime)));
-    // pstmt.setTimestamp(4, Timestamp.valueOf(LocalDateTime.of(arrivalDate,
-    // arrivalTime)));
-    // pstmt.setInt(5, flightID);
+    }
 
-    // pstmt.executeUpdate();
-    // }
-    // }
+    public Flight getFlights(int flightID) throws SQLException {
+        Flight returnFlight = null;
+        ArrayList<Aircraft> aircrafts = getAircrafts();
+        Statement myStmt = dbConnect.createStatement();
+        String query = "SELECT * FROM Flights WHERE flightID = ?";
+        PreparedStatement pstmt = dbConnect.prepareStatement(query);
+        pstmt.setInt(1, flightID);
+        ResultSet results = pstmt.executeQuery();
+        while (results.next()) {
+            LocalDateTime departureDateTime = results.getTimestamp("DepartureDateTime").toLocalDateTime();
+            LocalDateTime arrivalDateTime = results.getTimestamp("ArrivalDateTime").toLocalDateTime();
+            int aircraftID = results.getInt("AircraftID");
+            Aircraft aircraft = null;
+            for (Aircraft a : aircrafts) {
+                if (a.getAircraftID() == aircraftID) {
+                    aircraft = a;
+                    break;
+                }
+            }
+            returnFlight = new Flight(aircraft, results.getInt("FlightID"), results.getString("Origin"),
+                    results.getString("Destination"), departureDateTime.toLocalDate(),
+                    departureDateTime.toLocalTime(), arrivalDateTime.toLocalDate(), arrivalDateTime.toLocalTime());
+
+        }
+        results.close();
+        return returnFlight;
+    }
+
+    private void updateLocation(int flightID, String locationColumn, String data) {
+        try {
+            String updateQuery = "UPDATE flights SET " + locationColumn + " = ? WHERE FlightID = ?";
+            try (PreparedStatement preparedStatement = dbConnect.prepareStatement(updateQuery)) {
+                preparedStatement.setString(1, data);
+                preparedStatement.setInt(2, flightID);
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle the exception according to your needs
+        }
+    }
+
+    private void updateDateTime(int flightID, String dateTimeColumn, String dateTime) {
+        try {
+            String updateQuery = "UPDATE flights SET " + dateTimeColumn + " = ? WHERE FlightID = ?";
+            try (PreparedStatement preparedStatement = dbConnect.prepareStatement(updateQuery)) {
+                Timestamp timestamp = Timestamp.valueOf(dateTime);
+                preparedStatement.setTimestamp(1, timestamp);
+                preparedStatement.setInt(2, flightID);
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle the exception according to your needs
+        }
+    }
 
     /*
      * TODO: bookFlight - THIS DOESNT WORK YET
@@ -425,61 +473,10 @@ public class DBMS {
 
         DBMS connect = getDBMS();
 
-        // This is a list of all flight information in the database
-        // - can use all flight getter methods for flight info
-        // ArrayList<Flight> flightList = connect.getFlights();
-        // This is a list of all user information in the database
-        // - can use all user getter methods for user info
-        ArrayList<User> userList = connect.getUsers();
-
-        // This is a list of all aircraft information in the database
-        ArrayList<Aircraft> aircraftList = connect.getAircrafts();
-        // for (Aircraft a : aircraftList) {
-        // System.out.print(a.getAircraftID() + " ");
-        // System.out.println(a.getAircraftModel());
-        // }
-
-        // test add aircraft
-        // connect.removeAircraft(13);
-
-        ArrayList<CrewMember> crewList = connect.getCrewMembers(1);
-        // for (CrewMember c : crewList) {
-        // System.out.println(+c.getCrewID() + " " + c.getCrewName() + " " +
-        // c.getCrewPos());
-        // }
-
-        // connect.updateCrew(1, 0);
-        // crewList = connect.getCrewMembers(1);
-        // for (CrewMember c : crewList) {
-        // System.out.println(+c.getCrewID() + " " + c.getCrewName() + " " +
-        // c.getCrewPos());
-        // }
-
-        // connect.updateCrew(1, 1);
-        // crewList = connect.getCrewMembers(1);
-        // for (CrewMember c : crewList) {
-        // System.out.println(+c.getCrewID() + " " + c.getCrewName() + " " +
-        // c.getCrewPos());
-        // }
-
-        // test date
-        // String dateString = "2024-10-11";
-        // LocalDate date = LocalDate.parse(dateString);
-        // for (Flight f : flightList) {
-        // if (f.getDepartureDate().equals(date)) {
-        // System.out.println(
-        // "Flights Departing on this date: " + f.getFlightID() + " " +
-        // f.getDepartureLocation() + " to " +
-        // f.getArrivalLocation());
-        // }
-        // if (f.getArrivalDate().equals(date)) {
-        // System.out.println(
-        // "Flights Arriving on this date: " + f.getFlightID() + " " +
-        // f.getDepartureLocation() + " to " +
-        // f.getArrivalLocation());
-        // }
-
-        // }
+        int flightID = 1;
+        String indicator = "ArrivalDateTime";
+        String data = "2024-05-01 2:00:00";
+        connect.editFlightLocation(flightID, indicator, data);
 
         connect.closeConnection();
     }
