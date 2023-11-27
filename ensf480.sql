@@ -1,6 +1,6 @@
 /*
  Navicat Premium Data Transfer
-
+ 
  Source Server         : 111
  Source Server Type    : MySQL
  Source Server Version : 80035 (8.0.35)
@@ -13,6 +13,9 @@
 
  Date: 26/11/2023 08:30:42
 */
+DROP DATABASE IF EXISTS ENSF480;
+CREATE DATABASE ENSF480;
+USE ENSF480;
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
@@ -82,16 +85,29 @@ INSERT INTO `bookings` VALUES (4, 2, 1, 1, 'Economy', 1, NULL, '2024-03-03 12:00
 -- Table structure for crews
 -- ----------------------------
 DROP TABLE IF EXISTS `crews`;
-CREATE TABLE `crews`  (
+CREATE TABLE `crews` (
   `CrewID` int NOT NULL AUTO_INCREMENT,
   `Name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `Position` enum('pilot','flight_attendant','engineer') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `Position` enum('pilot', 'flight_attendant', 'engineer') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `FlightID` int,
   PRIMARY KEY (`CrewID`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of crews
 -- ----------------------------
+INSERT INTO `crews`
+VALUES (1, 'John Doe', 'pilot', 1);
+INSERT INTO `crews`
+VALUES (2, 'Jane Doe', 'pilot', 0);
+INSERT INTO `crews`
+VALUES (3, 'J Doe', 'flight_attendant', 1);
+INSERT INTO `crews`
+VALUES (4, 'Jane Doe', 'flight_attendant', 1);
+INSERT INTO `crews`
+VALUES (5, 'John Doe', 'engineer', 1);
+INSERT INTO `crews`
+VALUES (6, 'Jane Doe', 'engineer', 0);
 
 -- ----------------------------
 -- Table structure for flights
@@ -177,17 +193,22 @@ CREATE TABLE `payments`  (
 DROP TABLE IF EXISTS `promotions`;
 CREATE TABLE `promotions`  (
   `PromotionID` int NOT NULL AUTO_INCREMENT,
-  `UserID` int NOT NULL,
   `Description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `ValidOn` datetime NOT NULL,
   `ValidUntil` datetime NOT NULL,
   PRIMARY KEY (`PromotionID`) USING BTREE,
   INDEX `UserID`(`UserID` ASC) USING BTREE,
   CONSTRAINT `promotions_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `users` (`UserID`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
+
 -- ----------------------------
 -- Records of promotions
 -- ----------------------------
+INSERT into `promotions` VALUES (1,"Promotion 1","2023-10-01 12:00:00","2023-10-30 11:59:59");
+INSERT into `promotions` VALUES (2,"Promotion 2","2023-11-01 12:00:00","2023-10-30 11:59:59");
+INSERT into `promotions` VALUES (3,"Promotion 3","2023-12-01 12:00:00","2023-10-30 11:59:59");
+INSERT into `promotions` VALUES (4,"Promotion 4","2024-01-01 12:00:00","2023-10-30 11:59:59");
 
 -- ----------------------------
 -- Table structure for users
@@ -201,6 +222,8 @@ CREATE TABLE `users`  (
   `UserType` enum('passenger','tourism_agent','airline_agent','admin') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `MembershipStatus` tinyint(1) NULL DEFAULT 0,
   `CreditCardInfo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `CreditCardExpiry` int,
+  `CreditCardCVV` int,
   `PasswordHash` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`UserID`) USING BTREE,
   UNIQUE INDEX `Email`(`Email` ASC) USING BTREE
@@ -209,11 +232,12 @@ CREATE TABLE `users`  (
 -- ----------------------------
 -- Records of users
 -- ----------------------------
-INSERT INTO `users` VALUES (1, 'John Doe', '1234 5th Ave, Calgary, AB', 'johnDoe@gmail.com', 'passenger', 0, '1234-5678-9012-3456', '');
-INSERT INTO `users` VALUES (2, 'Jane Doe', '1234 5th Ave, Calgary, AB', 'janeDoe@gmail.com', 'passenger', 0, '1234-5678-9012-3456', '');
-INSERT INTO `users` VALUES (3, 'ysz', NULL, 'sgg', 'passenger', 0, NULL, '123456');
-INSERT INTO `users` VALUES (4, 'Hhf', NULL, 'bgesrg', 'passenger', 0, NULL, '12345678');
-INSERT INTO `users` VALUES (5, 'ryg', NULL, 'wghtg', 'passenger', 0, NULL, '4545');
-INSERT INTO `users` VALUES (6, 'sara', NULL, 'fsefs', 'passenger', 0, NULL, '123456');
+INSERT INTO `users` VALUES (1, 'John Doe', '1234 5th Ave, Calgary, AB', 'johnDoe@gmail.com', 'passenger', 0, '1234-5678-9012-3456',0101,123, '');
+INSERT INTO `users` VALUES (2, 'Jane Doe', '1234 5th Ave, Calgary, AB', 'janeDoe@gmail.com', 'passenger', 0, '1234-5678-9012-3456',0202,123, '');
+INSERT INTO `users` VALUES (3, 'ysz', NULL, 'sgg', 'passenger', 0, NULL, '123456',0303,123);
+INSERT INTO `users` VALUES (4, 'Hhf', NULL, 'bgesrg', 'passenger', 0, NULL, '12345678',0404,123);
+INSERT INTO `users` VALUES (5, 'ryg', NULL, 'wghtg', 'passenger', 0, NULL, '4545',0505,123);
+INSERT INTO `users` VALUES (6, 'sara', NULL, 'fsefs', 'passenger', 0, NULL,0606,123, '123456');
+INSERT INTO `users` VALUES (7, 'admin', NULL, '00000', 'admin', 0, NULL,0606,123, '0000');
 
 SET FOREIGN_KEY_CHECKS = 1;

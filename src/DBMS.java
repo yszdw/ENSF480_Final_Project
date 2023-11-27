@@ -23,13 +23,13 @@ public class DBMS {
     /**
      * DBMS Constructor
      *
-     * Called only when an instance does not yet exist, creates onnection to local
+     * Called only when an instance does not yet exist, creates cnnection to local
      * database
      *
      */
     private DBMS() throws SQLException {
         // the connection info here will need to be changed depending on the user
-        dbConnect = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/ENSF480", "root", "ensf480");
+        dbConnect = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/ENSF480", "root", "password");
     }
 
     /**
@@ -72,8 +72,11 @@ public class DBMS {
             int numEconomySeats = results.getInt("Ordinary");
             int numComfortSeats = results.getInt("Comfort");
             int numBusinessSeats = results.getInt("Business");
+            double economyPrice = results.getDouble("EconomyPrice");
+            double businessPrice = results.getDouble("BusinessPrice");
+
             Aircraft aircraft = new Aircraft(aircraftID, aircraftModel, numEconomySeats, numComfortSeats,
-                    numBusinessSeats);
+                    numBusinessSeats, economyPrice, businessPrice);
             aircrafts.add(aircraft);
         }
         results.close();
@@ -81,7 +84,43 @@ public class DBMS {
     }
 
     /*
-     * getFlight list from database
+     * add aircraft to database
+     */
+
+    public void addAircraft(String aircraftModel, int numEconomySeats, int numComfortSeats,
+            int numBusinessSeats, double economyPrice, double businessPrice) throws SQLException {
+        // Statement myStmt = dbConnect.createStatement();
+
+        // Use PreparedStatement to avoid SQL injection
+        String sql = "INSERT INTO aircrafts (Model, Ordinary, Comfort, Business, EconomyPrice, BusinessPrice) VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement pstmt = dbConnect.prepareStatement(sql)) {
+            pstmt.setString(1, aircraftModel);
+            pstmt.setInt(2, numEconomySeats);
+            pstmt.setInt(3, numComfortSeats);
+            pstmt.setInt(4, numBusinessSeats);
+            pstmt.setDouble(5, economyPrice);
+            pstmt.setDouble(6, businessPrice);
+
+            pstmt.executeUpdate();
+        }
+    }
+
+    /*
+     * remove aircraft from database
+     */
+
+    public void removeAircraft(int aircraftID) throws SQLException {
+        Statement myStmt = dbConnect.createStatement();
+        String sql = "DELETE FROM aircrafts WHERE AircraftID = ?";
+        try (PreparedStatement pstmt = dbConnect.prepareStatement(sql)) {
+            pstmt.setInt(1, aircraftID);
+            pstmt.executeUpdate();
+        }
+    }
+
+    /*
+     * getFlight list based on destination and origin from database
      */
     public ArrayList<Flight> getFlights(String origin, String destination) throws SQLException {
         ArrayList<Flight> flights = new ArrayList<Flight>();
@@ -100,7 +139,7 @@ public class DBMS {
             for (Aircraft a : aircrafts) {
                 if (a.getAircraftID() == aircraftID) {
                     aircraft = a;
-                    break; // 找到匹配的飞机后即可退出循环
+                    break;
                 }
             }
             Flight flight = new Flight(aircraft, results.getInt("FlightID"), results.getString("Origin"),
@@ -137,6 +176,172 @@ public class DBMS {
     }
 
     /*
+     * get ALL flights from database for selected date
+     */
+
+    public ArrayList<Flight> getFlights(LocalDate selectedDate) throws SQLException {
+        ArrayList<Flight> flights = new ArrayList<Flight>();
+        ArrayList<Aircraft> aircrafts = getAircrafts();
+        Statement myStmt = dbConnect.createStatement();
+        results = myStmt.executeQuery("SELECT * FROM Flights");
+        while (results.next()) {
+            LocalDateTime departureDateTime = results.getTimestamp("DepartureDateTime").toLocalDateTime();
+            LocalDateTime arrivalDateTime = results.getTimestamp("ArrivalDateTime").toLocalDateTime();
+            int aircraftID = results.getInt("AircraftID");
+            Aircraft aircraft = null;
+            for (Aircraft a : aircrafts) {
+                if (a.getAircraftID() == aircraftID) {
+                    aircraft = a;
+                }
+            }
+
+            Flight flight = new Flight(aircraft, results.getInt("FlightID"), results.getString("Origin"),
+                    results.getString("Destination"), departureDateTime.toLocalDate(),
+
+                    departureDateTime.toLocalTime(), arrivalDateTime.toLocalDate(), arrivalDateTime.toLocalTime());
+            flights.add(flight);
+        }
+        ArrayList<Flight> flightsOnDate = new ArrayList<Flight>();
+        for (Flight f : flights) {
+            if (f.getDepartureDate().equals(selectedDate)) {
+                flightsOnDate.add(f);
+            }
+        }
+        return flightsOnDate;
+    }
+
+    /*
+     * getFlight list from database
+     */
+    public ArrayList<Flight> getFlights() throws SQLException {
+        ArrayList<Flight> flights = new ArrayList<Flight>();
+        ArrayList<Aircraft> aircrafts = getAircrafts();
+        Statement myStmt = dbConnect.createStatement();
+        results = myStmt.executeQuery("SELECT * FROM Flights");
+        while (results.next()) {
+            LocalDateTime departureDateTime = results.getTimestamp("DepartureDateTime").toLocalDateTime();
+            LocalDateTime arrivalDateTime = results.getTimestamp("ArrivalDateTime").toLocalDateTime();
+            int aircraftID = results.getInt("AircraftID");
+            Aircraft aircraft = null;
+            for (Aircraft a : aircrafts) {
+                if (a.getAircraftID() == aircraftID) {
+                    aircraft = a;
+                }
+            }
+
+            Flight flight = new Flight(aircraft, results.getInt("FlightID"), results.getString("Origin"),
+                    results.getString("Destination"), departureDateTime.toLocalDate(),
+
+                    departureDateTime.toLocalTime(), arrivalDateTime.toLocalDate(), arrivalDateTime.toLocalTime());
+            flights.add(flight);
+        }
+        results.close();
+        return flights;
+    }
+
+    /*
+     * add flight to database
+     */
+    public void addFlight(Aircraft aircraft, String origin, String destination, LocalDate departureDate,
+            LocalTime departureTime, LocalDate arrivalDate, LocalTime arrivalTime) throws SQLException {
+        String sql = "INSERT INTO Flights (AircraftID, Origin, Destination, DepartureDateTime, ArrivalDateTime) VALUES (?, ?, ?, ?, ?)";
+
+        try (PreparedStatement pstmt = dbConnect.prepareStatement(sql)) {
+            pstmt.setInt(1, aircraft.getAircraftID());
+            pstmt.setString(2, origin);
+            pstmt.setString(3, destination);
+            pstmt.setTimestamp(4, Timestamp.valueOf(LocalDateTime.of(departureDate, departureTime)));
+            pstmt.setTimestamp(5, Timestamp.valueOf(LocalDateTime.of(arrivalDate, arrivalTime)));
+
+            pstmt.executeUpdate();
+        }
+    }
+
+    /*
+     * remove flight from database
+     */
+    public void removeFlight(int flightID) throws SQLException {
+        Statement myStmt = dbConnect.createStatement();
+        String sql = "DELETE FROM Flights WHERE FlightID = ?";
+        try (PreparedStatement pstmt = dbConnect.prepareStatement(sql)) {
+            pstmt.setInt(1, flightID);
+            pstmt.executeUpdate();
+        }
+    }
+
+    /*
+     * edit flight in database
+     */
+
+    public void editFlightLocation(int flightID, String indicator, String data) {
+        if ("Origin".equals(indicator)) {
+            updateLocation(flightID, "Origin", data);
+        } else if ("Destination".equals(indicator)) {
+            updateLocation(flightID, "Destination", data);
+        } else if ("DepartureDateTime".equals(indicator)) {
+            updateDateTime(flightID, "DepartureDateTime", data);
+        } else if ("ArrivalDateTime".equals(indicator)) {
+            updateDateTime(flightID, "ArrivalDateTime", data);
+        }
+
+    }
+
+    public Flight getFlights(int flightID) throws SQLException {
+        Flight returnFlight = null;
+        ArrayList<Aircraft> aircrafts = getAircrafts();
+        Statement myStmt = dbConnect.createStatement();
+        String query = "SELECT * FROM Flights WHERE flightID = ?";
+        PreparedStatement pstmt = dbConnect.prepareStatement(query);
+        pstmt.setInt(1, flightID);
+        ResultSet results = pstmt.executeQuery();
+        while (results.next()) {
+            LocalDateTime departureDateTime = results.getTimestamp("DepartureDateTime").toLocalDateTime();
+            LocalDateTime arrivalDateTime = results.getTimestamp("ArrivalDateTime").toLocalDateTime();
+            int aircraftID = results.getInt("AircraftID");
+            Aircraft aircraft = null;
+            for (Aircraft a : aircrafts) {
+                if (a.getAircraftID() == aircraftID) {
+                    aircraft = a;
+                    break;
+                }
+            }
+            returnFlight = new Flight(aircraft, results.getInt("FlightID"), results.getString("Origin"),
+                    results.getString("Destination"), departureDateTime.toLocalDate(),
+                    departureDateTime.toLocalTime(), arrivalDateTime.toLocalDate(), arrivalDateTime.toLocalTime());
+
+        }
+        results.close();
+        return returnFlight;
+    }
+
+    private void updateLocation(int flightID, String locationColumn, String data) {
+        try {
+            String updateQuery = "UPDATE flights SET " + locationColumn + " = ? WHERE FlightID = ?";
+            try (PreparedStatement preparedStatement = dbConnect.prepareStatement(updateQuery)) {
+                preparedStatement.setString(1, data);
+                preparedStatement.setInt(2, flightID);
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle the exception according to your needs
+        }
+    }
+
+    private void updateDateTime(int flightID, String dateTimeColumn, String dateTime) {
+        try {
+            String updateQuery = "UPDATE flights SET " + dateTimeColumn + " = ? WHERE FlightID = ?";
+            try (PreparedStatement preparedStatement = dbConnect.prepareStatement(updateQuery)) {
+                Timestamp timestamp = Timestamp.valueOf(dateTime);
+                preparedStatement.setTimestamp(1, timestamp);
+                preparedStatement.setInt(2, flightID);
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle the exception according to your needs
+        }
+    }
+
+    /*
      * TODO: bookFlight - THIS DOESNT WORK YET
      * Books a flight and insert into database
      */
@@ -162,11 +367,33 @@ public class DBMS {
             String address = results.getString("Address");
             String email = results.getString("Email");
             String userType = results.getString("UserType");
-            boolean isMember = results.getBoolean("MembershipStatus");
-            String creditCard = results.getString("CreditCardInfo");
-            User user = new User(userID, username, email, address, creditCard, userType);
-            user.setIsMember(isMember);
-            users.add(user);
+            String creditCardNumber = results.getString("CreditCardInfo");
+            int creditCardExpiry = results.getInt("CreditCardExpiry");
+            int creditCardCVV = results.getInt("CreditCardCVV");
+            switch (userType) {
+                case "admin":
+                    Admin admin = new Admin(userID, username, email, address);
+                    users.add(admin);
+                    break;
+                case "crew":
+                    String crewMemberPos = results.getString("CrewMemberPos");
+                    CrewMember crewMember = new CrewMember(userID, username, email, address, crewMemberPos);
+                    users.add(crewMember);
+                    break;
+                case "passenger":
+                    CreditCard card = new CreditCard(creditCardNumber, username, creditCardExpiry, creditCardCVV);
+                    RegisteredUser passenger = new RegisteredUser(userID, username, email, address, card);
+                    users.add(passenger);
+                    break;
+                case "agent":
+                    Agent agent = new Agent(userID, username, email, address);
+                    users.add(agent);
+                    break;
+
+                default:
+                    System.out.println("Invalid user type");
+                    break;
+            }
         }
         results.close();
         return users;
@@ -177,7 +404,8 @@ public class DBMS {
      */
     public void addUser(User user) throws SQLException {
         // SQL query for insertion using a prepared statement
-        String insertQuery = "INSERT INTO Users (Name, Address, Email, UserType, MembershipStatus, CreditCardInfo) VALUES (?, ?, ?, ?, ?, ?)";
+        String insertQuery = "INSERT INTO Users (Name, Address, Email, UserType, CreditCardNumber, CreditCardExpiry," +
+                "CreditCardCVV) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         // Create a prepared statement
         try (PreparedStatement preparedStatement = dbConnect.prepareStatement(insertQuery)) {
@@ -185,9 +413,23 @@ public class DBMS {
             preparedStatement.setString(1, user.getUsername());
             preparedStatement.setString(2, user.getAddress());
             preparedStatement.setString(3, user.getEmail());
-            preparedStatement.setString(4, user.getUserType());
-            preparedStatement.setBoolean(5, user.getIsMember());
-            preparedStatement.setString(6, user.getCreditCard());
+            // get user type from user object
+            if (user instanceof Admin) {
+                preparedStatement.setString(4, "admin");
+            } else if (user instanceof CrewMember) {
+                preparedStatement.setString(4, "crew");
+            } else if (user instanceof RegisteredUser) {
+                preparedStatement.setString(4, "passenger");
+            } else {
+                System.out.println("Invalid user type");
+            }
+            // get credit card from user object if passenger
+            if (user instanceof RegisteredUser) {
+                CreditCard card = ((RegisteredUser) user).getCreditCard();
+                preparedStatement.setString(5, card.getCardNumber());
+                preparedStatement.setInt(6, card.getExpiryDate());
+                preparedStatement.setInt(7, card.getCVV());
+            }
 
             // Execute the insertion
             int rowsAffected = preparedStatement.executeUpdate();
@@ -227,138 +469,102 @@ public class DBMS {
     }
 
     /*
-     * getSeating list
+     * getCrew list from database
      */
-    // public ArrayList<Seat> getSeats() throws SQLException {
-    // ArrayList<Seat> seats = new ArrayList<Seat>();
-    // Statement myStmt = dbConnect.createStatement();
-    // results = myStmt.executeQuery("SELECT * FROM Seats");
-    // while (results.next()) {
-    // String seatID = results.getString("SeatID");
-    // String seatType = results.getString("SeatType");
-    // int seatPrice = results.getInt("SeatPrice");
-    // Seat seat = new Seat(seatID, seatType, seatPrice);
-    // seats.add(seat);
-    // }
-    // return seats;
-    // }
+
+    public ArrayList<CrewMember> getCrewMembers(int flight) throws SQLException {
+        ArrayList<CrewMember> crewMembers = new ArrayList<>();
+
+        String sql = "SELECT * FROM crews WHERE FlightID = ?";
+
+        try (PreparedStatement pstmt = dbConnect.prepareStatement(sql)) {
+            pstmt.setInt(1, flight);
+
+            try (ResultSet results = pstmt.executeQuery()) {
+                while (results.next()) {
+                    int crewID = results.getInt("CrewID");
+                    String crewName = results.getString("Name");
+                    String position = results.getString("Position");
+
+                    CrewMember crewMember = new CrewMember(crewID, crewName, position);
+                    crewMembers.add(crewMember);
+                }
+            }
+        }
+
+        return crewMembers;
+    }
+
+    /*
+     * add crew to flight - changes flightID in database - 0 is no flights assigned
+     */
+    public void updateCrew(int crewID, int flight) throws SQLException {
+        String sql = "UPDATE crews SET FlightID = ? WHERE CrewID = ?";
+
+        try (PreparedStatement pstmt = dbConnect.prepareStatement(sql)) {
+            pstmt.setInt(1, flight);
+            pstmt.setInt(2, crewID);
+            pstmt.executeUpdate();
+        }
+    }
 
     /*
      * getBooking list from database
      */
 
-    // public ArrayList<Booking> getBookings() throws SQLException {
-    // ArrayList<Booking> bookings = new ArrayList<Booking>();
-    // ArrayList<User> users = getUsers();
-    // ArrayList<Flight> flights = getFlights();
-    // Statement myStmt = dbConnect.createStatement();
-    // results = myStmt.executeQuery("SELECT * FROM Bookings");
-    // while (results.next()) {
-    // int bookingID = results.getInt("BookingID");
-    // int userID = results.getInt("UserID");
-    // User user = null;
-    // for (User u : users) {
-    // if (u.getUserID() == userID) {
-    // user = u;
-    // }
-    // }
-    // int flightID = results.getInt("FlightID");
-    // Flight flight = null;
-    // for (Flight f : flights) {
-    // if (f.getFlightID() == flightID) {
-    // flight = f;
-    // }
-    // }
+    public ArrayList<Booking> getBookings() throws SQLException {
+        ArrayList<Booking> bookings = new ArrayList<Booking>();
+        ArrayList<User> users = getUsers();
+        ArrayList<Flight> flights = getFlights();
+        Statement myStmt = dbConnect.createStatement();
+        results = myStmt.executeQuery("SELECT * FROM Bookings");
+        while (results.next()) {
+            int bookingID = results.getInt("BookingID");
+            int userID = results.getInt("UserID");
+            User user = null;
+            for (User u : users) {
+                if (u.getUserID() == userID) {
+                    user = u;
+                }
+            }
+            int flightID = results.getInt("FlightID");
+            Flight flight = null;
+            for (Flight f : flights) {
+                if (f.getFlightID() == flightID) {
+                    flight = f;
+                }
+            }
 
-    // int seatID = results.getInt("SeatID");
+            int seatID = results.getInt("SeatID");
 
-    // boolean cancellationInsurance = results.getBoolean("CancellationInsurance");
-    // LocalDateTime bookingDateTime =
-    // results.getTimestamp("BookingDateTime").toLocalDateTime();
+            boolean cancellationInsurance = results.getBoolean("CancellationInsurance");
+            LocalDateTime bookingDateTime = results.getTimestamp("BookingDateTime").toLocalDateTime();
 
-    // // TODO: Need to replace dummieSeat with actual seat
-    // Booking booking = new Booking(bookingID, flight, user, seatID,
-    // cancellationInsurance, bookingDateTime);
-    // bookings.add(booking);
-    // }
-    // results.close();
-    // return bookings;
-    // }
+            // TODO: Need to replace dummieSeat with actual seat
+            Booking booking = new Booking(bookingID, flight, user, seatID, cancellationInsurance, bookingDateTime);
+            bookings.add(booking);
+        }
+        results.close();
+        return bookings;
+    }
 
-    // public static void main(String args[]) throws SQLException {
+    /*
+     * Gets the most current promotion in the database
+     */
+    public String getCurrentPromotion() throws SQLException {
+        Statement myStatement = dbConnect.createStatement();
+        results = myStatement.executeQuery("SELECT *\n" +
+                "FROM `promotions`\n" +
+                "ORDER BY `ValidOn` asc\n" +
+                "LIMIT 1;");
 
-    // DBMS connect = getDBMS();
+        String promo = "NaN";
 
-    // // This is a list of all flight information in the database
-    // // - can use all flight getter methods for flight info
-    // ArrayList<Flight> flightList = connect.getFlights();
-    // // This is a list of all user information in the database
-    // // - can use all user getter methods for user info
-    // ArrayList<User> userList = connect.getUsers();
+        while (results.next()) {
+            promo = results.getString("Description");
+        }
+        return promo;
 
-    // ArrayList<Booking> bookingList = connect.getBookings();
-    // for (Booking booking : bookingList) {
-    // System.out.println(booking.getBookingID());
-    // int flightID = booking.getFlight().getFlightID();
-    // for (Flight flight : flightList) {
-    // if (flight.getFlightID() == flightID) {
-    // System.out.println(flight.getDepartureLocation());
-    // System.out.println(flight.getArrivalLocation());
-    // System.out.println(flight.getDepartureDate());
-    // System.out.println(flight.getArrivalDate());
-    // System.out.println(flight.getDepartureTime());
-    // System.out.println(flight.getArrivalTime());
-    // }
-    // }
-    // System.out.println(booking.getUser().getUsername());
-    // System.out.println(booking.getBookedSeats());
-    // System.out.println(booking.getCancellationInsurance());
-    // System.out.println(booking.getBookingDateTime());
-    // }
+    }
 
-    // // for (Flight flight : flightList) {
-    // // System.out.println(flight.getAircraft().getAircraftModel());
-    // // System.out.println(flight.getAircraft().getAircraftID());
-    // // }
-
-    // /*
-    // * TODO: with no login, customer can browse flights and book a flight
-    // * can search for flights by date, origin, destination
-    // * - use flight class getter methods to get info from flightList
-    // */
-
-    // // selected a flight
-    // Flight testFlight = flightList.get(0);
-
-    // /*
-    // * TODO: prompt user to login or create an account
-    // * this is a test object
-    // */
-
-    // // User testObject = new User("test", "test st", "test@email", "test",
-    // // "passenger");
-
-    // User testObject = userList.get(0);
-
-    // // connect.addUser(testObject);
-
-    // // Upon selecting a flight, display seat availability
-
-    // // create a new booking
-    // // testFlight.bookSeat(new Seat("1", "economy", 80), testObject);
-    // // System.out.println("Available seats: ");
-    // // for (Seat seat : testFlight.getSeats().values()) {
-    // // if (seat.getIsAvailable()) {
-    // // System.out.println(seat.getSeatNumber());
-    // // }
-    // // }
-    // // connect.bookFlight(testFlight.getFlightID(), testObject);
-
-    // /*
-    // * TODO: with login, customer can view booked flights and cancel a flight
-    // * do they need to login? or they can view by bookingID?
-    // */
-
-    // connect.closeConnection();
-    // }
 }

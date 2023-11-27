@@ -116,7 +116,7 @@ public class RegisterFrame extends JFrame {
         // Database operation
         try {
             Connection connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/ensf480", "root",
-                    "ensf480");
+                    "password");
             String sql = "INSERT INTO users (Name, Email, PasswordHash) VALUES (?, ?, ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, username);
