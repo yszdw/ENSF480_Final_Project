@@ -4,6 +4,7 @@ public class RegisteredUser extends User {
 
     CreditCard creditCard;
 
+
     public RegisteredUser(int userID, String username, String email, String address, CreditCard creditCard) {
         super(userID, username, email, address);
         this.creditCard = creditCard;
@@ -16,5 +17,6 @@ public class RegisteredUser extends User {
     public CreditCard getCreditCard() {
         return creditCard;
     }
+
 
 }
