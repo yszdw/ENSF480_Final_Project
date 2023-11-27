@@ -35,7 +35,7 @@ CREATE TABLE `aircrafts`  (
   `EconomyPrice` decimal(10, 2) NOT NULL,
   `BusinessPrice` decimal(10, 2) NOT NULL,
   PRIMARY KEY (`AircraftID`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of aircrafts
@@ -71,7 +71,7 @@ CREATE TABLE `bookings`  (
   INDEX `FlightID`(`FlightID` ASC) USING BTREE,
   CONSTRAINT `bookings_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `users` (`UserID`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `bookings_ibfk_2` FOREIGN KEY (`FlightID`) REFERENCES `flights` (`FlightID`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of bookings
@@ -91,7 +91,7 @@ CREATE TABLE `crews` (
   `Position` enum('pilot', 'flight_attendant', 'engineer') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `FlightID` int,
   PRIMARY KEY (`CrewID`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of crews
@@ -121,7 +121,7 @@ CREATE TABLE `flights`  (
   `ArrivalDateTime` datetime NOT NULL,
   `AircraftID` int NOT NULL,
   PRIMARY KEY (`FlightID`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of flights
@@ -142,6 +142,33 @@ INSERT INTO `flights` VALUES (13, 'Vancouver', 'Halifax', '2024-11-07 09:00:00',
 INSERT INTO `flights` VALUES (14, 'Toronto', 'Halifax', '2024-10-11 15:00:00', '2024-10-11 17:00:00', 2);
 
 -- ----------------------------
+-- Table structure for orders
+-- ----------------------------
+DROP TABLE IF EXISTS `orders`;
+CREATE TABLE `orders`  (
+  `OrderID` int NOT NULL AUTO_INCREMENT,
+  `Username` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `FlightID` int NOT NULL,
+  `AircraftModel` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `DepartureLocation` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `ArrivalLocation` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `DepartureTime` time NOT NULL,
+  `ArrivalTime` time NOT NULL,
+  `Class` enum('Economy','Business','Comfort') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `SeatNumber` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `Insurance` tinyint(1) NOT NULL,
+  `TotalPrice` decimal(10, 2) NOT NULL,
+  PRIMARY KEY (`OrderID`) USING BTREE,
+  INDEX `FlightID`(`FlightID` ASC) USING BTREE,
+  CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`FlightID`) REFERENCES `flights` (`FlightID`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of orders
+-- ----------------------------
+INSERT INTO `orders` VALUES (1, 'sara', 2, 'Boeing 737', 'Calgary', 'Vancouver', '01:00:00', '02:00:00', 'Economy', 'E16', 1, 150.00);
+
+-- ----------------------------
 -- Table structure for payments
 -- ----------------------------
 DROP TABLE IF EXISTS `payments`;
@@ -154,7 +181,7 @@ CREATE TABLE `payments`  (
   PRIMARY KEY (`PaymentID`) USING BTREE,
   INDEX `BookingID`(`BookingID` ASC) USING BTREE,
   CONSTRAINT `payments_ibfk_1` FOREIGN KEY (`BookingID`) REFERENCES `bookings` (`BookingID`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of payments
@@ -169,8 +196,11 @@ CREATE TABLE `promotions`  (
   `Description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `ValidOn` datetime NOT NULL,
   `ValidUntil` datetime NOT NULL,
-  PRIMARY KEY (`PromotionID`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`PromotionID`) USING BTREE,
+  INDEX `UserID`(`UserID` ASC) USING BTREE,
+  CONSTRAINT `promotions_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `users` (`UserID`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+
 
 -- ----------------------------
 -- Records of promotions
