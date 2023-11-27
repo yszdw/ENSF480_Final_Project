@@ -24,7 +24,7 @@ public class DBMS {
     /**
      * DBMS Constructor
      *
-     * Called only when an instance does not yet exist, creates onnection to local
+     * Called only when an instance does not yet exist, creates cnnection to local
      * database
      *
      */
@@ -136,7 +136,7 @@ public class DBMS {
             String address = results.getString("Address");
             String email = results.getString("Email");
             String userType = results.getString("UserType");
-            int creditCardNumber = results.getInt("CreditCardNumber");
+            String creditCardNumber = results.getString("CreditCardInfo");
             int creditCardExpiry = results.getInt("CreditCardExpiry");
             int creditCardCVV = results.getInt("CreditCardCVV");
             switch (userType) {
@@ -195,7 +195,7 @@ public class DBMS {
             // get credit card from user object if passenger
             if (user instanceof RegisteredUser) {
                 CreditCard card = ((RegisteredUser) user).getCreditCard();
-                preparedStatement.setLong(5, card.getCardNumber());
+                preparedStatement.setString(5, card.getCardNumber());
                 preparedStatement.setInt(6, card.getExpiryDate());
                 preparedStatement.setInt(7, card.getCVV());
             }
@@ -346,4 +346,25 @@ public class DBMS {
 
         connect.closeConnection();
     }
+
+
+    /*
+     * Gets the most current promotion in the database
+     */
+    public String getCurrentPromotion() throws SQLException{
+        Statement myStatement = dbConnect.createStatement();
+        results = myStatement.executeQuery("SELECT *\n" +
+                                      "FROM `promotions`\n" +
+                                 "ORDER BY `ValidOn` asc\n" +
+                                                 "LIMIT 1;");
+
+        String promo = "NaN";
+
+        while (results.next()) {
+        promo =  results.getString("Description");
+        }
+        return promo;
+
+    }
 }
+
