@@ -207,7 +207,7 @@ INSERT INTO `users` VALUES (2, 'Jane Doe', '1234 5th Ave, Calgary, AB', 'janeDoe
 INSERT INTO `users` VALUES (3, 'ysz', NULL, 'sgg', 'passenger', 0, NULL, '123456',0303,123);
 INSERT INTO `users` VALUES (4, 'Hhf', NULL, 'bgesrg', 'passenger', 0, NULL, '12345678',0404,123);
 INSERT INTO `users` VALUES (5, 'ryg', NULL, 'wghtg', 'passenger', 0, NULL, '4545',0505,123);
-INSERT INTO `users` VALUES (6, 'sara', NULL, 'fsefs', 'passenger', 0, NULL, '123456',0606,123);
-INSERT INTO `users` VALUES (7, 'admin', NULL, 'fsefs', 'admin', 0, NULL, '0000',0606,123, '0000');
+INSERT INTO `users` VALUES (6, 'sara', NULL, 'fsefs', 'passenger', 0, NULL,0606,123, '123456');
+INSERT INTO `users` VALUES (7, 'admin', NULL, '00000', 'admin', 0, NULL,0606,123, '0000');
 
 SET FOREIGN_KEY_CHECKS = 1;

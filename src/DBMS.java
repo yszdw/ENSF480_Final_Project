@@ -139,7 +139,7 @@ public class DBMS {
             for (Aircraft a : aircrafts) {
                 if (a.getAircraftID() == aircraftID) {
                     aircraft = a;
-                    break; // 找到匹配的飞机后即可退出循环
+                    break;
                 }
             }
             Flight flight = new Flight(aircraft, results.getInt("FlightID"), results.getString("Origin"),
@@ -176,7 +176,7 @@ public class DBMS {
     }
 
     /*
-     * get ALL flights from database
+     * get ALL flights from database for selected date
      */
 
     public ArrayList<Flight> getFlights(LocalDate selectedDate) throws SQLException {
@@ -208,6 +208,35 @@ public class DBMS {
             }
         }
         return flightsOnDate;
+    }
+
+    /*
+     * getFlight list from database
+     */
+    public ArrayList<Flight> getFlights() throws SQLException {
+        ArrayList<Flight> flights = new ArrayList<Flight>();
+        ArrayList<Aircraft> aircrafts = getAircrafts();
+        Statement myStmt = dbConnect.createStatement();
+        results = myStmt.executeQuery("SELECT * FROM Flights");
+        while (results.next()) {
+            LocalDateTime departureDateTime = results.getTimestamp("DepartureDateTime").toLocalDateTime();
+            LocalDateTime arrivalDateTime = results.getTimestamp("ArrivalDateTime").toLocalDateTime();
+            int aircraftID = results.getInt("AircraftID");
+            Aircraft aircraft = null;
+            for (Aircraft a : aircrafts) {
+                if (a.getAircraftID() == aircraftID) {
+                    aircraft = a;
+                }
+            }
+
+            Flight flight = new Flight(aircraft, results.getInt("FlightID"), results.getString("Origin"),
+                    results.getString("Destination"), departureDateTime.toLocalDate(),
+
+                    departureDateTime.toLocalTime(), arrivalDateTime.toLocalDate(), arrivalDateTime.toLocalTime());
+            flights.add(flight);
+        }
+        results.close();
+        return flights;
     }
 
     /*
@@ -352,7 +381,7 @@ public class DBMS {
                     users.add(crewMember);
                     break;
                 case "passenger":
-                    CreditCard card = new CreditCard(creditCardNumber, username,creditCardExpiry, creditCardCVV);
+                    CreditCard card = new CreditCard(creditCardNumber, username, creditCardExpiry, creditCardCVV);
                     RegisteredUser passenger = new RegisteredUser(userID, username, email, address, card);
                     users.add(passenger);
                     break;
@@ -505,8 +534,8 @@ public class DBMS {
                     flight = f;
                 }
             }
-          
-          int seatID = results.getInt("SeatID");
+
+            int seatID = results.getInt("SeatID");
 
             boolean cancellationInsurance = results.getBoolean("CancellationInsurance");
             LocalDateTime bookingDateTime = results.getTimestamp("BookingDateTime").toLocalDateTime();
@@ -522,20 +551,20 @@ public class DBMS {
     /*
      * Gets the most current promotion in the database
      */
-    public String getCurrentPromotion() throws SQLException{
+    public String getCurrentPromotion() throws SQLException {
         Statement myStatement = dbConnect.createStatement();
         results = myStatement.executeQuery("SELECT *\n" +
-                                      "FROM `promotions`\n" +
-                                 "ORDER BY `ValidOn` asc\n" +
-                                                 "LIMIT 1;");
+                "FROM `promotions`\n" +
+                "ORDER BY `ValidOn` asc\n" +
+                "LIMIT 1;");
 
         String promo = "NaN";
 
         while (results.next()) {
-        promo =  results.getString("Description");
+            promo = results.getString("Description");
         }
         return promo;
 
     }
-}
 
+}

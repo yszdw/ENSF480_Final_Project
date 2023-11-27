@@ -805,20 +805,19 @@ public class LoginFrame extends JFrame {
             setLayout(new BorderLayout());
             setSize(600, 400);
 
-            String[] columnNames = { "User ID", "Username", "Email", "Address", "Credit Card", };
+            String[] columnNames = { "User ID", "Username", "Email", "Address", "Has Insurance", };
             DefaultTableModel model = new DefaultTableModel(columnNames, 0);
 
             for (User u : users) {
-                if (u.isMember) {
-                    Object[] row = new Object[7]; // Adjusted to match the number of columns
-                    row[0] = u.getUserID();
-                    row[1] = u.getUsername();
-                    row[2] = u.getEmail();
-                    row[3] = u.getAddress();
-                    row[4] = u.getCreditCard();
-                    model.addRow(row);
-                }
 
+                Object[] row = new Object[5]; // Adjusted to match the number of columns
+                row[0] = u.getUserID();
+                row[1] = u.getUsername();
+                row[2] = u.getEmail();
+                row[3] = u.getAddress();
+                row[4] = u.getHasInsurance();
+
+                model.addRow(row);
             }
 
             JTable table = new JTable(model);

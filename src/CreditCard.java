@@ -1,4 +1,3 @@
-package src;
 
 public class CreditCard {
     String CARDNUMBER;
@@ -17,12 +16,15 @@ public class CreditCard {
     public String getCardNumber() {
         return CARDNUMBER;
     }
+
     public String getCardHolderName() {
         return CARDHOLDERNAME;
     }
+
     public int getExpiryDate() {
         return EXPIRY;
     }
+
     public int getCVV() {
         return CVV;
     }
