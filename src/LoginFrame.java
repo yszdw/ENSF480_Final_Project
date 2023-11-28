@@ -74,8 +74,25 @@ public class LoginFrame extends JFrame {
         gbc.gridx = 1;
         inputPanel.add(passField, gbc);
 
-        // Login Button
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        // Back button to close the login window and show the welcome window
+        JButton backButton = new JButton("Back");
+        backButton.setFont(INPUT_FONT);
+        backButton.setBackground(BUTTON_COLOR); // Cornflower Blue
+        backButton.setForeground(BUTTON_TEXT_COLOR);
+        backButton.setFocusPainted(false);
+        backButton.setBorderPainted(false);
+        buttonPanel.add(backButton);
+
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loginFrame.dispose();
+            }
+        });
+
+
+        // Login Button
         JButton loginButton = new JButton("Login");
         loginButton.setFont(INPUT_FONT);
         loginButton.setBackground(BUTTON_COLOR); // Cornflower Blue
@@ -937,7 +954,8 @@ public class LoginFrame extends JFrame {
             setLayout(new BorderLayout());
             setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-            JLabel welcomeLabel = new JLabel("Welcome to our Flight Reservation System", SwingConstants.CENTER);
+            JLabel welcomeLabel = new JLabel("Welcome " + this.username + " to our Flight Reservation System",
+                    SwingConstants.CENTER);
             welcomeLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
             add(welcomeLabel, BorderLayout.NORTH);
 
@@ -962,6 +980,39 @@ public class LoginFrame extends JFrame {
             gbc.insets = new Insets(0, 0, 10, 0);
             buttonPanel.add(cancelFlightButton, gbc);
 
+            cancelFlightButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cancelFlightPanel(username); // Pass the username to createTicketPurchasePanel
+                }
+            });
+
+            JButton registerButton = null;
+
+            if (username.equals("guest")) {
+                cancelFlightButton.setEnabled(false);
+                // create register button
+                registerButton = createStyledButton("Register");
+                gbc.insets = new Insets(0, 0, 10, 0);
+                buttonPanel.add(registerButton, gbc);
+            }
+
+            if (registerButton != null) {
+                registerButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        // Hide the welcome frame
+                        WelcomeFrame.this.setVisible(false);
+                        WelcomeFrame.this.dispose(); // Optionally, you can dispose the WelcomeFrame
+
+                        // Create and show the register frame
+                        RegisterFrame registerFrame = new RegisterFrame();
+                        registerFrame.setVisible(true);
+                    }
+                });
+            }
+
+
             add(buttonPanel, BorderLayout.CENTER);
 
             pack();
@@ -978,6 +1029,54 @@ public class LoginFrame extends JFrame {
             button.setBorderPainted(false);
             return button;
         }
+    }
+
+    private void cancelFlightPanel(String username) {
+        JFrame browseFrame = new JFrame("Cancel Flight");
+        browseFrame.setSize(300, 250);
+        browseFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        browseFrame.setLayout(new GridLayout(5, 2, 10, 10));
+
+        JLabel fromLabel = new JLabel("Enter a flightID: ");
+        JTextField flightTextField = new JTextField();
+
+        browseFrame.add(fromLabel);
+        browseFrame.add(flightTextField);
+
+        JButton confirmButton = new JButton("Confirm");
+        confirmButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+
+                    int flightID = Integer.parseInt(flightTextField.getText());
+
+                    DBMS dbms = DBMS.getDBMS(); // This will not create a new instance but will return the existing
+                                                // one.
+                    // 0 if worked, 1 if not
+                    int cancelled = dbms.cancelFlight(flightID, username);
+
+                    if (cancelled == 0) {
+                        JOptionPane.showMessageDialog(browseFrame, "Flight cancelled successfully.",
+                                "Flight Cancelled", JOptionPane.INFORMATION_MESSAGE);
+                        // close window
+                        browseFrame.dispose();
+                    } else {
+                        JOptionPane.showMessageDialog(browseFrame, "Flight could not be cancelled.",
+                                "Flight Not Cancelled", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(browseFrame, "Error fetching flight data: " + ex.getMessage(),
+                            "Database Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        browseFrame.add(new JLabel());
+        browseFrame.add(confirmButton);
+
+        browseFrame.setVisible(true);
     }
 
     public LoginFrame() {

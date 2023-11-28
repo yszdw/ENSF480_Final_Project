@@ -628,4 +628,19 @@ public class DBMS {
         myStmt.executeUpdate(sql);
     }
 
+    public int cancelFlight(int flightID, String username) {
+        // returns 0 if successful, 1 if not
+        try {
+            String updateQuery = "DELETE FROM orders WHERE FlightID = ? AND Username = ?";
+            try (PreparedStatement preparedStatement = dbConnect.prepareStatement(updateQuery)) {
+                preparedStatement.setInt(1, flightID);
+                preparedStatement.setString(2, username);
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle the exception according to your needs
+            return 1;
+        }
+        return 0;
+    }
 }

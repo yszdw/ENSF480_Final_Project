@@ -237,5 +237,9 @@ INSERT INTO `users` VALUES (4, 'Hhf', NULL, 'bgesrg', 'passenger', 0, NULL, '123
 INSERT INTO `users` VALUES (5, 'ryg', NULL, 'wghtg', 'passenger', 0, NULL, '4545',0505,123);
 INSERT INTO `users` VALUES (6, 'sara', NULL, 'fsefs', 'passenger', 0, NULL,0606,123, '123456');
 INSERT INTO `users` VALUES (7, 'admin', NULL, '00000', 'admin', 0, NULL,0606,123, '0000');
+INSERT INTO `users` VALUES (8, 'Aryan', '1236 5th Ave, Calgary, AB'. 'aryan@gmail.com', 'passenger', 0, '1234123412341234', 1024, 100, 'pass');
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+SELECT * FROM users;
+SELECT * from orders;
