@@ -3,13 +3,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.LocalTime;
-import java.time.LocalDate;
+import java.sql.*;
+import java.time.*;
 import java.util.ArrayList;
 
 public class LoginFrame extends JFrame {
@@ -113,40 +108,15 @@ public class LoginFrame extends JFrame {
     }
 
     private boolean authenticate(String username, String password) {
-        // Here we should actually hash the password and compare against hashed password
-        // in the database
-        Connection connection = null;
-        PreparedStatement statement = null;
-        ResultSet resultSet = null;
-
         try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ensf480", "root", "password");
-            String sql = "SELECT * FROM users WHERE Name = ? AND PasswordHash = ?";
-            statement = connection.prepareStatement(sql);
-            statement.setString(1, username);
-            statement.setString(2, password); // In real app, you should hash the password before comparing
-
-            resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                return true; // User found with matching username and password
-            }
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Database error: " + sqlException.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        } finally {
-            try {
-                if (resultSet != null)
-                    resultSet.close();
-                if (statement != null)
-                    statement.close();
-                if (connection != null)
-                    connection.close();
-            } catch (SQLException sqlException) {
-                sqlException.printStackTrace();
-            }
+            DBMS dbms = DBMS.getDBMS();
+            return dbms.loginCheck(username, password);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error fetching flight data: " + ex.getMessage(),
+                    "Database Error", JOptionPane.ERROR_MESSAGE);
         }
-        return false; // User not found, or db error occurred
+        return false;
     }
 
     private void createAdminLoginPanel() {
@@ -215,7 +185,8 @@ public class LoginFrame extends JFrame {
                 // Implement your login logic here
                 String username = userTextField.getText();
                 String password = new String(passField.getPassword());
-                if (admin(username, password)) {
+
+                if (authenticate(username, password) && username.equals("admin")) {
                     // Login successful
                     SwingUtilities.invokeLater(() -> {
                         loginFrame.dispose(); // Close the login window
@@ -235,46 +206,6 @@ public class LoginFrame extends JFrame {
         loginFrame.add(inputPanel, BorderLayout.CENTER);
         loginFrame.add(buttonPanel, BorderLayout.SOUTH);
         loginFrame.setVisible(true);
-    }
-
-    private boolean admin(String username, String password) {
-        Connection connection = null;
-        PreparedStatement statement = null;
-        ResultSet resultSet = null;
-
-        try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ensf480", "root", "password");
-            String sql = "SELECT * FROM users WHERE Name = ? AND PasswordHash = ?";
-            statement = connection.prepareStatement(sql);
-            statement.setString(1, username);
-            statement.setString(2, password); // In a real app, you should hash the password before comparing
-
-            resultSet = statement.executeQuery();
-
-            if (resultSet.next()) {
-                // Check if the user has the role of an admin
-                String userType = resultSet.getString("UserType");
-                if ("admin".equals(userType)) {
-                    return true; // Admin found with matching username and password
-                }
-            }
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Database error: " + sqlException.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        } finally {
-            try {
-                if (resultSet != null)
-                    resultSet.close();
-                if (statement != null)
-                    statement.close();
-                if (connection != null)
-                    connection.close();
-            } catch (SQLException sqlException) {
-                sqlException.printStackTrace();
-            }
-        }
-        return false; // User not found, or db error occurred
     }
 
     public class WelcomeFrame extends JFrame {
@@ -389,7 +320,7 @@ public class LoginFrame extends JFrame {
         buttonPanel.add(userRegisterButton, gbc);
 
         JPanel groupPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel groupLabel = new JLabel("group25");
+        JLabel groupLabel = new JLabel("group24");
         groupLabel.setFont(GROUP_FONT);
         groupLabel.setForeground(Color.GRAY);
         groupPanel.add(groupLabel);
@@ -682,6 +613,14 @@ public class LoginFrame extends JFrame {
         public LocalTime getArrivalTime() {
             return getSelectedFlight().getArrivalTime();
         }
+
+        public LocalDate getDepartureDate() {
+            return getSelectedFlight().getDepartureDate();
+        }
+
+        public LocalDate getArrivalDate() {
+            return getSelectedFlight().getArrivalDate();
+        }
     }
 
     public class SeatSelectionFrame extends JFrame {
@@ -852,7 +791,9 @@ public class LoginFrame extends JFrame {
                         System.err.println("1");
                         // Retrieve the selected flight and other booking details
                         Flight selectedFlight = seatSelectionFrame.flightInfoFrame.getSelectedFlight();// flightInfoFrame.getSelectedFlight();
+                        LocalDate departureDate = seatSelectionFrame.flightInfoFrame.getDepartureDate();
                         LocalTime departureTime = seatSelectionFrame.flightInfoFrame.getDepartureTime();
+                        LocalDate arrivalDate = seatSelectionFrame.flightInfoFrame.getArrivalDate();
                         LocalTime arrivaltime = seatSelectionFrame.flightInfoFrame.getArrivalTime();
                         System.err.println("2");
                         boolean isEconomy = seatSelectionFrame.bookingFrame.isEconomyClassSelected();
@@ -866,7 +807,8 @@ public class LoginFrame extends JFrame {
                         PaymentFrame.this.dispose();
 
                         ConfirmationFrame confirmationFrame = new ConfirmationFrame(username, selectedFlight, isEconomy,
-                                isBusiness, hasInsurance, seatNumber, totalPrice, departureTime, arrivaltime);
+                                isBusiness, hasInsurance, seatNumber, totalPrice, departureDate, departureTime,
+                                arrivalDate, arrivaltime);
                         confirmationFrame.setVisible(true);
                     } else {
                         // Handle failed payment case
@@ -883,7 +825,8 @@ public class LoginFrame extends JFrame {
     public class ConfirmationFrame extends JFrame {
         public ConfirmationFrame(String username, Flight selectedFlight, boolean isEconomy, boolean isBusiness,
                 boolean hasInsurance,
-                String seatNumber, double totalprice, LocalTime departurTime, LocalTime arrivalTime) {
+                String seatNumber, double totalprice, LocalDate departureDate, LocalTime departureTime,
+                LocalDate arrivalDate, LocalTime arrivalTime) {
             setTitle("Booking Confirmation");
             setSize(300, 200); // Adjust the size as needed
             setLayout(new BorderLayout());
@@ -895,7 +838,8 @@ public class LoginFrame extends JFrame {
             infoPanel.add(new JLabel("Aircraft: " + selectedFlight.getAircraft().getAircraftModel()));
             infoPanel.add(new JLabel("From: " + selectedFlight.getDepartureLocation()));
             infoPanel.add(new JLabel("To: " + selectedFlight.getArrivalLocation()));
-            infoPanel.add(new JLabel("Departure time: " + departurTime));
+
+            infoPanel.add(new JLabel("Departure time: " + departureTime));
             infoPanel.add(new JLabel("Arrival time: " + arrivalTime));
             infoPanel.add(new JLabel("Class: " + (isEconomy ? "Economy" : isBusiness ? "Business" : "Comfort")));
             infoPanel.add(new JLabel("Seat: " + seatNumber));
@@ -911,53 +855,20 @@ public class LoginFrame extends JFrame {
             setLocationRelativeTo(null);
             setVisible(true);
             // Example of calling the updateDatabase method.
-            updateDatabase(username, selectedFlight.getFlightID(), selectedFlight.getAircraft().getAircraftModel(),
-                    selectedFlight.getDepartureLocation(), selectedFlight.getArrivalLocation(), departurTime,
-                    arrivalTime,
-                    (isEconomy ? "Economy" : isBusiness ? "Business" : "Comfort"), seatNumber, hasInsurance,
-                    totalprice);
-
-        }
-
-        public void updateDatabase(String username, int flightID, String aircraftModel, String departureLocation,
-                String arrivalLocation, LocalTime departureTime, LocalTime arrivalTime, String seatClass,
-                String seatNumber, boolean hasInsurance, double totalprice) {
-
-            // Define the JDBC URL.
-            String jdbcURL = "jdbc:mysql://localhost:3306/ensf480";
-            String dbUser = "root"; // Replace with your database username.
-            String dbPassword = "ensf480"; // Replace with your database password.
-
-            // SQL query to insert a new order.
-            String sql = "INSERT INTO orders (Username, FlightID, AircraftModel, DepartureLocation, ArrivalLocation, DepartureTime, ArrivalTime, Class, SeatNumber, Insurance, TotalPrice) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-            try (Connection connection = DriverManager.getConnection(jdbcURL, dbUser, dbPassword);
-                    PreparedStatement statement = connection.prepareStatement(sql)) {
-
-                // Set the parameters for the prepared statement.
-                statement.setString(1, username);
-                statement.setInt(2, flightID);
-                statement.setString(3, aircraftModel);
-                statement.setString(4, departureLocation);
-                statement.setString(5, arrivalLocation);
-                statement.setTime(6, java.sql.Time.valueOf(departureTime));
-                statement.setTime(7, java.sql.Time.valueOf(arrivalTime));
-                statement.setString(8, seatClass);
-                statement.setString(9, seatNumber);
-                statement.setBoolean(10, hasInsurance);
-                statement.setDouble(11, totalprice);
-
-                // Execute the insert SQL statement.
-                int rowsInserted = statement.executeUpdate();
-                if (rowsInserted > 0) {
-                    System.out.println("A new order was inserted successfully!");
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.out.println("Database update error: " + e.getMessage());
+            try {
+                DBMS dbms = DBMS.getDBMS();
+                dbms.addOrder(username, selectedFlight.getFlightID(), selectedFlight.getAircraft().getAircraftModel(),
+                        selectedFlight.getDepartureLocation(), selectedFlight.getArrivalLocation(),
+                        Timestamp.valueOf(LocalDateTime.of(departureDate, departureTime)),
+                        Timestamp.valueOf(LocalDateTime.of(arrivalDate, arrivalTime)),
+                        (isEconomy ? "Economy" : isBusiness ? "Business" : "Comfort"), seatNumber, hasInsurance,
+                        totalprice);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error updating database: " + ex.getMessage(),
+                        "Database Error", JOptionPane.ERROR_MESSAGE);
             }
         }
-
     }
 
     public static void main(String[] args) {
