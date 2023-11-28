@@ -636,11 +636,13 @@ public class DBMS {
                 preparedStatement.setInt(1, flightID);
                 preparedStatement.setString(2, username);
                 preparedStatement.executeUpdate();
+                return 0;
             }
+
+
         } catch (SQLException e) {
             e.printStackTrace(); // Handle the exception according to your needs
             return 1;
         }
-        return 0;
     }
 }

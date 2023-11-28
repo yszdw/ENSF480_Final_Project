@@ -992,7 +992,7 @@ public class LoginFrame extends JFrame {
             setLayout(new BorderLayout());
             setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-            JLabel welcomeLabel = new JLabel("Welcome " + this.username + " to our Flight Reservation System",
+            JLabel welcomeLabel = new JLabel("Welcome " + this.username + ", to our Flight Reservation System",
                     SwingConstants.CENTER);
             welcomeLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
             add(welcomeLabel, BorderLayout.NORTH);
@@ -1126,7 +1126,7 @@ public class LoginFrame extends JFrame {
                         // close window
                         browseFrame.dispose();
                     } else {
-                        JOptionPane.showMessageDialog(browseFrame, "Flight could not be cancelled.",
+                        JOptionPane.showMessageDialog(browseFrame, "Order ID not found, please try again.",
                                 "Flight Not Cancelled", JOptionPane.ERROR_MESSAGE);
                     }
                 } catch (SQLException ex) {
@@ -1265,6 +1265,8 @@ public class LoginFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
+                    // hide the ticket frame
+                    ticketFrame.dispose();
 
                     String origin = (String) fromComboBox.getSelectedItem();
                     String destination = (String) toComboBox.getSelectedItem();
@@ -1370,6 +1372,8 @@ public class LoginFrame extends JFrame {
             confirmButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    // Hide the booking frame
+                    BookingFrame.this.dispose();
                     SeatSelectionFrame seatSelectionFrame = new SeatSelectionFrame(
                             economyClassButton.isSelected() ? economySeats : businessClassButton.isSelected() ?
                                     businessSeats: comfortSeats,
@@ -1629,7 +1633,8 @@ public class LoginFrame extends JFrame {
             confirmButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-
+                    // Close the seat selection frame and open the payment frame
+                    SeatSelectionFrame.this.dispose();
                     PaymentFrame paymentFrame = new PaymentFrame(totalPrice, SeatSelectionFrame.this, username);
                     paymentFrame.setVisible(true);
                 }
@@ -1765,7 +1770,6 @@ public class LoginFrame extends JFrame {
                         LocalTime arrivaltime = seatSelectionFrame.flightInfoFrame.getArrivalTime();
                         boolean isEconomy = seatSelectionFrame.bookingFrame.isEconomyClassSelected();
 
-                        System.err.println(isEconomy);
                         boolean isBusiness = seatSelectionFrame.bookingFrame.isBusinessClassSelected();
                         boolean hasInsurance = seatSelectionFrame.bookingFrame.isInsuranceSelected();
                         String seatNumber = seatSelectionFrame.getSelectedSeatNumber();
