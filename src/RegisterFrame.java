@@ -21,6 +21,8 @@ public class RegisterFrame extends JFrame {
     private JPasswordField passField;
     private JTextField emailTextField;
 
+    private JTextField addressTextField;
+
     public RegisterFrame() {
         setTitle("User Registration");
         setSize(400, 400);
@@ -40,6 +42,20 @@ public class RegisterFrame extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(10, 10, 10, 10);
 
+        // Email
+        JLabel emailLabel = new JLabel("Email:");
+        emailLabel.setFont(INPUT_FONT);
+        emailTextField = new JTextField(20);
+        emailTextField.setFont(INPUT_FONT);
+        emailTextField.setBackground(INPUT_COLOR);
+
+        // Address
+        JLabel addressLabel = new JLabel("Address:");
+        addressLabel.setFont(INPUT_FONT);
+        addressTextField = new JTextField(20);
+        addressTextField.setFont(INPUT_FONT);
+        addressTextField.setBackground(INPUT_COLOR);
+
         // Username
         JLabel userLabel = new JLabel("Username:");
         userLabel.setFont(INPUT_FONT);
@@ -54,29 +70,31 @@ public class RegisterFrame extends JFrame {
         passField.setFont(INPUT_FONT);
         passField.setBackground(INPUT_COLOR);
 
-        // Email
-        JLabel emailLabel = new JLabel("Email:");
-        emailLabel.setFont(INPUT_FONT);
-        emailTextField = new JTextField(20);
-        emailTextField.setFont(INPUT_FONT);
-        emailTextField.setBackground(INPUT_COLOR);
-
-        // Adding components to inputPanel
+        // Adding components to inputPanel in order of email, address, username, and password
         gbc.gridx = 0;
         gbc.gridy = 0;
-        inputPanel.add(userLabel, gbc);
-        gbc.gridx = 1;
-        inputPanel.add(userTextField, gbc);
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        inputPanel.add(passLabel, gbc);
-        gbc.gridx = 1;
-        inputPanel.add(passField, gbc);
-        gbc.gridx = 0;
-        gbc.gridy = 2;
         inputPanel.add(emailLabel, gbc);
         gbc.gridx = 1;
+        gbc.gridy = 0;
         inputPanel.add(emailTextField, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        inputPanel.add(addressLabel, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        inputPanel.add(addressTextField, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        inputPanel.add(userLabel, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        inputPanel.add(userTextField, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        inputPanel.add(passLabel, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        inputPanel.add(passField, gbc);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         // back button to login
@@ -125,6 +143,7 @@ public class RegisterFrame extends JFrame {
         String username = userTextField.getText();
         String password = new String(passField.getPassword()); // In real application, hash the password
         String email = emailTextField.getText();
+        String address = addressTextField.getText();
 
         // Input validation
         if (username.isEmpty() || password.isEmpty() || email.isEmpty()) {
@@ -136,7 +155,7 @@ public class RegisterFrame extends JFrame {
         try {
 
             DBMS dbms = DBMS.getDBMS();
-            if (dbms.registerUser(username, password, email)) {
+            if (dbms.registerUser(username, password, email, address)) {
 
                 JOptionPane.showMessageDialog(this, "Registration successful!");
                 this.dispose();

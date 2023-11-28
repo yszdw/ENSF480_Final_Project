@@ -31,7 +31,7 @@ public class DBMS {
      */
     private DBMS() throws SQLException {
         // the connection info here will need to be changed depending on the user
-        dbConnect = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/ENSF480", "root", "AbXy219!");
+        dbConnect = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/ENSF480", "root", "password");
     }
 
     /**
@@ -759,14 +759,15 @@ public class DBMS {
      * Register user
      */
 
-    public boolean registerUser(String username, String password, String email) throws SQLException {
+    public boolean registerUser(String username, String password, String email, String address) throws SQLException {
         PreparedStatement preparedStatement = null;
         try {
-            String sql = "INSERT INTO users (Name, Email, PasswordHash) VALUES (?, ?, ?)";
+            String sql = "INSERT INTO users (Name, Email, PasswordHash, Address) VALUES (?, ?, ?, ?)";
             preparedStatement = dbConnect.prepareStatement(sql);
             preparedStatement.setString(1, username);
             preparedStatement.setString(2, email);
             preparedStatement.setString(3, password); // Password should be hashed + salted
+            preparedStatement.setString(4, address);
 
             int rowsInserted = preparedStatement.executeUpdate();
             if (rowsInserted > 0) {
@@ -782,13 +783,9 @@ public class DBMS {
     }
 
     public int addOrder(String email, String username, int flightID, String aircraftModel, String departureLocation,
-                              String arrivalLocation, LocalTime departureTime, LocalTime arrivalTime, String seatClass,
+                              String arrivalLocation, Timestamp departureTime, Timestamp arrivalTime, String seatClass,
                               String seatNumber, boolean hasInsurance, double totalprice) throws SQLException {
 
-        // Define the JDBC URL.
-        String jdbcURL = "jdbc:mysql://localhost:3306/ensf480";
-        String dbUser = "root"; // Replace with your database username.
-        String dbPassword = "password"; // Replace with your database password.
 
         // SQL query to insert a new order.
         String sql = "INSERT INTO orders (Email, Username, FlightID, AircraftModel, DepartureLocation, ArrivalLocation, " +
@@ -805,8 +802,8 @@ public class DBMS {
             statement.setString(4, aircraftModel);
             statement.setString(5, departureLocation);
             statement.setString(6, arrivalLocation);
-            statement.setTimestamp(7, Timestamp.valueOf(LocalDateTime.of(LocalDate.now(), departureTime)));
-            statement.setTimestamp(8, Timestamp.valueOf(LocalDateTime.of(LocalDate.now(), arrivalTime)));
+            statement.setTimestamp(7, departureTime);
+            statement.setTimestamp(8, arrivalTime);
             statement.setString(9, seatClass);
             statement.setString(10, seatNumber);
             statement.setBoolean(11, hasInsurance);
@@ -829,8 +826,8 @@ public class DBMS {
             statement2.setString(4, aircraftModel);
             statement2.setString(5, departureLocation);
             statement2.setString(6, arrivalLocation);
-            statement2.setTimestamp(7, Timestamp.valueOf(LocalDateTime.of(LocalDate.now(), departureTime)));
-            statement2.setTimestamp(8, Timestamp.valueOf(LocalDateTime.of(LocalDate.now(), arrivalTime)));
+            statement2.setTimestamp(7, departureTime);
+            statement2.setTimestamp(8, arrivalTime);
             statement2.setString(9, seatClass);
             statement2.setString(10, seatNumber);
             statement2.setBoolean(11, hasInsurance);

@@ -255,6 +255,56 @@ public class LoginFrame extends JFrame {
         loginFrame.setVisible(true);
     }
 
+    public class AddCreditCardFrame extends JFrame {
+        private String username;
+        private JTextField cardNumberField;
+        private JTextField expirationDateField;
+        private JTextField cvvField;
+
+        public AddCreditCardFrame(String username) {
+            this.username = username;
+            setTitle("Add Credit Card");
+            setSize(400, 300);
+            setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            setLayout(new BorderLayout());
+
+            // Title Panel
+            JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            JLabel titleLabel = new JLabel("Add Credit Card");
+            titleLabel.setFont(MAIN_FONT);
+            titlePanel.add(titleLabel);
+
+            // Input Panel
+            JPanel inputPanel = new JPanel(new GridBagLayout());
+            inputPanel.setBackground(BACKGROUND_COLOR);
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.insets = new Insets(10, 10, 10, 10);
+
+            // Card Number
+            JLabel cardNumberLabel = new JLabel("Card Number:");
+            cardNumberLabel.setFont(INPUT_FONT);
+            cardNumberField = new JTextField(20);
+            cardNumberField.setFont(INPUT_FONT);
+            cardNumberField.setBackground(INPUT_COLOR);
+
+            // Expiration Date
+            JLabel expirationDateLabel = new JLabel("Expiration Date:");
+            expirationDateLabel.setFont(INPUT_FONT);
+            expirationDateField = new JTextField(20);
+            expirationDateField.setFont(INPUT_FONT);
+            expirationDateField.setBackground(INPUT_COLOR);
+
+            // CVV
+            JLabel cvvLabel = new JLabel("CVV:");
+            cvvLabel.setFont(INPUT_FONT);
+            cvvField = new JTextField(20);
+            cvvField.setFont(INPUT_FONT);
+            cvvField.setBackground(INPUT_COLOR);
+
+        }
+    }
+
     public class WelcomeFrame extends JFrame {
         private String username;
 
@@ -325,6 +375,21 @@ public class LoginFrame extends JFrame {
                         // Create and show the login frame
                         LoginFrame loginFrame = new LoginFrame();
                         loginFrame.setVisible(true);
+                    }
+                });
+
+                // also add "Add Credit Card" button
+                JButton addCreditCardButton = createStyledButton("Add Credit Card");
+                gbc.insets = new Insets(0, 0, 10, 0);
+                buttonPanel.add(addCreditCardButton, gbc);
+
+                addCreditCardButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+
+                        // Create and show the login frame
+                        AddCreditCardFrame addCreditCardFrame = new AddCreditCardFrame(username);
+                        addCreditCardFrame.setVisible(true);
                     }
                 });
             }
@@ -550,7 +615,7 @@ public class LoginFrame extends JFrame {
         JButton userLoginButton = createStyledButton("User Login");
         JButton adminLoginButton = createStyledButton("Admin Login");
         JButton guestLoginButton = createStyledButton("Guest Login");
-        JButton userRegisterButton = createStyledButton("User Register");
+        JButton userRegisterButton = createStyledButton("Register User");
 
         // Add action listeners to your buttons
         userRegisterButton.addActionListener(new ActionListener() {
@@ -1203,14 +1268,18 @@ public class LoginFrame extends JFrame {
             setLayout(new BorderLayout());
             int orderID = -1;
             try {
-                DBMS db = DBMS.getDBMS();
-                orderID = db.addOrder(email, username, selectedFlight.getFlightID(),
-                        selectedFlight.getAircraft().getAircraftModel(), selectedFlight.getDepartureLocation(),
-                        selectedFlight.getArrivalLocation(), departureTime, arrivalTime, (isEconomy ? "Economy" : isBusiness
-                                ? "Business" : "Comfort"), seatNumber, hasInsurance, totalPrice);
-            }
-            catch (SQLException e) {
-                e.printStackTrace();
+                DBMS dbms = DBMS.getDBMS();
+
+                orderID = dbms.addOrder(email, username, selectedFlight.getFlightID(), selectedFlight.getAircraft().getAircraftModel(),
+                        selectedFlight.getDepartureLocation(), selectedFlight.getArrivalLocation(),
+                        Timestamp.valueOf(LocalDateTime.of(departureDate, departureTime)),
+                        Timestamp.valueOf(LocalDateTime.of(arrivalDate, arrivalTime)),
+                        (isEconomy ? "Economy" : isBusiness ? "Business" : "Comfort"), seatNumber, hasInsurance,
+                        totalPrice);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error updating database: " + ex.getMessage(),
+                        "Database Error", JOptionPane.ERROR_MESSAGE);
             }
             System.out.println("Order ID: " + orderID);
 
@@ -1251,80 +1320,6 @@ public class LoginFrame extends JFrame {
             pack();
             setLocationRelativeTo(null);
             setVisible(true);
-
-        }
-        // Q: This method is being called twice, why?
-        // A: Because you are calling it twice in the PaymentFrame class
-        // Q: Where in the class am i calling it?
-        // A: In the constructor
-        public int updateDatabase(String email, String username, int flightID, String aircraftModel, String departureLocation,
-                                  String arrivalLocation, LocalTime departureTime, LocalTime arrivalTime, String seatClass,
-                                  String seatNumber, boolean hasInsurance, double totalprice) throws SQLException {
-
-            // Define the JDBC URL.
-            String jdbcURL = "jdbc:mysql://localhost:3306/ensf480";
-            String dbUser = "root"; // Replace with your database username.
-            String dbPassword = "password"; // Replace with your database password.
-
-            // SQL query to insert a new order.
-            String sql = "INSERT INTO orders (Email, Username, FlightID, AircraftModel, DepartureLocation, ArrivalLocation, " +
-                    "DepartureDateTime, ArrivalDateTime, Class, SeatNumber, Insurance, TotalPrice) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-
-            try (Connection connection = DriverManager.getConnection(jdbcURL, dbUser, dbPassword);
-                 PreparedStatement statement = connection.prepareStatement(sql)) {
-
-                // Set the parameters for the prepared statement.
-                statement.setString(1, email);
-                statement.setString(2, username);
-                statement.setInt(3, flightID);
-                statement.setString(4, aircraftModel);
-                statement.setString(5, departureLocation);
-                statement.setString(6, arrivalLocation);
-                statement.setTimestamp(7, Timestamp.valueOf(LocalDateTime.of(LocalDate.now(), departureTime)));
-                statement.setTimestamp(8, Timestamp.valueOf(LocalDateTime.of(LocalDate.now(), arrivalTime)));
-                statement.setString(9, seatClass);
-                statement.setString(10, seatNumber);
-                statement.setBoolean(11, hasInsurance);
-                statement.setDouble(12, totalprice);
-
-                // Execute the insert SQL statement.
-                int rowsInserted = statement.executeUpdate();
-                if (rowsInserted > 0) {
-                    System.out.println("A new order was inserted successfully!");
-                }
-
-                // Get the order ID of the inserted order
-                String sql2 = "SELECT OrderID FROM orders WHERE Email = ? AND Username = ? AND FlightID = ? AND " +
-                        "AircraftModel = ? AND DepartureLocation = ? AND ArrivalLocation = ? AND DepartureDateTime = ? " +
-                        "AND ArrivalDateTime = ? AND Class = ? AND SeatNumber = ? AND Insurance = ? AND TotalPrice = ?";
-                PreparedStatement statement2 = connection.prepareStatement(sql2);
-                statement2.setString(1, email);
-                statement2.setString(2, username);
-                statement2.setInt(3, flightID);
-                statement2.setString(4, aircraftModel);
-                statement2.setString(5, departureLocation);
-                statement2.setString(6, arrivalLocation);
-                statement2.setTimestamp(7, Timestamp.valueOf(LocalDateTime.of(LocalDate.now(), departureTime)));
-                statement2.setTimestamp(8, Timestamp.valueOf(LocalDateTime.of(LocalDate.now(), arrivalTime)));
-                statement2.setString(9, seatClass);
-                statement2.setString(10, seatNumber);
-                statement2.setBoolean(11, hasInsurance);
-                statement2.setDouble(12, totalprice);
-                ResultSet result = statement2.executeQuery();
-                if (result.next()) {
-                    return result.getInt("OrderID");
-                }
-                else {
-                    System.out.println("Error getting order ID");
-                    return -1;
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                System.out.println("Database update error: " + e.getMessage());
-                return -1;
-            }
         }
     }
 
