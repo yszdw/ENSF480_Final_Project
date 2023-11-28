@@ -781,38 +781,72 @@ public class DBMS {
         return false;
     }
 
-    public void addOrder(String email, String username, int flightID, String aircraftModel, String departureLocation,
-            String arrivalLocation, Timestamp departureDateTime, Timestamp arrivalDateTime, String seatClass,
-            String seatNumber, boolean hasInsurance, double totalprice) {
-        PreparedStatement preparedStatement = null;
+    public int addOrder(String email, String username, int flightID, String aircraftModel, String departureLocation,
+                              String arrivalLocation, LocalTime departureTime, LocalTime arrivalTime, String seatClass,
+                              String seatNumber, boolean hasInsurance, double totalprice) throws SQLException {
 
-        try {
-            String sql = "INSERT INTO orders (Email, Username, FlightID, AircraftModel, DepartureLocation, ArrivalLocation, " +
-                    "DepartureDateTime, ArrivalDateTime, Class, SeatNumber, Insurance, TotalPrice) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            preparedStatement = dbConnect.prepareStatement(sql);
+        // Define the JDBC URL.
+        String jdbcURL = "jdbc:mysql://localhost:3306/ensf480";
+        String dbUser = "root"; // Replace with your database username.
+        String dbPassword = "password"; // Replace with your database password.
+
+        // SQL query to insert a new order.
+        String sql = "INSERT INTO orders (Email, Username, FlightID, AircraftModel, DepartureLocation, ArrivalLocation, " +
+                "DepartureDateTime, ArrivalDateTime, Class, SeatNumber, Insurance, TotalPrice) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+
+        try (PreparedStatement statement = dbConnect.prepareStatement(sql)) {
+
             // Set the parameters for the prepared statement.
-            preparedStatement.setString(1, email);
-            preparedStatement.setString(2, username);
-            preparedStatement.setInt(3, flightID);
-            preparedStatement.setString(4, aircraftModel);
-            preparedStatement.setString(5, departureLocation);
-            preparedStatement.setString(6, arrivalLocation);
-            preparedStatement.setTimestamp(7, departureDateTime);
-            preparedStatement.setTimestamp(8, arrivalDateTime);
-            preparedStatement.setString(9, seatClass);
-            preparedStatement.setString(10, seatNumber);
-            preparedStatement.setBoolean(11, hasInsurance);
-            preparedStatement.setDouble(12, totalprice);
+            statement.setString(1, email);
+            statement.setString(2, username);
+            statement.setInt(3, flightID);
+            statement.setString(4, aircraftModel);
+            statement.setString(5, departureLocation);
+            statement.setString(6, arrivalLocation);
+            statement.setTimestamp(7, Timestamp.valueOf(LocalDateTime.of(LocalDate.now(), departureTime)));
+            statement.setTimestamp(8, Timestamp.valueOf(LocalDateTime.of(LocalDate.now(), arrivalTime)));
+            statement.setString(9, seatClass);
+            statement.setString(10, seatNumber);
+            statement.setBoolean(11, hasInsurance);
+            statement.setDouble(12, totalprice);
 
             // Execute the insert SQL statement.
-            int rowsInserted = preparedStatement.executeUpdate();
+            int rowsInserted = statement.executeUpdate();
             if (rowsInserted > 0) {
                 System.out.println("A new order was inserted successfully!");
+            }
+
+            // Get the order ID of the inserted order
+            String sql2 = "SELECT OrderID FROM orders WHERE Email = ? AND Username = ? AND FlightID = ? AND " +
+                    "AircraftModel = ? AND DepartureLocation = ? AND ArrivalLocation = ? AND DepartureDateTime = ? " +
+                    "AND ArrivalDateTime = ? AND Class = ? AND SeatNumber = ? AND Insurance = ? AND TotalPrice = ?";
+            PreparedStatement statement2 = dbConnect.prepareStatement(sql2);
+            statement2.setString(1, email);
+            statement2.setString(2, username);
+            statement2.setInt(3, flightID);
+            statement2.setString(4, aircraftModel);
+            statement2.setString(5, departureLocation);
+            statement2.setString(6, arrivalLocation);
+            statement2.setTimestamp(7, Timestamp.valueOf(LocalDateTime.of(LocalDate.now(), departureTime)));
+            statement2.setTimestamp(8, Timestamp.valueOf(LocalDateTime.of(LocalDate.now(), arrivalTime)));
+            statement2.setString(9, seatClass);
+            statement2.setString(10, seatNumber);
+            statement2.setBoolean(11, hasInsurance);
+            statement2.setDouble(12, totalprice);
+            ResultSet result = statement2.executeQuery();
+            if (result.next()) {
+                return result.getInt("OrderID");
+            }
+            else {
+                System.out.println("Error getting order ID");
+                return -1;
             }
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Database update error: " + e.getMessage());
+            return -1;
         }
     }
     // SQL query to insert a new order.

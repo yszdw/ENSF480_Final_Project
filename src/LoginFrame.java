@@ -1203,7 +1203,8 @@ public class LoginFrame extends JFrame {
             setLayout(new BorderLayout());
             int orderID = -1;
             try {
-                orderID = updateDatabase(email, username, selectedFlight.getFlightID(),
+                DBMS db = DBMS.getDBMS();
+                orderID = db.addOrder(email, username, selectedFlight.getFlightID(),
                         selectedFlight.getAircraft().getAircraftModel(), selectedFlight.getDepartureLocation(),
                         selectedFlight.getArrivalLocation(), departureTime, arrivalTime, (isEconomy ? "Economy" : isBusiness
                                 ? "Business" : "Comfort"), seatNumber, hasInsurance, totalPrice);
@@ -1234,6 +1235,7 @@ public class LoginFrame extends JFrame {
             closeButton.addActionListener(e -> dispose());
             add(closeButton, BorderLayout.SOUTH);
 
+            //This block sends the emails after purchasing a ticket
             try {
                 DBMS db = DBMS.getDBMS();
                 Email_Controller.sendReceipt(username, email, (hasInsurance ? "Yes" : "No"),
@@ -1250,20 +1252,6 @@ public class LoginFrame extends JFrame {
             setLocationRelativeTo(null);
             setVisible(true);
 
-            try {
-                DBMS dbms = DBMS.getDBMS();
-
-                dbms.addOrder(email, username, selectedFlight.getFlightID(), selectedFlight.getAircraft().getAircraftModel(),
-                        selectedFlight.getDepartureLocation(), selectedFlight.getArrivalLocation(),
-                        Timestamp.valueOf(LocalDateTime.of(departureDate, departureTime)),
-                        Timestamp.valueOf(LocalDateTime.of(arrivalDate, arrivalTime)),
-                        (isEconomy ? "Economy" : isBusiness ? "Business" : "Comfort"), seatNumber, hasInsurance,
-                        totalPrice);
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Error updating database: " + ex.getMessage(),
-                        "Database Error", JOptionPane.ERROR_MESSAGE);
-            }
         }
         // Q: This method is being called twice, why?
         // A: Because you are calling it twice in the PaymentFrame class
