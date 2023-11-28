@@ -590,4 +590,90 @@ public class DBMS {
 
     }
 
+    /*
+     * login verification
+     */
+
+    public boolean loginCheck(String username, String password) throws SQLException {
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        try {
+            String sql = "SELECT * FROM users WHERE Name = ? AND PasswordHash = ?";
+            preparedStatement = dbConnect.prepareStatement(sql);
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, password); // In a real app, you should hash the password before comparing
+
+            resultSet = preparedStatement.executeQuery();
+
+            return resultSet.next(); // User found with matching username and password
+        } finally {
+            // Close resources in a finally block
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+        }
+    }
+
+    /*
+     * Register user
+     */
+
+    public boolean registerUser(String username, String password, String email) throws SQLException {
+        PreparedStatement preparedStatement = null;
+        try {
+            String sql = "INSERT INTO users (Name, Email, PasswordHash) VALUES (?, ?, ?)";
+            preparedStatement = dbConnect.prepareStatement(sql);
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, email);
+            preparedStatement.setString(3, password); // Password should be hashed + salted
+
+            int rowsInserted = preparedStatement.executeUpdate();
+            if (rowsInserted > 0) {
+                return true;
+            }
+        } finally {
+            // Close resources in a finally block
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+        }
+        return false;
+    }
+
+    public void addOrder(String username, int flightID, String aircraftModel, String departureLocation,
+            String arrivalLocation, Timestamp departureDateTime, Timestamp arrivalDateTime, String seatClass,
+            String seatNumber, boolean hasInsurance, double totalprice) {
+        PreparedStatement preparedStatement = null;
+
+        try {
+            String sql = "INSERT INTO orders (Username, FlightID, AircraftModel, DepartureLocation, ArrivalLocation, DepartureDateTime, ArrivalDateTime, Class, SeatNumber, Insurance, TotalPrice) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            preparedStatement = dbConnect.prepareStatement(sql);
+            // Set the parameters for the prepared statement.
+            preparedStatement.setString(1, username);
+            preparedStatement.setInt(2, flightID);
+            preparedStatement.setString(3, aircraftModel);
+            preparedStatement.setString(4, departureLocation);
+            preparedStatement.setString(5, arrivalLocation);
+            preparedStatement.setTimestamp(6, departureDateTime);
+            preparedStatement.setTimestamp(7, arrivalDateTime);
+            preparedStatement.setString(8, seatClass);
+            preparedStatement.setString(9, seatNumber);
+            preparedStatement.setBoolean(10, hasInsurance);
+            preparedStatement.setDouble(11, totalprice);
+
+            // Execute the insert SQL statement.
+            int rowsInserted = preparedStatement.executeUpdate();
+            if (rowsInserted > 0) {
+                System.out.println("A new order was inserted successfully!");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Database update error: " + e.getMessage());
+        }
+    }
+    // SQL query to insert a new order.
+
 }
