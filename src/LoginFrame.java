@@ -446,6 +446,11 @@ public class LoginFrame extends JFrame {
                             int selectedRow = table.getSelectedRow();
                             if (selectedRow >= 0) {
                                 int orderID = (Integer) table.getValueAt(selectedRow, 0);
+                                //SEND EMAIL HERE
+
+                                String email = dbms.getEmail(orderID);
+                                Email_Controller.sendCancellationEmail(orderID,email);
+
                                 dbms.cancelOrder(orderID);
                                 JOptionPane.showMessageDialog(browseFrame, "Order cancelled successfully.",
                                         "Order Cancelled", JOptionPane.INFORMATION_MESSAGE);

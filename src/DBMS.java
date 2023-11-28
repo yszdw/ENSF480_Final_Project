@@ -31,7 +31,7 @@ public class DBMS {
      */
     private DBMS() throws SQLException {
         // the connection info here will need to be changed depending on the user
-        dbConnect = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/ENSF480", "root", "password");
+        dbConnect = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/ENSF480", "root", "AbXy219!");
     }
 
     /**
@@ -70,7 +70,24 @@ public class DBMS {
 
             try (ResultSet results = pstmt.executeQuery()) {
                 if (results.next()) {
-                    // Replace "your_email_column_name" with the actual column name for email
+
+                    email = results.getString("Email");
+                }
+            }
+        }
+
+        return email;
+    }
+    public String getEmail(int orderID) throws SQLException {
+        String email = null;
+
+        String query = "SELECT Email FROM Orders WHERE OrderID = ?";
+        try (PreparedStatement pstmt = dbConnect.prepareStatement(query)) {
+            pstmt.setInt(1, orderID);
+
+            try (ResultSet results = pstmt.executeQuery()) {
+                if (results.next()) {
+
                     email = results.getString("Email");
                 }
             }
@@ -618,6 +635,32 @@ public class DBMS {
 
         results.close();
         return orders;
+    }
+
+    public Order getOrder(int OrderID) throws SQLException{
+        Statement myStmt = dbConnect.createStatement();
+        String id = Integer.toString(OrderID);
+        results = myStmt.executeQuery("SELECT * FROM Orders WHERE OrderID = " + id);
+        while (results.next()) {
+            int orderID = results.getInt("OrderID");
+            String email = results.getString("Email");
+            String username = results.getString("Username");
+            int flightID2 = results.getInt("FlightID");
+            String aircraftModel = results.getString("AircraftModel");
+            String departureLocation = results.getString("DepartureLocation");
+            String arrivalLocation = results.getString("ArrivalLocation");
+            String departureTime = results.getString("DepartureDateTime");
+            String arrivalTime = results.getString("ArrivalDateTime");
+            String seatClass = results.getString("Class");
+            String seatNumber = results.getString("SeatNumber");
+            boolean insurance = results.getBoolean("Insurance");
+            double totalPrice = results.getDouble("TotalPrice");
+            Order order = new Order(orderID, email, username, flightID2, aircraftModel, departureLocation, arrivalLocation,
+                    departureTime, arrivalTime, seatClass, seatNumber, insurance, totalPrice);
+
+            return order;
+        }
+        return null;
     }
 
     /*

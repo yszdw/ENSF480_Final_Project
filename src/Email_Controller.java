@@ -153,7 +153,7 @@ public class Email_Controller {
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
 
             // Set the email subject and body
-            message.setSubject(String.format("Ticket for your flight to %s", arrive));
+            message.setSubject(String.format("Ticket for your flight to %s", to));
 
             message.setText(String.format("Hello,\n\nThis is your email ticket for your flight to %s\n\n"
                             + "Username: %s\n"
@@ -176,6 +176,56 @@ public class Email_Controller {
         }
 
 
+
+    }
+
+    public static void sendCancellationEmail(int orderID,String email){
+        // For testing, place your own email in the line below
+        // String userEmail = "aaron.dalbroi2002@gmail.com";
+
+
+
+        Properties properties = new Properties();
+        properties.put("mail.smtp.auth", "true");
+        properties.put("mail.smtp.starttls.enable", "true");
+        properties.put("mail.smtp.host", "smtp.gmail.com");
+        properties.put("mail.smtp.port", "587");
+
+        // Create a session with the email server
+        Session session = Session.getInstance(properties, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(programEmail, emailPassword);
+            }
+        });
+
+        try {
+            Order o = DBMS.getDBMS().getOrder(orderID);
+            // Create a MimeMessage object
+            Message message = new MimeMessage(session);
+
+            // Set the sender's email address
+            message.setFrom(new InternetAddress(email));
+
+            // Set the recipient's email address
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
+
+            // Set the email subject and body
+            message.setSubject(String.format("Ticket Cancellation"));
+
+            message.setText(String.format("Hello,\n\nYour ticket for your flight to %s has been cancelled\n\n"
+                            + "Seat Class: %s\n"
+                            + "Seat: %s\n",
+                    o.getArrivalLocation(),o.getSeatClass(),o.getSeatNumber()));
+
+            // Send the email
+            Transport.send(message);
+
+            System.out.println("Email sent successfully");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
