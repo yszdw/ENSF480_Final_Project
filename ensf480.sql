@@ -4,7 +4,7 @@
  Source Server         : 111
  Source Server Type    : MySQL
  Source Server Version : 80035 (8.0.35)
- Source Host           : localhost:3306
+ Source Host           : localhost:3306orders
  Source Schema         : ensf480
 
  Target Server Type    : MySQL
@@ -196,9 +196,7 @@ CREATE TABLE `promotions`  (
   `Description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `ValidOn` datetime NOT NULL,
   `ValidUntil` datetime NOT NULL,
-  PRIMARY KEY (`PromotionID`) USING BTREE,
-  INDEX `UserID`(`UserID` ASC) USING BTREE,
-  CONSTRAINT `promotions_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `users` (`UserID`) ON DELETE RESTRICT ON UPDATE RESTRICT
+  PRIMARY KEY (`PromotionID`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 

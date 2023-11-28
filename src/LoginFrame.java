@@ -1,5 +1,3 @@
-import com.mysql.cj.x.protobuf.MysqlxCrud;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
@@ -1537,7 +1535,7 @@ public class LoginFrame extends JFrame {
 
             setTitle("Make Payment");
             setLayout(new BorderLayout());
-            setSize(350, 200);
+            setSize(400, 250);
             setLocationRelativeTo(null);
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -1550,7 +1548,20 @@ public class LoginFrame extends JFrame {
             pricePanel.add(priceField);
 
             // Panel for card information
-            JPanel cardPanel = new JPanel(new GridLayout(3, 2, 5, 5));
+            JPanel cardPanel = null;
+            // if user is guest also ask for name and address
+            if (username.equals("guest")) {
+                cardPanel = new JPanel(new GridLayout(5, 2, 5, 5));
+                cardPanel.add(new JLabel("Name:"));
+                JTextField nameField = new JTextField();
+                cardPanel.add(nameField);
+                cardPanel.add(new JLabel("Address:"));
+                JTextField addressField = new JTextField();
+                cardPanel.add(addressField);
+            }
+            else {
+                cardPanel = new JPanel(new GridLayout(3, 2, 5, 5));
+            }
             cardPanel.add(new JLabel("Card Number:"));
             JTextField cardNumberField = new JTextField();
             cardPanel.add(cardNumberField);
@@ -1561,6 +1572,7 @@ public class LoginFrame extends JFrame {
             JTextField cvvField = new JTextField();
             cardPanel.add(cvvField);
 
+
             // Confirm button to submit payment
             JButton confirmButton = new JButton("Confirm Payment");
             // Adding components to the frame
@@ -1568,7 +1580,7 @@ public class LoginFrame extends JFrame {
             add(cardPanel, BorderLayout.CENTER);
             add(confirmButton, BorderLayout.SOUTH);
 
-            pack();
+//            pack();
             setVisible(true);
             confirmButton.addActionListener(new ActionListener() {
                 @Override
@@ -1584,12 +1596,10 @@ public class LoginFrame extends JFrame {
                         JOptionPane.showMessageDialog(PaymentFrame.this, "Payment successful!", "Payment",
                                 JOptionPane.INFORMATION_MESSAGE);
 
-                        System.err.println("1");
                         // Retrieve the selected flight and other booking details
                         Flight selectedFlight = seatSelectionFrame.flightInfoFrame.getSelectedFlight();// flightInfoFrame.getSelectedFlight();
                         LocalTime departureTime = seatSelectionFrame.flightInfoFrame.getDepartureTime();
                         LocalTime arrivaltime = seatSelectionFrame.flightInfoFrame.getArrivalTime();
-                        System.err.println("2");
                         boolean isEconomy = seatSelectionFrame.bookingFrame.isEconomyClassSelected();
 
                         System.err.println(isEconomy);
@@ -1600,12 +1610,20 @@ public class LoginFrame extends JFrame {
                         // Close the payment frame and open the confirmation frame
                         PaymentFrame.this.dispose();
 
+
                         ConfirmationFrame confirmationFrame = new ConfirmationFrame(username, selectedFlight, isEconomy,
                                 isBusiness, hasInsurance, seatNumber, totalPrice, departureTime, arrivaltime);
                         confirmationFrame.setVisible(true);
+                        // Update Database
+                        confirmationFrame.updateDatabase(username, selectedFlight.getFlightID(),
+                                selectedFlight.getAircraft().getAircraftModel(), selectedFlight.getDepartureLocation(),
+                                selectedFlight.getArrivalLocation(), departureTime, arrivaltime,
+                                (isEconomy ? "Economy" : isBusiness ? "Business" : "Comfort"), seatNumber, hasInsurance,
+                                totalPrice);
                     } else {
                         // Handle failed payment case
-                        JOptionPane.showMessageDialog(PaymentFrame.this, "Payment failed. Please try again.",
+                        JOptionPane.showMessageDialog(PaymentFrame.this, "Payment failed. Please" +
+                                        " try again.",
                                 "Payment Error",
                                 JOptionPane.ERROR_MESSAGE);
                     }
@@ -1613,12 +1631,13 @@ public class LoginFrame extends JFrame {
             });
 
         }
+
     }
 
     public class ConfirmationFrame extends JFrame {
         public ConfirmationFrame(String username, Flight selectedFlight, boolean isEconomy, boolean isBusiness,
-                boolean hasInsurance,
-                String seatNumber, double totalprice, LocalTime departurTime, LocalTime arrivalTime) {
+                                 boolean hasInsurance,
+                                 String seatNumber, double totalPrice, LocalTime departureTime, LocalTime arrivalTime) {
             setTitle("Booking Confirmation");
             setSize(300, 200); // Adjust the size as needed
             setLayout(new BorderLayout());
@@ -1630,12 +1649,12 @@ public class LoginFrame extends JFrame {
             infoPanel.add(new JLabel("Aircraft: " + selectedFlight.getAircraft().getAircraftModel()));
             infoPanel.add(new JLabel("From: " + selectedFlight.getDepartureLocation()));
             infoPanel.add(new JLabel("To: " + selectedFlight.getArrivalLocation()));
-            infoPanel.add(new JLabel("Departure time: " + departurTime));
+            infoPanel.add(new JLabel("Departure time: " + departureTime));
             infoPanel.add(new JLabel("Arrival time: " + arrivalTime));
             infoPanel.add(new JLabel("Class: " + (isEconomy ? "Economy" : isBusiness ? "Business" : "Comfort")));
             infoPanel.add(new JLabel("Seat: " + seatNumber));
             infoPanel.add(new JLabel("Insurance: " + (hasInsurance ? "Yes" : "No")));
-            infoPanel.add(new JLabel("total price: " + totalprice));
+            infoPanel.add(new JLabel("total price: " + totalPrice));
             add(infoPanel, BorderLayout.CENTER);
 
             JButton closeButton = new JButton("Close");
@@ -1645,12 +1664,6 @@ public class LoginFrame extends JFrame {
             pack();
             setLocationRelativeTo(null);
             setVisible(true);
-            // Example of calling the updateDatabase method.
-            updateDatabase(username, selectedFlight.getFlightID(), selectedFlight.getAircraft().getAircraftModel(),
-                    selectedFlight.getDepartureLocation(), selectedFlight.getArrivalLocation(), departurTime,
-                    arrivalTime,
-                    (isEconomy ? "Economy" : isBusiness ? "Business" : "Comfort"), seatNumber, hasInsurance,
-                    totalprice);
 
         }
 
@@ -1664,7 +1677,9 @@ public class LoginFrame extends JFrame {
             String dbPassword = "password"; // Replace with your database password.
 
             // SQL query to insert a new order.
-            String sql = "INSERT INTO orders (Username, FlightID, AircraftModel, DepartureLocation, ArrivalLocation, DepartureTime, ArrivalTime, Class, SeatNumber, Insurance, TotalPrice) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO orders (Username, FlightID, AircraftModel, DepartureLocation, ArrivalLocation, " +
+                    "DepartureTime, ArrivalTime, Class, SeatNumber, Insurance, TotalPrice) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             try (Connection connection = DriverManager.getConnection(jdbcURL, dbUser, dbPassword);
                     PreparedStatement statement = connection.prepareStatement(sql)) {

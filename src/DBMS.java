@@ -614,4 +614,18 @@ public class DBMS {
         return orders;
     }
 
+    /*
+     * add order to database
+     */
+    public void addOrder(String username, int flightID, String aircraftModel, String departureLocation,
+            String arrivalLocation, LocalTime departureTime, LocalTime arrivalTime, String seatClass, String seatNumber,
+            boolean insurance, double totalPrice) throws SQLException {
+        Statement myStmt = dbConnect.createStatement();
+        String sql = "INSERT INTO Orders (Username, FlightID, AircraftModel, DepartureLocation, ArrivalLocation, " +
+                "DepartureTime, ArrivalTime, Class, SeatNumber, Insurance, TotalPrice) VALUES ("
+                + username + flightID + aircraftModel + departureLocation + arrivalLocation + departureTime.toString()
+                + arrivalTime.toString() + seatClass + seatNumber + insurance + totalPrice + ")";
+        myStmt.executeUpdate(sql);
+    }
+
 }
