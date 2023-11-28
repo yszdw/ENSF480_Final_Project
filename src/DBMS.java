@@ -598,7 +598,7 @@ public class DBMS {
      * Register user
      */
 
-    public boolean registerUser(String username, String password, String email, String address) throws SQLException {
+    public boolean registerUser(String username, String password, String email) throws SQLException {
         PreparedStatement preparedStatement = null;
         try {
             String sql = "INSERT INTO users (Name, Email, PasswordHash) VALUES (?, ?, ?)";
