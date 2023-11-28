@@ -1,5 +1,9 @@
+package src;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -68,8 +72,27 @@ public class LoginFrame extends JFrame {
         gbc.gridx = 1;
         inputPanel.add(passField, gbc);
 
-        // Login Button
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        // Back button to close the login window and show the welcome window
+        JButton backButton = new JButton("Back");
+        backButton.setFont(INPUT_FONT);
+        backButton.setBackground(BUTTON_COLOR); // Cornflower Blue
+        backButton.setForeground(BUTTON_TEXT_COLOR);
+        backButton.setFocusPainted(false);
+        backButton.setBorderPainted(false);
+        buttonPanel.add(backButton);
+
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loginFrame.dispose();
+                LoginFrame loginFrame = new LoginFrame();
+                loginFrame.setVisible(true);
+            }
+        });
+
+
+        // Login Button
         JButton loginButton = new JButton("Login");
         loginButton.setFont(INPUT_FONT);
         loginButton.setBackground(BUTTON_COLOR); // Cornflower Blue
@@ -109,12 +132,14 @@ public class LoginFrame extends JFrame {
 
     private boolean authenticate(String username, String password) {
         try {
+
             DBMS dbms = DBMS.getDBMS();
             return dbms.loginCheck(username, password);
         } catch (SQLException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(null, "Error fetching flight data: " + ex.getMessage(),
                     "Database Error", JOptionPane.ERROR_MESSAGE);
+
         }
         return false;
     }
@@ -168,8 +193,28 @@ public class LoginFrame extends JFrame {
         gbc.gridx = 1;
         inputPanel.add(passField, gbc);
 
-        // Login Button
+
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
+        // Back button to close the login window and show the welcome window
+        JButton backButton = new JButton("Back");
+        backButton.setFont(INPUT_FONT);
+        backButton.setBackground(BUTTON_COLOR); // Cornflower Blue
+        backButton.setForeground(BUTTON_TEXT_COLOR);
+        backButton.setFocusPainted(false);
+        backButton.setBorderPainted(false);
+        buttonPanel.add(backButton);
+
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loginFrame.dispose();
+                LoginFrame loginFrame = new LoginFrame();
+                loginFrame.setVisible(true);
+            }
+        });
+
+        // Login Button
         JButton loginButton = new JButton("Login");
         loginButton.setFont(INPUT_FONT);
         loginButton.setBackground(BUTTON_COLOR); // Cornflower Blue
@@ -177,6 +222,8 @@ public class LoginFrame extends JFrame {
         loginButton.setFocusPainted(false);
         loginButton.setBorderPainted(false);
         buttonPanel.add(loginButton);
+
+
 
         // Action listener for the login button
         loginButton.addActionListener(new ActionListener() {
@@ -208,6 +255,56 @@ public class LoginFrame extends JFrame {
         loginFrame.setVisible(true);
     }
 
+    public class AddCreditCardFrame extends JFrame {
+        private String username;
+        private JTextField cardNumberField;
+        private JTextField expirationDateField;
+        private JTextField cvvField;
+
+        public AddCreditCardFrame(String username) {
+            this.username = username;
+            setTitle("Add Credit Card");
+            setSize(400, 300);
+            setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            setLayout(new BorderLayout());
+
+            // Title Panel
+            JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            JLabel titleLabel = new JLabel("Add Credit Card");
+            titleLabel.setFont(MAIN_FONT);
+            titlePanel.add(titleLabel);
+
+            // Input Panel
+            JPanel inputPanel = new JPanel(new GridBagLayout());
+            inputPanel.setBackground(BACKGROUND_COLOR);
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.insets = new Insets(10, 10, 10, 10);
+
+            // Card Number
+            JLabel cardNumberLabel = new JLabel("Card Number:");
+            cardNumberLabel.setFont(INPUT_FONT);
+            cardNumberField = new JTextField(20);
+            cardNumberField.setFont(INPUT_FONT);
+            cardNumberField.setBackground(INPUT_COLOR);
+
+            // Expiration Date
+            JLabel expirationDateLabel = new JLabel("Expiration Date:");
+            expirationDateLabel.setFont(INPUT_FONT);
+            expirationDateField = new JTextField(20);
+            expirationDateField.setFont(INPUT_FONT);
+            expirationDateField.setBackground(INPUT_COLOR);
+
+            // CVV
+            JLabel cvvLabel = new JLabel("CVV:");
+            cvvLabel.setFont(INPUT_FONT);
+            cvvField = new JTextField(20);
+            cvvField.setFont(INPUT_FONT);
+            cvvField.setBackground(INPUT_COLOR);
+
+        }
+    }
+
     public class WelcomeFrame extends JFrame {
         private String username;
 
@@ -218,7 +315,8 @@ public class LoginFrame extends JFrame {
             setLayout(new BorderLayout());
             setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-            JLabel welcomeLabel = new JLabel("Welcome to our Flight Reservation System", SwingConstants.CENTER);
+            JLabel welcomeLabel = new JLabel("Welcome " + this.username + ", to our Flight Reservation System",
+                    SwingConstants.CENTER);
             welcomeLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
             add(welcomeLabel, BorderLayout.NORTH);
 
@@ -243,6 +341,90 @@ public class LoginFrame extends JFrame {
             gbc.insets = new Insets(0, 0, 10, 0);
             buttonPanel.add(cancelFlightButton, gbc);
 
+            JButton registerButton = null;
+
+            if (username.equals("guest")) {
+                // have to add register button
+                registerButton = createStyledButton("Register");
+                gbc.insets = new Insets(0, 0, 10, 0);
+                buttonPanel.add(registerButton, gbc);
+
+                // Back button to close the login window and show the welcome window
+
+                JButton backButton = createStyledButton("Login");
+                backButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        WelcomeFrame.this.dispose();
+                        LoginFrame loginFrame = new LoginFrame();
+                        loginFrame.setVisible(true);
+                    }
+                });
+            } else {
+//                // User is logged in so add logout button
+                JButton logoutButton = createStyledButton("Logout");
+                gbc.insets = new Insets(0, 0, 10, 0);
+                buttonPanel.add(logoutButton, gbc);
+
+                logoutButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        // Hide the welcome frame
+                        WelcomeFrame.this.dispose(); // Optionally, you can dispose the WelcomeFrame
+
+                        // Create and show the login frame
+                        LoginFrame loginFrame = new LoginFrame();
+                        loginFrame.setVisible(true);
+                    }
+                });
+
+                // also add "Add Credit Card" button
+                JButton addCreditCardButton = createStyledButton("Add Credit Card");
+                gbc.insets = new Insets(0, 0, 10, 0);
+                buttonPanel.add(addCreditCardButton, gbc);
+
+                addCreditCardButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+
+                        // Create and show the login frame
+                        AddCreditCardFrame addCreditCardFrame = new AddCreditCardFrame(username);
+                        addCreditCardFrame.setVisible(true);
+                    }
+                });
+            }
+            cancelFlightButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        try {
+                            DBMS dbms = DBMS.getDBMS();
+                            if (username.equals("guest")) {
+                                cancelFlightPanel();
+                            } else {
+                                cancelFlightPanel(dbms.getEmail(username)); // Pass the username to cancelFlightPanel
+                            }
+                        } catch (SQLException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    }
+                });
+
+            if (registerButton != null) {
+                registerButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        // Hide the welcome frame
+                        WelcomeFrame.this.setVisible(false);
+                        WelcomeFrame.this.dispose(); // Optionally, you can dispose the WelcomeFrame
+
+                        // Create and show the register frame
+                        RegisterFrame registerFrame = new RegisterFrame();
+                        registerFrame.setVisible(true);
+                    }
+                });
+            }
+
+
             add(buttonPanel, BorderLayout.CENTER);
 
             pack();
@@ -259,6 +441,159 @@ public class LoginFrame extends JFrame {
             button.setBorderPainted(false);
             return button;
         }
+    }
+
+    /*
+     * Uses User's email in db to get all orders, then returns a list of all orders, with a button to cancel each one
+     */
+    private void cancelFlightPanel(String email) {
+        System.out.println("cancelFlightPanel(email)");
+        JFrame browseFrame = new JFrame("Cancel Flight");
+        browseFrame.setSize(1200, 300);
+        browseFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        browseFrame.setLayout(new BorderLayout());
+
+        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JLabel titleLabel = new JLabel("Cancel Flight");
+        titleLabel.setFont(MAIN_FONT);
+        titlePanel.add(titleLabel);
+
+        try {
+            DBMS dbms = DBMS.getDBMS();
+            ArrayList<Order> orders = dbms.getOrders(email);
+            if (orders.size() == 0) {
+                JOptionPane.showMessageDialog(browseFrame, "No orders found for email: " + email,
+                        "No Orders Found", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                // Display Orders in a table
+                String[] columnNames = {"Order ID", "Flight ID", "Departure Location", "Arrival Location",
+                        "Departure Time", "Arrival Time", "Seat Class", "Seat Number", "Insurance",
+                        "Total Price"};
+                // this table has 11 rows instead of 10 and OrderID is duplicated on both ends, how to fix?
+                // A: remove the first column from the table
+                // What command do I use to remove the last column?
+                // A: table.removeColumn(table.getColumnModel().getColumn(10));
+                DefaultTableModel model = new DefaultTableModel(columnNames, 0);
+
+                for (Order order : orders) {
+                    Object[] row = new Object[10];
+                    row[0] = order.getOrderID();
+                    row[1] = order.getFlightID();
+                    row[2] = order.getDepartureLocation();
+                    row[3] = order.getArrivalLocation();
+                    row[4] = order.getDepartureTime();
+                    row[5] = order.getArrivalTime();
+                    row[6] = order.getSeatClass();
+                    row[7] = order.getSeatNumber();
+                    row[8] = order.getInsurance();
+                    row[9] = order.getTotalPrice();
+                    model.addRow(row);
+                }
+                JTable table = new JTable(model);
+                table.addColumn(new TableColumn());
+                JScrollPane scrollPane = new JScrollPane(table);
+                browseFrame.add(scrollPane, BorderLayout.CENTER);
+                table.removeColumn(table.getColumnModel().getColumn(10));
+                browseFrame.setVisible(true);
+
+                // Add a button to cancel selected order
+                JButton cancelButton = new JButton("Cancel Order");
+
+                // add button to Frame
+                JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+                buttonPanel.add(cancelButton);
+                browseFrame.add(buttonPanel, BorderLayout.SOUTH);
+
+                cancelButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        try {
+                            int selectedRow = table.getSelectedRow();
+                            if (selectedRow >= 0) {
+                                int orderID = (Integer) table.getValueAt(selectedRow, 0);
+                                //SEND EMAIL HERE
+
+                                String email = dbms.getEmail(orderID);
+                                Email_Controller.sendCancellationEmail(orderID,email);
+
+                                dbms.cancelOrder(orderID);
+                                JOptionPane.showMessageDialog(browseFrame, "Order cancelled successfully.",
+                                        "Order Cancelled", JOptionPane.INFORMATION_MESSAGE);
+                                model.removeRow(selectedRow); // Remove the canceled order from the table
+                            } else {
+                                JOptionPane.showMessageDialog(browseFrame, "Please select an order to cancel.",
+                                        "No Order Selected", JOptionPane.WARNING_MESSAGE);
+                            }
+                        } catch (SQLException ex) {
+                            ex.printStackTrace();
+                            JOptionPane.showMessageDialog(browseFrame, "Error cancelling order: " + ex.getMessage(),
+                                    "Database Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                });
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(browseFrame, "Error fetching orders: " + ex.getMessage(),
+                    "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /*
+     * Asks Guest for email, then goes through orders table and returns a list of all orders, with a button to cancel
+     * each one. Overloaded to add guest cancellation functionality
+     */
+    private void cancelFlightPanel() {
+        System.out.println("cancelFlightPanel()");
+        JFrame browseFrame = new JFrame("Cancel Flight");
+        browseFrame.setSize(1200, 300);
+        browseFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        browseFrame.setLayout(new BorderLayout());
+
+        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JLabel titleLabel = new JLabel("Cancel Flight");
+        titleLabel.setFont(MAIN_FONT);
+        titlePanel.add(titleLabel);
+
+        JTextField emailField = new JTextField(20);
+        emailField.setFont(INPUT_FONT);
+        emailField.setBackground(INPUT_COLOR);
+        JLabel emailLabel = new JLabel("Email:");
+        emailLabel.setFont(INPUT_FONT);
+        JPanel emailPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        emailPanel.add(emailLabel);
+        emailPanel.add(emailField);
+        browseFrame.add(emailPanel, BorderLayout.NORTH);
+
+        JButton confirmButton = new JButton("Confirm");
+        confirmButton.setFont(INPUT_FONT);
+        confirmButton.setBackground(BUTTON_COLOR); // Cornflower Blue
+        confirmButton.setForeground(BUTTON_TEXT_COLOR);
+        confirmButton.setFocusPainted(false);
+        confirmButton.setBorderPainted(false);
+        JPanel confirmPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        confirmPanel.add(confirmButton);
+        browseFrame.add(confirmPanel, BorderLayout.SOUTH);
+
+        // show email input panel
+        browseFrame.setVisible(true);
+
+        // add action listener to confirm button
+
+        confirmButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String email = emailField.getText();
+                if (email.equals("")) {
+                    JOptionPane.showMessageDialog(browseFrame, "Please enter an email.",
+                            "No Email Entered", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    // Hide the browse frame
+                    browseFrame.dispose();
+                    cancelFlightPanel(email);
+                }
+            }
+        });
     }
 
     public LoginFrame() {
@@ -280,14 +615,13 @@ public class LoginFrame extends JFrame {
         JButton userLoginButton = createStyledButton("User Login");
         JButton adminLoginButton = createStyledButton("Admin Login");
         JButton guestLoginButton = createStyledButton("Guest Login");
-        JButton userRegisterButton = createStyledButton("User Register");
+        JButton userRegisterButton = createStyledButton("Register User");
 
         // Add action listeners to your buttons
         userRegisterButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Hide the login frame
-                LoginFrame.this.setVisible(false);
                 LoginFrame.this.dispose(); // Optionally, you can dispose the LoginFrame
 
                 // Create and show the register frame
@@ -299,14 +633,28 @@ public class LoginFrame extends JFrame {
         userLoginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                createUserLoginPanel();
+                createUserLoginPanel(); // Call the method to create the login panel
+                LoginFrame.this.dispose(); // Optionally, you can dispose the LoginFrame
             }
         });
 
         adminLoginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                createAdminLoginPanel();
+                createAdminLoginPanel(); // Call the method to create the login panel
+                LoginFrame.this.dispose(); // Optionally, you can dispose the LoginFrame
+            }
+        });
+
+        guestLoginButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Hide the login frame
+                LoginFrame.this.dispose(); // Optionally, you can dispose the LoginFrame
+
+                // Create and show the welcome frame
+                WelcomeFrame welcomeFrame = new WelcomeFrame("guest");
+                welcomeFrame.setVisible(true);
             }
         });
 
@@ -370,6 +718,8 @@ public class LoginFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
+                    // hide the ticket frame
+                    ticketFrame.dispose();
 
                     String origin = (String) fromComboBox.getSelectedItem();
                     String destination = (String) toComboBox.getSelectedItem();
@@ -398,30 +748,38 @@ public class LoginFrame extends JFrame {
 
         private FlightInfoFrame flightInfoFrame;
         private JRadioButton economyClassButton;
+        private JRadioButton comfortClassButton;
         private JRadioButton businessClassButton;
         private JCheckBox insuranceCheckbox;
         private JLabel totalPriceLabel;
         private String username;
 
         private int economySeats;
+        private int comfortSeats;
         private int businessSeats;
 
         private double economyPrice;
+        private double comfortPrice;
         private double businessPrice;
         private double insurancePrice;
 
         private double totalPrice; // Class variable to store the total price
 
         private void updatePrice() {
-            totalPrice = economyClassButton.isSelected() ? economyPrice : businessPrice;
+            totalPrice = economyClassButton.isSelected() ? economyPrice :
+                    businessClassButton.isSelected() ? businessPrice: comfortPrice;
             if (insuranceCheckbox.isSelected()) {
                 totalPrice += insurancePrice;
             }
-            totalPriceLabel.setText("Total Price: $" + String.format("%.2f", totalPrice));
+            totalPriceLabel.setText("Price Per Seat: $" + String.format("%.2f", totalPrice));
         }
 
         public boolean isEconomyClassSelected() {
             return economyClassButton.isSelected();
+        }
+
+        public boolean isComfortClassSelected() {
+            return comfortClassButton.isSelected();
         }
 
         public boolean isBusinessClassSelected() {
@@ -436,22 +794,26 @@ public class LoginFrame extends JFrame {
                 double businessPrice, double insurancePrice, String username) {
             this.flightInfoFrame = flightInfoFrame; // Store the FlightInfoFrame reference
             this.economySeats = aircraft.getNumEconomySeats();
+            this.comfortSeats = aircraft.getNumComfortSeats();
             this.businessSeats = aircraft.getNumBusinessSeats();
             this.economyPrice = economyPrice;
+            this.comfortPrice = this.economyPrice * 1.5;
             this.businessPrice = businessPrice;
             this.insurancePrice = insurancePrice;
             this.username = username;
 
             setTitle("Booking Options");
-            setSize(300, 200); // Set size
+            setSize(600, 200); // Set size
             setLayout(new FlowLayout()); // Set layout
 
             economyClassButton = new JRadioButton("Economy Class", true);
+            comfortClassButton = new JRadioButton("Comfort Class");
             businessClassButton = new JRadioButton("Business Class");
 
             // Group the radio buttons.
             ButtonGroup group = new ButtonGroup();
             group.add(economyClassButton);
+            group.add(comfortClassButton);
             group.add(businessClassButton);
 
             insuranceCheckbox = new JCheckBox("Cancellation Insurance");
@@ -463,9 +825,13 @@ public class LoginFrame extends JFrame {
             confirmButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    // Hide the booking frame
+                    BookingFrame.this.dispose();
                     SeatSelectionFrame seatSelectionFrame = new SeatSelectionFrame(
-                            economyClassButton.isSelected() ? economySeats : businessSeats,
-                            economyClassButton.isSelected(),
+                            economyClassButton.isSelected() ? economySeats : businessClassButton.isSelected() ?
+                                    businessSeats: comfortSeats,
+                            economyClassButton.isSelected() ? "Economy Class" : businessClassButton.isSelected() ?
+                                    "Business Class": "Comfort Class",
                             totalPrice,
                             flightInfoFrame, // 这里假设你是在FlightInfoFrame内部创建BookingFrame
                             BookingFrame.this, username);
@@ -474,6 +840,7 @@ public class LoginFrame extends JFrame {
             });
 
             add(economyClassButton);
+            add(comfortClassButton);
             add(businessClassButton);
             add(insuranceCheckbox);
             add(totalPriceLabel);
@@ -488,6 +855,7 @@ public class LoginFrame extends JFrame {
 
             // Add the ActionListener to the radio buttons and checkbox
             economyClassButton.addActionListener(priceChangeListener);
+            comfortClassButton.addActionListener(priceChangeListener);
             businessClassButton.addActionListener(priceChangeListener);
             insuranceCheckbox.addActionListener(priceChangeListener);
 
@@ -626,8 +994,6 @@ public class LoginFrame extends JFrame {
     public class SeatSelectionFrame extends JFrame {
         private FlightInfoFrame flightInfoFrame;
         private BookingFrame bookingFrame;
-        private static final int ECONOMY_SEATS = 70;
-        private static final int BUSINESS_SEATS = 30;
         private double totalPrice;
         private JButton confirmButton;
         private JButton selectedSeatButton;
@@ -641,7 +1007,7 @@ public class LoginFrame extends JFrame {
             }
         }
 
-        public SeatSelectionFrame(int totalSeats, boolean isEconomy, double totalPrice, FlightInfoFrame flightInfoFrame,
+        public SeatSelectionFrame(int totalSeats, String seatType, double totalPrice, FlightInfoFrame flightInfoFrame,
                 BookingFrame bookingFrame, String username) {
             this.totalPrice = totalPrice;
             this.flightInfoFrame = flightInfoFrame;
@@ -653,27 +1019,53 @@ public class LoginFrame extends JFrame {
 
             int numRows = (int) Math.ceil((totalSeats - 5) / 5.0) + 1;
             JPanel seatPanel = new JPanel(new GridLayout(numRows, 5, 10, 10));
-            seatPanel.setBorder(BorderFactory.createTitledBorder(isEconomy ? "Economy Class" : "Business Class"));
-
+            seatPanel.setBorder(BorderFactory.createTitledBorder(seatType));
             for (int row = 0; row < numRows; row++) {
+                char seatChar = seatType.charAt(0);
                 for (int col = 0; col < 5; col++) {
-
-                    if (row > 0 && (col == 0 || col == 4)) {
-                        seatPanel.add(Box.createRigidArea(new Dimension(50, 50)));
+                    if (col == 2) {
+                        seatPanel.add(Box.createRigidArea(new Dimension(50, 50))); // Gap after 2 seats
                     } else {
-                        String seatLabel = ((row == 0) ? "P" : (isEconomy ? "E" : "B")) + ((row * 5) + col);
+                        int seatNumber = (col < 3) ? col + 1 : col; // Calculate seat number
+                        seatNumber += (row * 4); // Add the row offset
+                        String seatLabel = String.valueOf(seatChar) + (seatNumber); // Convert to string
                         JButton seatButton = createSeatButton(seatLabel);
                         seatPanel.add(seatButton);
                     }
                 }
             }
 
+            // Check if seat is already booked and disable the button
+            try {
+                DBMS dbms = DBMS.getDBMS();
+                ArrayList<Order> orders = dbms.getOrders(flightInfoFrame.getSelectedFlight().getFlightID());
+                for (Order order : orders) {
+                    String seatNumber = order.getSeatNumber();
+                    for (Component component : seatPanel.getComponents()) {
+                        if (component instanceof JButton) {
+                            JButton button = (JButton) component;
+                            if (button.getText().equals(seatNumber)) {
+                                button.setEnabled(false);
+                            }
+                        }
+                    }
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(SeatSelectionFrame.this,
+                        "Error accessing database: " + ex.getMessage(),
+                        "Database Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+
+
             confirmButton = new JButton("Confirm Selection");
             confirmButton.setEnabled(false);
             confirmButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-
+                    // Close the seat selection frame and open the payment frame
+                    SeatSelectionFrame.this.dispose();
                     PaymentFrame paymentFrame = new PaymentFrame(totalPrice, SeatSelectionFrame.this, username);
                     paymentFrame.setVisible(true);
                 }
@@ -742,7 +1134,7 @@ public class LoginFrame extends JFrame {
 
             setTitle("Make Payment");
             setLayout(new BorderLayout());
-            setSize(350, 200);
+            setSize(400, 250);
             setLocationRelativeTo(null);
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -755,7 +1147,24 @@ public class LoginFrame extends JFrame {
             pricePanel.add(priceField);
 
             // Panel for card information
-            JPanel cardPanel = new JPanel(new GridLayout(3, 2, 5, 5));
+            JPanel cardPanel = null;
+            JTextField emailField = null;
+            // if user is guest also ask for name and address
+            if (username.equals("guest")) {
+                cardPanel = new JPanel(new GridLayout(6, 2, 5, 5));
+                cardPanel.add(new JLabel("Name:"));
+                JTextField nameField = new JTextField();
+                cardPanel.add(nameField);
+                cardPanel.add(new JLabel("Email:"));
+                emailField = new JTextField();
+                cardPanel.add(emailField);
+                cardPanel.add(new JLabel("Address:"));
+                JTextField addressField = new JTextField();
+                cardPanel.add(addressField);
+            }
+            else {
+                cardPanel = new JPanel(new GridLayout(3, 2, 5, 5));
+            }
             cardPanel.add(new JLabel("Card Number:"));
             JTextField cardNumberField = new JTextField();
             cardPanel.add(cardNumberField);
@@ -766,6 +1175,7 @@ public class LoginFrame extends JFrame {
             JTextField cvvField = new JTextField();
             cardPanel.add(cvvField);
 
+
             // Confirm button to submit payment
             JButton confirmButton = new JButton("Confirm Payment");
             // Adding components to the frame
@@ -773,32 +1183,31 @@ public class LoginFrame extends JFrame {
             add(cardPanel, BorderLayout.CENTER);
             add(confirmButton, BorderLayout.SOUTH);
 
-            pack();
+//            pack();
             setVisible(true);
+            JPanel finalCardPanel = cardPanel;
+            JTextField finalEmailField = emailField;
             confirmButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    // Implement the payment processing logic here
-                    // For example, validate the card information, process the payment, etc.
-
+                    // TODO: Validate the card information here (If user logged in then just check with db)
+                    // TODO: Send Email confirmation
                     // Let's assume the payment is processed successfully here
                     boolean paymentSuccess = true; // This should be the result of your payment processing logic
+
 
                     if (paymentSuccess) {
                         JOptionPane.showMessageDialog(PaymentFrame.this, "Payment successful!", "Payment",
                                 JOptionPane.INFORMATION_MESSAGE);
 
-                        System.err.println("1");
                         // Retrieve the selected flight and other booking details
                         Flight selectedFlight = seatSelectionFrame.flightInfoFrame.getSelectedFlight();// flightInfoFrame.getSelectedFlight();
                         LocalDate departureDate = seatSelectionFrame.flightInfoFrame.getDepartureDate();
                         LocalTime departureTime = seatSelectionFrame.flightInfoFrame.getDepartureTime();
                         LocalDate arrivalDate = seatSelectionFrame.flightInfoFrame.getArrivalDate();
                         LocalTime arrivaltime = seatSelectionFrame.flightInfoFrame.getArrivalTime();
-                        System.err.println("2");
                         boolean isEconomy = seatSelectionFrame.bookingFrame.isEconomyClassSelected();
 
-                        System.err.println(isEconomy);
                         boolean isBusiness = seatSelectionFrame.bookingFrame.isBusinessClassSelected();
                         boolean hasInsurance = seatSelectionFrame.bookingFrame.isInsuranceSelected();
                         String seatNumber = seatSelectionFrame.getSelectedSeatNumber();
@@ -806,13 +1215,33 @@ public class LoginFrame extends JFrame {
                         // Close the payment frame and open the confirmation frame
                         PaymentFrame.this.dispose();
 
-                        ConfirmationFrame confirmationFrame = new ConfirmationFrame(username, selectedFlight, isEconomy,
+                        String email = "";
+                        if (username.equals("guest")) {
+                            email = finalEmailField.getText();
+                        }
+                        else {
+                            try {
+                                DBMS dbms = DBMS.getDBMS();
+                                email = dbms.getEmail(username);
+                            } catch (SQLException ex) {
+                                ex.printStackTrace();
+                                JOptionPane.showMessageDialog(PaymentFrame.this,
+                                        "Error accessing database: " + ex.getMessage(),
+                                        "Database Error",
+                                        JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+                        System.out.println("Email: " + email);
+                        ConfirmationFrame confirmationFrame = new ConfirmationFrame(email, username, selectedFlight, isEconomy,
                                 isBusiness, hasInsurance, seatNumber, totalPrice, departureDate, departureTime,
                                 arrivalDate, arrivaltime);
                         confirmationFrame.setVisible(true);
+                        // hide the payment frame
+                        PaymentFrame.this.dispose();
                     } else {
                         // Handle failed payment case
-                        JOptionPane.showMessageDialog(PaymentFrame.this, "Payment failed. Please try again.",
+                        JOptionPane.showMessageDialog(PaymentFrame.this, "Payment failed. Please" +
+                                        " try again.",
                                 "Payment Error",
                                 JOptionPane.ERROR_MESSAGE);
                     }
@@ -820,54 +1249,77 @@ public class LoginFrame extends JFrame {
             });
 
         }
+
     }
 
+    // Q: Why is this class being called twice?
+    // A: Because you are calling it twice in the PaymentFrame class
+    // Q: Where in the class am i calling it?
+    // A: In the constructor
+    // Q: How do i fix it?
+    // A: Remove the call from the constructor
     public class ConfirmationFrame extends JFrame {
-        public ConfirmationFrame(String username, Flight selectedFlight, boolean isEconomy, boolean isBusiness,
+        public ConfirmationFrame(String email, String username, Flight selectedFlight, boolean isEconomy, boolean isBusiness,
                 boolean hasInsurance,
-                String seatNumber, double totalprice, LocalDate departureDate, LocalTime departureTime,
-                LocalDate arrivalDate, LocalTime arrivalTime) {
+                String seatNumber, double totalPrice, LocalDate departureDate, LocalTime departureTime,
+                LocalDate arrivalDate, LocalTime arrivalTime){
             setTitle("Booking Confirmation");
-            setSize(300, 200); // Adjust the size as needed
+            setSize(500, 300); // Adjust the size as needed
             setLayout(new BorderLayout());
+            int orderID = -1;
+            try {
+                DBMS dbms = DBMS.getDBMS();
+
+                orderID = dbms.addOrder(email, username, selectedFlight.getFlightID(), selectedFlight.getAircraft().getAircraftModel(),
+                        selectedFlight.getDepartureLocation(), selectedFlight.getArrivalLocation(),
+                        Timestamp.valueOf(LocalDateTime.of(departureDate, departureTime)),
+                        Timestamp.valueOf(LocalDateTime.of(arrivalDate, arrivalTime)),
+                        (isEconomy ? "Economy" : isBusiness ? "Business" : "Comfort"), seatNumber, hasInsurance,
+                        totalPrice);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error updating database: " + ex.getMessage(),
+                        "Database Error", JOptionPane.ERROR_MESSAGE);
+            }
+            System.out.println("Order ID: " + orderID);
 
             JPanel infoPanel = new JPanel(new GridLayout(0, 1)); // Use GridLayout for listing the information
             infoPanel.add(new JLabel("This is your receipt:"));
+            infoPanel.add(new JLabel("")); // Empty label for spacing
+            infoPanel.add(new JLabel("Order ID: " + orderID)); // This should be the order ID from the database
             infoPanel.add(new JLabel("Passenger name: " + username));
             infoPanel.add(new JLabel("Flight ID: " + selectedFlight.getFlightID()));
             infoPanel.add(new JLabel("Aircraft: " + selectedFlight.getAircraft().getAircraftModel()));
             infoPanel.add(new JLabel("From: " + selectedFlight.getDepartureLocation()));
             infoPanel.add(new JLabel("To: " + selectedFlight.getArrivalLocation()));
-
             infoPanel.add(new JLabel("Departure time: " + departureTime));
             infoPanel.add(new JLabel("Arrival time: " + arrivalTime));
             infoPanel.add(new JLabel("Class: " + (isEconomy ? "Economy" : isBusiness ? "Business" : "Comfort")));
             infoPanel.add(new JLabel("Seat: " + seatNumber));
             infoPanel.add(new JLabel("Insurance: " + (hasInsurance ? "Yes" : "No")));
-            infoPanel.add(new JLabel("total price: " + totalprice));
+            infoPanel.add(new JLabel("total price: " + totalPrice));
             add(infoPanel, BorderLayout.CENTER);
 
             JButton closeButton = new JButton("Close");
             closeButton.addActionListener(e -> dispose());
             add(closeButton, BorderLayout.SOUTH);
 
+            //This block sends the emails after purchasing a ticket
+            try {
+                DBMS db = DBMS.getDBMS();
+                Email_Controller.sendReceipt(username, email, (hasInsurance ? "Yes" : "No"),
+                        selectedFlight.getArrivalLocation(), totalPrice);
+                Email_Controller.sendTicket(username, email, selectedFlight.getAircraft().getAircraftModel(),
+                        selectedFlight.getDepartureLocation(), selectedFlight.getArrivalLocation(),
+                        departureTime, arrivalTime, (isEconomy ? "Economy" : isBusiness ? "Business" : "Comfort"),
+                        seatNumber);
+
+            } catch (Exception e) {
+                System.out.println(e);
+            }
             pack();
             setLocationRelativeTo(null);
             setVisible(true);
-            // Example of calling the updateDatabase method.
-            try {
-                DBMS dbms = DBMS.getDBMS();
-                dbms.addOrder(username, selectedFlight.getFlightID(), selectedFlight.getAircraft().getAircraftModel(),
-                        selectedFlight.getDepartureLocation(), selectedFlight.getArrivalLocation(),
-                        Timestamp.valueOf(LocalDateTime.of(departureDate, departureTime)),
-                        Timestamp.valueOf(LocalDateTime.of(arrivalDate, arrivalTime)),
-                        (isEconomy ? "Economy" : isBusiness ? "Business" : "Comfort"), seatNumber, hasInsurance,
-                        totalprice);
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Error updating database: " + ex.getMessage(),
-                        "Database Error", JOptionPane.ERROR_MESSAGE);
-            }
         }
     }
 

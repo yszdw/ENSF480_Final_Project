@@ -4,7 +4,7 @@
  Source Server         : 111
  Source Server Type    : MySQL
  Source Server Version : 80035 (8.0.35)
- Source Host           : localhost:3306
+ Source Host           : localhost:3306orders
  Source Schema         : ensf480
  
  Target Server Type    : MySQL
@@ -302,6 +302,7 @@ VALUES (
 DROP TABLE IF EXISTS `orders`;
 CREATE TABLE `orders` (
   `OrderID` int NOT NULL AUTO_INCREMENT,
+  `Email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `Username` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `FlightID` int NOT NULL,
   `AircraftModel` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -323,6 +324,7 @@ CREATE TABLE `orders` (
 INSERT INTO `orders`
 VALUES (
     1,
+    'sara@gmail.com',
     'sara',
     2,
     'Boeing 737',
@@ -362,8 +364,6 @@ CREATE TABLE `promotions` (
   `ValidOn` datetime NOT NULL,
   `ValidUntil` datetime NOT NULL,
   PRIMARY KEY (`PromotionID`) USING BTREE
-  -- INDEX `UserID`(`UserID` ASC) USING BTREE,
-  -- CONSTRAINT `promotions_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `users` (`UserID`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 -- ----------------------------
 -- Records of promotions
@@ -402,7 +402,7 @@ VALUES (
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `UserID` int NOT NULL AUTO_INCREMENT,
-  `Name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `Name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL UNIQUE,
   `Address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `Email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `UserType` enum(
@@ -422,95 +422,17 @@ CREATE TABLE `users` (
 -- ----------------------------
 -- Records of users
 -- ----------------------------
-INSERT INTO `users`
-VALUES (
-    1,
-    'John Doe',
-    '1234 5th Ave, Calgary, AB',
-    'johnDoe@gmail.com',
-    'passenger',
-    0,
-    '1234-5678-9012-3456',
-    0101,
-    123,
-    ''
-  );
-INSERT INTO `users`
-VALUES (
-    2,
-    'Jane Doe',
-    '1234 5th Ave, Calgary, AB',
-    'janeDoe@gmail.com',
-    'passenger',
-    0,
-    '1234-5678-9012-3456',
-    0202,
-    123,
-    ''
-  );
-INSERT INTO `users`
-VALUES (
-    3,
-    'ysz',
-    NULL,
-    'sgg',
-    'passenger',
-    0,
-    NULL,
-    '123456',
-    0303,
-    123
-  );
-INSERT INTO `users`
-VALUES (
-    4,
-    'Hhf',
-    NULL,
-    'bgesrg',
-    'passenger',
-    0,
-    NULL,
-    '12345678',
-    0404,
-    123
-  );
-INSERT INTO `users`
-VALUES (
-    5,
-    'ryg',
-    NULL,
-    'wghtg',
-    'passenger',
-    0,
-    NULL,
-    '4545',
-    0505,
-    123
-  );
-INSERT INTO `users`
-VALUES (
-    6,
-    'sara',
-    NULL,
-    'fsefs',
-    'passenger',
-    0,
-    NULL,
-    0606,
-    123,
-    '123456'
-  );
-INSERT INTO `users`
-VALUES (
-    7,
-    'admin',
-    NULL,
-    '00000',
-    'admin',
-    0,
-    NULL,
-    0606,
-    123,
-    '0000'
-  );
+INSERT INTO `users` VALUES (1, 'John Doe', '1234 5th Ave, Calgary, AB', 'johnDoe@gmail.com', 'passenger', 0, '1234-5678-9012-3456',0101,123, '');
+INSERT INTO `users` VALUES (2, 'Jane Doe', '1234 5th Ave, Calgary, AB', 'janeDoe@gmail.com', 'passenger', 0, '1234-5678-9012-3456',0202,123, '');
+INSERT INTO `users` VALUES (3, 'ysz', NULL, 'sgg', 'passenger', 0, NULL, '123456',0303,123);
+INSERT INTO `users` VALUES (4, 'Hhf', NULL, 'bgesrg', 'passenger', 0, NULL, '12345678',0404,123);
+INSERT INTO `users` VALUES (5, 'ryg', NULL, 'wghtg', 'passenger', 0, NULL, '4545',0505,123);
+INSERT INTO `users` VALUES (6, 'sara', NULL, 'sara@gmail.com', 'passenger', 0, NULL,0606,123, '123456');
+INSERT INTO `users` VALUES (7, 'admin', NULL, '00000', 'admin', 0, NULL,0606,123, '0000');
+INSERT INTO `users` VALUES (8, 'Aryan', '1236 5th Ave, Calgary, AB', 'aryan@gmail.com', 'passenger', 0, '1234123412341234', 1024, 100, 'pass');
+
 SET FOREIGN_KEY_CHECKS = 1;
+
+select * from orders;
+select * from users;
+SELECT * FROM Orders WHERE Email = 'Aryan@gmail.com';

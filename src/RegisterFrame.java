@@ -1,3 +1,5 @@
+package src;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -19,6 +21,8 @@ public class RegisterFrame extends JFrame {
     private JPasswordField passField;
     private JTextField emailTextField;
 
+    private JTextField addressTextField;
+
     public RegisterFrame() {
         setTitle("User Registration");
         setSize(400, 400);
@@ -38,6 +42,20 @@ public class RegisterFrame extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(10, 10, 10, 10);
 
+        // Email
+        JLabel emailLabel = new JLabel("Email:");
+        emailLabel.setFont(INPUT_FONT);
+        emailTextField = new JTextField(20);
+        emailTextField.setFont(INPUT_FONT);
+        emailTextField.setBackground(INPUT_COLOR);
+
+        // Address
+        JLabel addressLabel = new JLabel("Address:");
+        addressLabel.setFont(INPUT_FONT);
+        addressTextField = new JTextField(20);
+        addressTextField.setFont(INPUT_FONT);
+        addressTextField.setBackground(INPUT_COLOR);
+
         // Username
         JLabel userLabel = new JLabel("Username:");
         userLabel.setFont(INPUT_FONT);
@@ -52,32 +70,51 @@ public class RegisterFrame extends JFrame {
         passField.setFont(INPUT_FONT);
         passField.setBackground(INPUT_COLOR);
 
-        // Email
-        JLabel emailLabel = new JLabel("Email:");
-        emailLabel.setFont(INPUT_FONT);
-        emailTextField = new JTextField(20);
-        emailTextField.setFont(INPUT_FONT);
-        emailTextField.setBackground(INPUT_COLOR);
-
-        // Adding components to inputPanel
+        // Adding components to inputPanel in order of email, address, username, and password
         gbc.gridx = 0;
         gbc.gridy = 0;
-        inputPanel.add(userLabel, gbc);
-        gbc.gridx = 1;
-        inputPanel.add(userTextField, gbc);
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        inputPanel.add(passLabel, gbc);
-        gbc.gridx = 1;
-        inputPanel.add(passField, gbc);
-        gbc.gridx = 0;
-        gbc.gridy = 2;
         inputPanel.add(emailLabel, gbc);
         gbc.gridx = 1;
+        gbc.gridy = 0;
         inputPanel.add(emailTextField, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        inputPanel.add(addressLabel, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        inputPanel.add(addressTextField, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        inputPanel.add(userLabel, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        inputPanel.add(userTextField, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        inputPanel.add(passLabel, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        inputPanel.add(passField, gbc);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        // back button to login
+        JButton backButton = new JButton("Back");
+        backButton.setFont(INPUT_FONT);
+        backButton.setBackground(new Color(100, 149, 237)); // Cornflower Blue
+        backButton.setForeground(Color.WHITE);
+        backButton.setFocusPainted(false);
+        backButton.setBorderPainted(false);
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LoginFrame loginFrame = new LoginFrame();
+                loginFrame.setVisible(true);
+                dispose();
+            }
+        });
+        buttonPanel.add(backButton);
 
         // Register Button
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton registerButton = new JButton("Register");
         registerButton.setFont(INPUT_FONT);
         registerButton.setBackground(new Color(100, 149, 237)); // Cornflower Blue
@@ -106,6 +143,7 @@ public class RegisterFrame extends JFrame {
         String username = userTextField.getText();
         String password = new String(passField.getPassword()); // In real application, hash the password
         String email = emailTextField.getText();
+        String address = addressTextField.getText();
 
         // Input validation
         if (username.isEmpty() || password.isEmpty() || email.isEmpty()) {
@@ -115,8 +153,10 @@ public class RegisterFrame extends JFrame {
 
         // Database operation
         try {
+
             DBMS dbms = DBMS.getDBMS();
-            if (dbms.registerUser(username, password, email, email)) {
+            if (dbms.registerUser(username, password, email, address)) {
+
                 JOptionPane.showMessageDialog(this, "Registration successful!");
                 this.dispose();
                 // Optionally, open the login window or main app window here
