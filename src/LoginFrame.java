@@ -88,6 +88,8 @@ public class LoginFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 loginFrame.dispose();
+                LoginFrame loginFrame = new LoginFrame();
+                loginFrame.setVisible(true);
             }
         });
 
@@ -216,8 +218,28 @@ public class LoginFrame extends JFrame {
         gbc.gridx = 1;
         inputPanel.add(passField, gbc);
 
-        // Login Button
+
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
+        // Back button to close the login window and show the welcome window
+        JButton backButton = new JButton("Back");
+        backButton.setFont(INPUT_FONT);
+        backButton.setBackground(BUTTON_COLOR); // Cornflower Blue
+        backButton.setForeground(BUTTON_TEXT_COLOR);
+        backButton.setFocusPainted(false);
+        backButton.setBorderPainted(false);
+        buttonPanel.add(backButton);
+
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loginFrame.dispose();
+                LoginFrame loginFrame = new LoginFrame();
+                loginFrame.setVisible(true);
+            }
+        });
+
+        // Login Button
         JButton loginButton = new JButton("Login");
         loginButton.setFont(INPUT_FONT);
         loginButton.setBackground(BUTTON_COLOR); // Cornflower Blue
@@ -225,6 +247,8 @@ public class LoginFrame extends JFrame {
         loginButton.setFocusPainted(false);
         loginButton.setBorderPainted(false);
         buttonPanel.add(loginButton);
+
+
 
         // Action listener for the login button
         loginButton.addActionListener(new ActionListener() {
@@ -424,6 +448,20 @@ public class LoginFrame extends JFrame {
                     }
                 }
             });
+
+            // Back button to close the login window and show the welcome window
+            JButton backButton = createStyledButton("Logout");
+
+            backButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    adminFrame.this.dispose();
+                    LoginFrame loginFrame = new LoginFrame();
+                    loginFrame.setVisible(true);
+                }
+            });
+
+            buttonPanel.add(backButton, gbc);
 
             add(buttonPanel, BorderLayout.CENTER);
 
@@ -980,22 +1018,49 @@ public class LoginFrame extends JFrame {
             gbc.insets = new Insets(0, 0, 10, 0);
             buttonPanel.add(cancelFlightButton, gbc);
 
-            cancelFlightButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    cancelFlightPanel(username); // Pass the username to createTicketPurchasePanel
-                }
-            });
-
             JButton registerButton = null;
 
             if (username.equals("guest")) {
-                cancelFlightButton.setEnabled(false);
-                // create register button
+                // have to add register button
                 registerButton = createStyledButton("Register");
                 gbc.insets = new Insets(0, 0, 10, 0);
                 buttonPanel.add(registerButton, gbc);
+
+                // Back button to close the login window and show the welcome window
+
+                JButton backButton = createStyledButton("Login");
+                backButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        WelcomeFrame.this.dispose();
+                        LoginFrame loginFrame = new LoginFrame();
+                        loginFrame.setVisible(true);
+                    }
+                });
+            } else {
+//                // User is logged in so add logout button
+                JButton logoutButton = createStyledButton("Logout");
+                gbc.insets = new Insets(0, 0, 10, 0);
+                buttonPanel.add(logoutButton, gbc);
+
+                logoutButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        // Hide the welcome frame
+                        WelcomeFrame.this.dispose(); // Optionally, you can dispose the WelcomeFrame
+
+                        // Create and show the login frame
+                        LoginFrame loginFrame = new LoginFrame();
+                        loginFrame.setVisible(true);
+                    }
+                });
             }
+            cancelFlightButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        cancelFlightPanel(username); // Pass the username to createTicketPurchasePanel
+                    }
+                });
 
             if (registerButton != null) {
                 registerButton.addActionListener(new ActionListener() {
@@ -1030,18 +1095,17 @@ public class LoginFrame extends JFrame {
             return button;
         }
     }
-
     private void cancelFlightPanel(String username) {
         JFrame browseFrame = new JFrame("Cancel Flight");
         browseFrame.setSize(300, 250);
         browseFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         browseFrame.setLayout(new GridLayout(5, 2, 10, 10));
 
-        JLabel fromLabel = new JLabel("Enter a flightID: ");
-        JTextField flightTextField = new JTextField();
+        JLabel fromLabel = new JLabel("Enter your Order ID: ");
+        JTextField orderTextField = new JTextField();
 
         browseFrame.add(fromLabel);
-        browseFrame.add(flightTextField);
+        browseFrame.add(orderTextField);
 
         JButton confirmButton = new JButton("Confirm");
         confirmButton.addActionListener(new ActionListener() {
@@ -1049,12 +1113,12 @@ public class LoginFrame extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 try {
 
-                    int flightID = Integer.parseInt(flightTextField.getText());
+                    int orderID = Integer.parseInt(orderTextField.getText());
 
                     DBMS dbms = DBMS.getDBMS(); // This will not create a new instance but will return the existing
                                                 // one.
                     // 0 if worked, 1 if not
-                    int cancelled = dbms.cancelFlight(flightID, username);
+                    int cancelled = dbms.cancelFlight(orderID, username);
 
                     if (cancelled == 0) {
                         JOptionPane.showMessageDialog(browseFrame, "Flight cancelled successfully.",
@@ -1105,7 +1169,6 @@ public class LoginFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Hide the login frame
-                LoginFrame.this.setVisible(false);
                 LoginFrame.this.dispose(); // Optionally, you can dispose the LoginFrame
 
                 // Create and show the register frame
@@ -1118,6 +1181,7 @@ public class LoginFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 createUserLoginPanel(); // Call the method to create the login panel
+                LoginFrame.this.dispose(); // Optionally, you can dispose the LoginFrame
             }
         });
 
@@ -1125,6 +1189,7 @@ public class LoginFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 createAdminLoginPanel(); // Call the method to create the login panel
+                LoginFrame.this.dispose(); // Optionally, you can dispose the LoginFrame
             }
         });
 
@@ -1132,7 +1197,6 @@ public class LoginFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Hide the login frame
-                LoginFrame.this.setVisible(false);
                 LoginFrame.this.dispose(); // Optionally, you can dispose the LoginFrame
 
                 // Create and show the welcome frame
@@ -1713,12 +1777,6 @@ public class LoginFrame extends JFrame {
                         ConfirmationFrame confirmationFrame = new ConfirmationFrame(username, selectedFlight, isEconomy,
                                 isBusiness, hasInsurance, seatNumber, totalPrice, departureTime, arrivaltime);
                         confirmationFrame.setVisible(true);
-                        // Update Database
-                        confirmationFrame.updateDatabase(username, selectedFlight.getFlightID(),
-                                selectedFlight.getAircraft().getAircraftModel(), selectedFlight.getDepartureLocation(),
-                                selectedFlight.getArrivalLocation(), departureTime, arrivaltime,
-                                (isEconomy ? "Economy" : isBusiness ? "Business" : "Comfort"), seatNumber, hasInsurance,
-                                totalPrice);
                     } else {
                         // Handle failed payment case
                         JOptionPane.showMessageDialog(PaymentFrame.this, "Payment failed. Please" +
@@ -1738,11 +1796,19 @@ public class LoginFrame extends JFrame {
                                  boolean hasInsurance,
                                  String seatNumber, double totalPrice, LocalTime departureTime, LocalTime arrivalTime) {
             setTitle("Booking Confirmation");
-            setSize(300, 200); // Adjust the size as needed
+            setSize(500, 300); // Adjust the size as needed
             setLayout(new BorderLayout());
+
+            int OrderID = updateDatabase(username, selectedFlight.getFlightID(),
+                    selectedFlight.getAircraft().getAircraftModel(), selectedFlight.getDepartureLocation(),
+                    selectedFlight.getArrivalLocation(), departureTime, arrivalTime,(isEconomy ? "Economy" : isBusiness
+                            ? "Business" : "Comfort"), seatNumber, hasInsurance, totalPrice);
+
 
             JPanel infoPanel = new JPanel(new GridLayout(0, 1)); // Use GridLayout for listing the information
             infoPanel.add(new JLabel("This is your receipt:"));
+            infoPanel.add(new JLabel("")); // Empty label for spacing
+            infoPanel.add(new JLabel("Order ID: " + OrderID)); // This should be the order ID from the database
             infoPanel.add(new JLabel("Passenger name: " + username));
             infoPanel.add(new JLabel("Flight ID: " + selectedFlight.getFlightID()));
             infoPanel.add(new JLabel("Aircraft: " + selectedFlight.getAircraft().getAircraftModel()));
@@ -1766,7 +1832,8 @@ public class LoginFrame extends JFrame {
 
         }
 
-        public void updateDatabase(String username, int flightID, String aircraftModel, String departureLocation,
+        // Update Database with new order, returns order ID
+        public int updateDatabase(String username, int flightID, String aircraftModel, String departureLocation,
                 String arrivalLocation, LocalTime departureTime, LocalTime arrivalTime, String seatClass,
                 String seatNumber, boolean hasInsurance, double totalprice) {
 
@@ -1801,9 +1868,35 @@ public class LoginFrame extends JFrame {
                 if (rowsInserted > 0) {
                     System.out.println("A new order was inserted successfully!");
                 }
+
+                // Get the order ID of the inserted order
+                String sql2 = "SELECT OrderID FROM orders WHERE Username = ? AND FlightID = ? AND AircraftModel = ? AND " +
+                        "DepartureLocation = ? AND ArrivalLocation = ? AND DepartureTime = ? AND ArrivalTime = ? AND " +
+                        "Class = ? AND SeatNumber = ? AND Insurance = ? AND TotalPrice = ?";
+                PreparedStatement statement2 = connection.prepareStatement(sql2);
+                statement2.setString(1, username);
+                statement2.setInt(2, flightID);
+                statement2.setString(3, aircraftModel);
+                statement2.setString(4, departureLocation);
+                statement2.setString(5, arrivalLocation);
+                statement2.setTime(6, java.sql.Time.valueOf(departureTime));
+                statement2.setTime(7, java.sql.Time.valueOf(arrivalTime));
+                statement2.setString(8, seatClass);
+                statement2.setString(9, seatNumber);
+                statement2.setBoolean(10, hasInsurance);
+                statement2.setDouble(11, totalprice);
+                ResultSet result = statement2.executeQuery();
+                if (result.next()) {
+                    return result.getInt("OrderID");
+                }
+                else {
+                    System.out.println("Error getting order ID");
+                    return -1;
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
                 System.out.println("Database update error: " + e.getMessage());
+                return -1;
             }
         }
 

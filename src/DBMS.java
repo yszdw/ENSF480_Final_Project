@@ -631,7 +631,7 @@ public class DBMS {
     public int cancelFlight(int flightID, String username) {
         // returns 0 if successful, 1 if not
         try {
-            String updateQuery = "DELETE FROM orders WHERE FlightID = ? AND Username = ?";
+            String updateQuery = "DELETE FROM orders WHERE orderID = ? AND Username = ?";
             try (PreparedStatement preparedStatement = dbConnect.prepareStatement(updateQuery)) {
                 preparedStatement.setInt(1, flightID);
                 preparedStatement.setString(2, username);
