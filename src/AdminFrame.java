@@ -1,6 +1,7 @@
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
+package src;
 
+import javax.swing.table.DefaultTableModel;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

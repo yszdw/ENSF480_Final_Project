@@ -1,4 +1,5 @@
 package src;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -857,14 +858,14 @@ public class LoginFrame extends JFrame {
             try {
                 DBMS db = DBMS.getDBMS();
                 String email = db.getEmail(username);
-                Email_Controller.sendReceipt(username,email,(hasInsurance ? "Yes" : "No"),selectedFlight.getArrivalLocation(),totalprice);
-                Email_Controller.sendTicket(username,email,selectedFlight.getAircraft().getAircraftModel(),
-                                            selectedFlight.getDepartureLocation(),selectedFlight.getArrivalLocation(),
-                                            departurTime,arrivalTime,(isEconomy ? "Economy" : isBusiness ? "Business" : "Comfort"),
-                                            seatNumber);
+                Email_Controller.sendReceipt(username, email, (hasInsurance ? "Yes" : "No"),
+                        selectedFlight.getArrivalLocation(), totalprice);
+                Email_Controller.sendTicket(username, email, selectedFlight.getAircraft().getAircraftModel(),
+                        selectedFlight.getDepartureLocation(), selectedFlight.getArrivalLocation(),
+                        departureTime, arrivalTime, (isEconomy ? "Economy" : isBusiness ? "Business" : "Comfort"),
+                        seatNumber);
 
-            }
-            catch(Exception e){
+            } catch (Exception e) {
                 System.out.println(e);
             }
             pack();
