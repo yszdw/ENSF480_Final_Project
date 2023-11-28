@@ -337,6 +337,87 @@ VALUES (
     1,
     150.00
   );
+  INSERT INTO `orders`
+VALUES (
+    2,
+    'sara@gmail.com',
+    'sara',
+    2,
+    'Boeing 737',
+    'Calgary',
+    'Vancouver',
+    '2024-05-01 01:00:00',
+    '2024-05-01 02:00:00',
+    'Economy',
+    'E17',
+    1,
+    150.00
+  );
+  INSERT INTO `orders`
+VALUES (
+    3,
+    'sara@gmail.com',
+    'sara',
+    2,
+    'Boeing 737',
+    'Calgary',
+    'Vancouver',
+    '2024-05-01 01:00:00',
+    '2024-05-01 02:00:00',
+    'Economy',
+    'E18',
+    1,
+    150.00
+  );
+  INSERT INTO `orders`
+VALUES (
+    4,
+    'sara@gmail.com',
+    'sara',
+    3,
+    'Boeing 737',
+    'Calgary',
+    'Vancouver',
+    '2024-05-01 01:00:00',
+    '2024-05-01 02:00:00',
+    'Economy',
+    'E16',
+    1,
+    150.00
+  );
+  INSERT INTO `orders`
+VALUES (
+    5,
+    'sara@gmail.com',
+    'sara',
+    3,
+    'Boeing 737',
+    'Calgary',
+    'Vancouver',
+    '2024-05-01 01:00:00',
+    '2024-05-01 02:00:00',
+    'Economy',
+    'E17',
+    1,
+    150.00
+  );
+  INSERT INTO `orders`
+VALUES (
+    6,
+    'sara@gmail.com',
+    'sara',
+    3,
+    'Boeing 737',
+    'Calgary',
+    'Vancouver',
+    '2024-05-01 01:00:00',
+    '2024-05-01 02:00:00',
+    'Economy',
+    'E18',
+    1,
+    150.00
+  );
+
 -- ----------------------------
 -- Table structure for payments
 -- ----------------------------
@@ -409,7 +490,8 @@ CREATE TABLE `users` (
     'passenger',
     'tourism_agent',
     'airline_agent',
-    'admin'
+    'admin',
+    'flight_attendant'
   ) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `MembershipStatus` tinyint(1) NULL DEFAULT 0,
   `CreditCardInfo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
@@ -422,17 +504,141 @@ CREATE TABLE `users` (
 -- ----------------------------
 -- Records of users
 -- ----------------------------
-INSERT INTO `users` VALUES (1, 'John Doe', '1234 5th Ave, Calgary, AB', 'johnDoe@gmail.com', 'passenger', 0, '1234-5678-9012-3456',0101,123, '');
-INSERT INTO `users` VALUES (2, 'Jane Doe', '1234 5th Ave, Calgary, AB', 'janeDoe@gmail.com', 'passenger', 0, '1234-5678-9012-3456',0202,123, '');
-INSERT INTO `users` VALUES (3, 'ysz', NULL, 'sgg', 'passenger', 0, NULL, '123456',0303,123);
-INSERT INTO `users` VALUES (4, 'Hhf', NULL, 'bgesrg', 'passenger', 0, NULL, '12345678',0404,123);
-INSERT INTO `users` VALUES (5, 'ryg', NULL, 'wghtg', 'passenger', 0, NULL, '4545',0505,123);
-INSERT INTO `users` VALUES (6, 'sara', NULL, 'sara@gmail.com', 'passenger', 0, NULL,0606,123, '123456');
-INSERT INTO `users` VALUES (7, 'admin', NULL, '00000', 'admin', 0, NULL,0606,123, '0000');
-INSERT INTO `users` VALUES (8, 'Aryan', '1236 5th Ave, Calgary, AB', 'aryan@gmail.com', 'passenger', 0, '1234123412341234', 1024, 100, 'pass');
-
+INSERT INTO `users`
+VALUES (
+    1,
+    'John Doe',
+    '1234 5th Ave, Calgary, AB',
+    'johnDoe@gmail.com',
+    'passenger',
+    0,
+    '1234-5678-9012-3456',
+    0101,
+    123,
+    ''
+  );
+INSERT INTO `users`
+VALUES (
+    2,
+    'Jane Doe',
+    '1234 5th Ave, Calgary, AB',
+    'janeDoe@gmail.com',
+    'passenger',
+    0,
+    '1234-5678-9012-3456',
+    0202,
+    123,
+    ''
+  );
+INSERT INTO `users`
+VALUES (
+    3,
+    'ysz',
+    NULL,
+    'sgg',
+    'passenger',
+    0,
+    NULL,
+    '123456',
+    0303,
+    123
+  );
+INSERT INTO `users`
+VALUES (
+    4,
+    'Hhf',
+    NULL,
+    'bgesrg',
+    'passenger',
+    0,
+    NULL,
+    '12345678',
+    0404,
+    123
+  );
+INSERT INTO `users`
+VALUES (
+    5,
+    'ryg',
+    NULL,
+    'wghtg',
+    'passenger',
+    0,
+    NULL,
+    '4545',
+    0505,
+    123
+  );
+INSERT INTO `users`
+VALUES (
+    6,
+    'sara',
+    NULL,
+    'sara@gmail.com',
+    'passenger',
+    0,
+    NULL,
+    0606,
+    123,
+    '123456'
+  );
+INSERT INTO `users`
+VALUES (
+    7,
+    'admin',
+    NULL,
+    '00000',
+    'admin',
+    0,
+    NULL,
+    0606,
+    123,
+    '0000'
+  );
+INSERT INTO `users`
+VALUES (
+    8,
+    'Aryan',
+    '1236 5th Ave, Calgary, AB',
+    'aryan@gmail.com',
+    'passenger',
+    0,
+    '1234123412341234',
+    1024,
+    100,
+    'pass'
+  );
+INSERT INTO `users`
+VALUES (
+    9,
+    'braydon',
+    '1236 5th Ave, Calgary, AB',
+    'braydon@gmail.com',
+    'flight_attendant',
+    0,
+    '1234123412341234',
+    1024,
+    100,
+    '0000'
+  );
+  INSERT INTO `users`
+VALUES (
+    10,
+    'bruh',
+    '1236 5th Ave, Calgary, AB',
+    'bruh@gmail.com',
+    'airline_agent',
+    0,
+    '1234123412341234',
+    1024,
+    100,
+    '0000'
+  );
 SET FOREIGN_KEY_CHECKS = 1;
-
-select * from orders;
-select * from users;
-SELECT * FROM Orders WHERE Email = 'Aryan@gmail.com';
+-- select *
+-- from orders;
+-- select *
+-- from users;
+-- SELECT *
+-- FROM Orders
+-- WHERE Email = 'Aryan@gmail.com';

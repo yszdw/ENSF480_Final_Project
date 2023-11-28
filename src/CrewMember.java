@@ -1,6 +1,8 @@
 package src;
+
 public class CrewMember extends User {
     String crewMemberPos;
+    int crewMemberID;
     String flightID;
     String name;
 
@@ -10,10 +12,10 @@ public class CrewMember extends User {
     }
 
     public CrewMember(int crewMemberID, String name, String crewMemberPos) {
-
+        this.crewMemberID = crewMemberID;
         this.crewMemberPos = crewMemberPos;
         this.name = name;
-        this.crewMemberPos = crewMemberPos;
+
     }
 
     public CrewMember() {
@@ -31,7 +33,7 @@ public class CrewMember extends User {
     }
 
     public int getCrewID() {
-        return userID;
+        return crewMemberID;
     }
 
     public String getCrewName() {
