@@ -31,7 +31,7 @@ public class DBMS {
      */
     private DBMS() throws SQLException {
         // the connection info here will need to be changed depending on the user
-        dbConnect = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/ENSF480", "root", "password");
+        dbConnect = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/ENSF480", "root", "ensf480");
     }
 
     /**
@@ -78,6 +78,7 @@ public class DBMS {
 
         return email;
     }
+
     public String getEmail(int orderID) throws SQLException {
         String email = null;
 
@@ -628,7 +629,8 @@ public class DBMS {
             String seatNumber = results.getString("SeatNumber");
             boolean insurance = results.getBoolean("Insurance");
             double totalPrice = results.getDouble("TotalPrice");
-            Order order = new Order(orderID, email, username, flightID2, aircraftModel, departureLocation, arrivalLocation,
+            Order order = new Order(orderID, email, username, flightID2, aircraftModel, departureLocation,
+                    arrivalLocation,
                     departureTime, arrivalTime, seatClass, seatNumber, insurance, totalPrice);
             orders.add(order);
         }
@@ -637,7 +639,7 @@ public class DBMS {
         return orders;
     }
 
-    public Order getOrder(int OrderID) throws SQLException{
+    public Order getOrder(int OrderID) throws SQLException {
         Statement myStmt = dbConnect.createStatement();
         String id = Integer.toString(OrderID);
         results = myStmt.executeQuery("SELECT * FROM Orders WHERE OrderID = " + id);
@@ -655,7 +657,8 @@ public class DBMS {
             String seatNumber = results.getString("SeatNumber");
             boolean insurance = results.getBoolean("Insurance");
             double totalPrice = results.getDouble("TotalPrice");
-            Order order = new Order(orderID, email, username, flightID2, aircraftModel, departureLocation, arrivalLocation,
+            Order order = new Order(orderID, email, username, flightID2, aircraftModel, departureLocation,
+                    arrivalLocation,
                     departureTime, arrivalTime, seatClass, seatNumber, insurance, totalPrice);
 
             return order;
@@ -690,7 +693,8 @@ public class DBMS {
             String seatNumber = results.getString("SeatNumber");
             boolean insurance = results.getBoolean("Insurance");
             double totalPrice = results.getDouble("TotalPrice");
-            Order order = new Order(orderID, email, username, flightID2, aircraftModel, departureLocation, arrivalLocation,
+            Order order = new Order(orderID, email, username, flightID2, aircraftModel, departureLocation,
+                    arrivalLocation,
                     departureTime, arrivalTime, seatClass, seatNumber, insurance, totalPrice);
             orders.add(order);
         }
@@ -721,7 +725,6 @@ public class DBMS {
                 preparedStatement.executeUpdate();
                 return 0;
             }
-
 
         } catch (SQLException e) {
             e.printStackTrace(); // Handle the exception according to your needs
@@ -783,15 +786,14 @@ public class DBMS {
     }
 
     public int addOrder(String email, String username, int flightID, String aircraftModel, String departureLocation,
-                              String arrivalLocation, Timestamp departureTime, Timestamp arrivalTime, String seatClass,
-                              String seatNumber, boolean hasInsurance, double totalprice) throws SQLException {
-
+            String arrivalLocation, Timestamp departureTime, Timestamp arrivalTime, String seatClass,
+            String seatNumber, boolean hasInsurance, double totalprice) throws SQLException {
 
         // SQL query to insert a new order.
-        String sql = "INSERT INTO orders (Email, Username, FlightID, AircraftModel, DepartureLocation, ArrivalLocation, " +
+        String sql = "INSERT INTO orders (Email, Username, FlightID, AircraftModel, DepartureLocation, ArrivalLocation, "
+                +
                 "DepartureDateTime, ArrivalDateTime, Class, SeatNumber, Insurance, TotalPrice) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
 
         try (PreparedStatement statement = dbConnect.prepareStatement(sql)) {
 
@@ -835,8 +837,7 @@ public class DBMS {
             ResultSet result = statement2.executeQuery();
             if (result.next()) {
                 return result.getInt("OrderID");
-            }
-            else {
+            } else {
                 System.out.println("Error getting order ID");
                 return -1;
             }
@@ -847,5 +848,41 @@ public class DBMS {
         }
     }
     // SQL query to insert a new order.
+
+    public void updateCreditCardInfo(String username, String cardNumber, String expirationDate, String cvv)
+            throws SQLException {
+        String sql = "UPDATE users SET CreditCardInfo = ?, CreditCardExpiry = ?, CreditCardCVV = ? WHERE Name = ?";
+        try (PreparedStatement pstmt = dbConnect.prepareStatement(sql)) {
+            pstmt.setString(1, cardNumber);
+            pstmt.setString(2, expirationDate); // Format or convert this as required by your database schema
+            pstmt.setString(3, cvv);
+            pstmt.setString(4, username);
+            pstmt.executeUpdate();
+        }
+    }
+
+    public String getCreditCardInfo(String username) throws SQLException {
+        String query = "SELECT CreditCardInfo FROM Users WHERE Name = ?";
+        try (PreparedStatement pstmt = dbConnect.prepareStatement(query)) {
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("CreditCardInfo");
+            }
+        }
+        return null;
+    }
+
+    public boolean hasCreditCard(String username) throws SQLException {
+        String query = "SELECT COUNT(*) FROM Users WHERE Name = ? AND CreditCardInfo IS NOT NULL";
+        try (PreparedStatement pstmt = dbConnect.prepareStatement(query)) {
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        }
+        return false;
+    }
 
 }
