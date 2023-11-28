@@ -78,8 +78,25 @@ public class RegisterFrame extends JFrame {
         gbc.gridx = 1;
         inputPanel.add(emailTextField, gbc);
 
-        // Register Button
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        // back button to login
+        JButton backButton = new JButton("Back");
+        backButton.setFont(INPUT_FONT);
+        backButton.setBackground(new Color(100, 149, 237)); // Cornflower Blue
+        backButton.setForeground(Color.WHITE);
+        backButton.setFocusPainted(false);
+        backButton.setBorderPainted(false);
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LoginFrame loginFrame = new LoginFrame();
+                loginFrame.setVisible(true);
+                dispose();
+            }
+        });
+        buttonPanel.add(backButton);
+
+        // Register Button
         JButton registerButton = new JButton("Register");
         registerButton.setFont(INPUT_FONT);
         registerButton.setBackground(new Color(100, 149, 237)); // Cornflower Blue
