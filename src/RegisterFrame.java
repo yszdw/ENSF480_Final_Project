@@ -1,3 +1,5 @@
+package src;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -115,8 +117,10 @@ public class RegisterFrame extends JFrame {
 
         // Database operation
         try {
+
             DBMS dbms = DBMS.getDBMS();
             if (dbms.registerUser(username, password, email)) {
+
                 JOptionPane.showMessageDialog(this, "Registration successful!");
                 this.dispose();
                 // Optionally, open the login window or main app window here

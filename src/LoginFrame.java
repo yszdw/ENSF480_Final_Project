@@ -1,3 +1,4 @@
+package src;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -109,12 +110,14 @@ public class LoginFrame extends JFrame {
 
     private boolean authenticate(String username, String password) {
         try {
+
             DBMS dbms = DBMS.getDBMS();
             return dbms.loginCheck(username, password);
         } catch (SQLException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(null, "Error fetching flight data: " + ex.getMessage(),
                     "Database Error", JOptionPane.ERROR_MESSAGE);
+
         }
         return false;
     }
@@ -851,10 +854,24 @@ public class LoginFrame extends JFrame {
             closeButton.addActionListener(e -> dispose());
             add(closeButton, BorderLayout.SOUTH);
 
+            try {
+                DBMS db = DBMS.getDBMS();
+                String email = db.getEmail(username);
+                Email_Controller.sendReceipt(username,email,(hasInsurance ? "Yes" : "No"),selectedFlight.getArrivalLocation(),totalprice);
+                Email_Controller.sendTicket(username,email,selectedFlight.getAircraft().getAircraftModel(),
+                                            selectedFlight.getDepartureLocation(),selectedFlight.getArrivalLocation(),
+                                            departurTime,arrivalTime,(isEconomy ? "Economy" : isBusiness ? "Business" : "Comfort"),
+                                            seatNumber);
+
+            }
+            catch(Exception e){
+                System.out.println(e);
+            }
             pack();
             setLocationRelativeTo(null);
             setVisible(true);
             // Example of calling the updateDatabase method.
+
             try {
                 DBMS dbms = DBMS.getDBMS();
                 dbms.addOrder(username, selectedFlight.getFlightID(), selectedFlight.getAircraft().getAircraftModel(),
@@ -867,6 +884,7 @@ public class LoginFrame extends JFrame {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(this, "Error updating database: " + ex.getMessage(),
                         "Database Error", JOptionPane.ERROR_MESSAGE);
+
             }
         }
     }
