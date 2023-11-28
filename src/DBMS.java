@@ -1,4 +1,5 @@
 
+import javax.swing.plaf.nimbus.State;
 import java.sql.*;
 import java.util.*;
 import java.time.*;
@@ -565,6 +566,52 @@ public class DBMS {
         }
         return promo;
 
+    }
+
+    /*
+     * Get Orders from database
+     */
+    public ArrayList<Order> getOrders(int flightID) throws SQLException {
+        ArrayList<Order> orders = new ArrayList<Order>();
+        Statement myStmt = dbConnect.createStatement();
+        results = myStmt.executeQuery("SELECT * FROM Orders WHERE FlightID = " + flightID);
+        while (results.next()) {
+            int orderID = results.getInt("OrderID");
+            String username = results.getString("Username");
+            int flightID2 = results.getInt("FlightID");
+            String aircraftModelName = results.getString("AircraftModel");
+//            // TODO: from db get aircraft model with name aircraftModelName
+              // This was giving me trouble and I am not using it so I commented it out. If we need it we can fix later
+//            Statement myStmt2 = dbConnect.createStatement();
+//            ResultSet results2 = myStmt2.executeQuery("SELECT * FROM Aircrafts WHERE Model = " + aircraftModelName +
+//                     " LIMIT 1");
+            Aircraft aircraftModel = null;
+//            while (results2.next()) {
+//                int aircraftID = results2.getInt("AircraftID");
+//                String aircraftModel2 = results2.getString("Model");
+//                int numEconomySeats = results2.getInt("Ordinary");
+//                int numComfortSeats = results2.getInt("Comfort");
+//                int numBusinessSeats = results2.getInt("Business");
+//                double economyPrice = results2.getDouble("EconomyPrice");
+//                double businessPrice = results2.getDouble("BusinessPrice");
+//                aircraftModel = new Aircraft(aircraftID, aircraftModel2, numEconomySeats, numComfortSeats,
+//                        numBusinessSeats, economyPrice, businessPrice);
+//            }
+            String departureLocation = results.getString("DepartureLocation");
+            String arrivalLocation = results.getString("ArrivalLocation");
+            String departureTime = results.getString("DepartureTime");
+            String arrivalTime = results.getString("ArrivalTime");
+            String seatClass = results.getString("Class");
+            String seatNumber = results.getString("SeatNumber");
+            boolean insurance = results.getBoolean("Insurance");
+            double totalPrice = results.getDouble("TotalPrice");
+            Order order = new Order(orderID, username, flightID2, aircraftModel, departureLocation, arrivalLocation,
+                    departureTime, arrivalTime, seatClass, seatNumber, insurance, totalPrice);
+            orders.add(order);
+        }
+
+        results.close();
+        return orders;
     }
 
 }

@@ -1,3 +1,5 @@
+import com.mysql.cj.x.protobuf.MysqlxCrud;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
@@ -1130,30 +1132,38 @@ public class LoginFrame extends JFrame {
 
         private FlightInfoFrame flightInfoFrame;
         private JRadioButton economyClassButton;
+        private JRadioButton comfortClassButton;
         private JRadioButton businessClassButton;
         private JCheckBox insuranceCheckbox;
         private JLabel totalPriceLabel;
         private String username;
 
         private int economySeats;
+        private int comfortSeats;
         private int businessSeats;
 
         private double economyPrice;
+        private double comfortPrice;
         private double businessPrice;
         private double insurancePrice;
 
         private double totalPrice; // Class variable to store the total price
 
         private void updatePrice() {
-            totalPrice = economyClassButton.isSelected() ? economyPrice : businessPrice;
+            totalPrice = economyClassButton.isSelected() ? economyPrice :
+                    businessClassButton.isSelected() ? businessPrice: comfortPrice;
             if (insuranceCheckbox.isSelected()) {
                 totalPrice += insurancePrice;
             }
-            totalPriceLabel.setText("Total Price: $" + String.format("%.2f", totalPrice));
+            totalPriceLabel.setText("Price Per Seat: $" + String.format("%.2f", totalPrice));
         }
 
         public boolean isEconomyClassSelected() {
             return economyClassButton.isSelected();
+        }
+
+        public boolean isComfortClassSelected() {
+            return comfortClassButton.isSelected();
         }
 
         public boolean isBusinessClassSelected() {
@@ -1168,22 +1178,26 @@ public class LoginFrame extends JFrame {
                 double businessPrice, double insurancePrice, String username) {
             this.flightInfoFrame = flightInfoFrame; // Store the FlightInfoFrame reference
             this.economySeats = aircraft.getNumEconomySeats();
+            this.comfortSeats = aircraft.getNumComfortSeats();
             this.businessSeats = aircraft.getNumBusinessSeats();
             this.economyPrice = economyPrice;
+            this.comfortPrice = this.economyPrice * 1.5;
             this.businessPrice = businessPrice;
             this.insurancePrice = insurancePrice;
             this.username = username;
 
             setTitle("Booking Options");
-            setSize(300, 200); // Set size
+            setSize(600, 200); // Set size
             setLayout(new FlowLayout()); // Set layout
 
             economyClassButton = new JRadioButton("Economy Class", true);
+            comfortClassButton = new JRadioButton("Comfort Class");
             businessClassButton = new JRadioButton("Business Class");
 
             // Group the radio buttons.
             ButtonGroup group = new ButtonGroup();
             group.add(economyClassButton);
+            group.add(comfortClassButton);
             group.add(businessClassButton);
 
             insuranceCheckbox = new JCheckBox("Cancellation Insurance");
@@ -1196,8 +1210,10 @@ public class LoginFrame extends JFrame {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     SeatSelectionFrame seatSelectionFrame = new SeatSelectionFrame(
-                            economyClassButton.isSelected() ? economySeats : businessSeats,
-                            economyClassButton.isSelected(),
+                            economyClassButton.isSelected() ? economySeats : businessClassButton.isSelected() ?
+                                    businessSeats: comfortSeats,
+                            economyClassButton.isSelected() ? "Economy Class" : businessClassButton.isSelected() ?
+                                    "Business Class": "Comfort Class",
                             totalPrice,
                             flightInfoFrame, // 这里假设你是在FlightInfoFrame内部创建BookingFrame
                             BookingFrame.this, username);
@@ -1206,6 +1222,7 @@ public class LoginFrame extends JFrame {
             });
 
             add(economyClassButton);
+            add(comfortClassButton);
             add(businessClassButton);
             add(insuranceCheckbox);
             add(totalPriceLabel);
@@ -1220,6 +1237,7 @@ public class LoginFrame extends JFrame {
 
             // Add the ActionListener to the radio buttons and checkbox
             economyClassButton.addActionListener(priceChangeListener);
+            comfortClassButton.addActionListener(priceChangeListener);
             businessClassButton.addActionListener(priceChangeListener);
             insuranceCheckbox.addActionListener(priceChangeListener);
 
@@ -1380,8 +1398,6 @@ public class LoginFrame extends JFrame {
     public class SeatSelectionFrame extends JFrame {
         private FlightInfoFrame flightInfoFrame;
         private BookingFrame bookingFrame;
-        private static final int ECONOMY_SEATS = 70;
-        private static final int BUSINESS_SEATS = 30;
         private double totalPrice;
         private JButton confirmButton;
         private JButton selectedSeatButton;
@@ -1395,7 +1411,7 @@ public class LoginFrame extends JFrame {
             }
         }
 
-        public SeatSelectionFrame(int totalSeats, boolean isEconomy, double totalPrice, FlightInfoFrame flightInfoFrame,
+        public SeatSelectionFrame(int totalSeats, String seatType, double totalPrice, FlightInfoFrame flightInfoFrame,
                 BookingFrame bookingFrame, String username) {
             this.totalPrice = totalPrice;
             this.flightInfoFrame = flightInfoFrame;
@@ -1407,20 +1423,45 @@ public class LoginFrame extends JFrame {
 
             int numRows = (int) Math.ceil((totalSeats - 5) / 5.0) + 1;
             JPanel seatPanel = new JPanel(new GridLayout(numRows, 5, 10, 10));
-            seatPanel.setBorder(BorderFactory.createTitledBorder(isEconomy ? "Economy Class" : "Business Class"));
-
+            seatPanel.setBorder(BorderFactory.createTitledBorder(seatType));
             for (int row = 0; row < numRows; row++) {
+                char seatChar = seatType.charAt(0);
                 for (int col = 0; col < 5; col++) {
-
-                    if (row > 0 && (col == 0 || col == 4)) {
-                        seatPanel.add(Box.createRigidArea(new Dimension(50, 50)));
+                    if (col == 2) {
+                        seatPanel.add(Box.createRigidArea(new Dimension(50, 50))); // Gap after 2 seats
                     } else {
-                        String seatLabel = ((row == 0) ? "P" : (isEconomy ? "E" : "B")) + ((row * 5) + col);
+                        int seatNumber = (col < 3) ? col + 1 : col; // Calculate seat number
+                        seatNumber += (row * 4); // Add the row offset
+                        String seatLabel = String.valueOf(seatChar) + (seatNumber); // Convert to string
                         JButton seatButton = createSeatButton(seatLabel);
                         seatPanel.add(seatButton);
                     }
                 }
             }
+
+            // Check if seat is already booked and disable the button
+            try {
+                DBMS dbms = DBMS.getDBMS();
+                ArrayList<Order> orders = dbms.getOrders(flightInfoFrame.getSelectedFlight().getFlightID());
+                for (Order order : orders) {
+                    String seatNumber = order.getSeatNumber();
+                    for (Component component : seatPanel.getComponents()) {
+                        if (component instanceof JButton) {
+                            JButton button = (JButton) component;
+                            if (button.getText().equals(seatNumber)) {
+                                button.setEnabled(false);
+                            }
+                        }
+                    }
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(SeatSelectionFrame.this,
+                        "Error accessing database: " + ex.getMessage(),
+                        "Database Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+
 
             confirmButton = new JButton("Confirm Selection");
             confirmButton.setEnabled(false);
@@ -1538,6 +1579,7 @@ public class LoginFrame extends JFrame {
                     // Let's assume the payment is processed successfully here
                     boolean paymentSuccess = true; // This should be the result of your payment processing logic
 
+
                     if (paymentSuccess) {
                         JOptionPane.showMessageDialog(PaymentFrame.this, "Payment successful!", "Payment",
                                 JOptionPane.INFORMATION_MESSAGE);
@@ -1619,7 +1661,7 @@ public class LoginFrame extends JFrame {
             // Define the JDBC URL.
             String jdbcURL = "jdbc:mysql://localhost:3306/ensf480";
             String dbUser = "root"; // Replace with your database username.
-            String dbPassword = "ensf480"; // Replace with your database password.
+            String dbPassword = "password"; // Replace with your database password.
 
             // SQL query to insert a new order.
             String sql = "INSERT INTO orders (Username, FlightID, AircraftModel, DepartureLocation, ArrivalLocation, DepartureTime, ArrivalTime, Class, SeatNumber, Insurance, TotalPrice) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
