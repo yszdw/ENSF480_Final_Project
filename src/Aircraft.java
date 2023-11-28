@@ -1,4 +1,4 @@
-
+package src;
 public class Aircraft {
     final int AIRCRAFTID;
     final String AIRCRAFMODEL;

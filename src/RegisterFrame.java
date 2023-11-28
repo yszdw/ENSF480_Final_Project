@@ -1,3 +1,5 @@
+package src;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -132,16 +134,10 @@ public class RegisterFrame extends JFrame {
 
         // Database operation
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/ensf480", "root",
-                    "password");
-            String sql = "INSERT INTO users (Name, Email, PasswordHash) VALUES (?, ?, ?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1, username);
-            preparedStatement.setString(2, email);
-            preparedStatement.setString(3, password); // Password should be hashed + salted
 
-            int rowsInserted = preparedStatement.executeUpdate();
-            if (rowsInserted > 0) {
+            DBMS dbms = DBMS.getDBMS();
+            if (dbms.registerUser(username, password, email)) {
+
                 JOptionPane.showMessageDialog(this, "Registration successful!");
                 this.dispose();
                 // Optionally, open the login window or main app window here
@@ -149,10 +145,10 @@ public class RegisterFrame extends JFrame {
                 loginFrame.setVisible(true);
                 // Or if there's a main application window that should be shown after
                 // registration, instantiate and display it here instead.
+            } else {
+                JOptionPane.showMessageDialog(this, "Registration failed. Please try again.", "Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
-
-            preparedStatement.close();
-            connection.close();
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
             JOptionPane.showMessageDialog(this, "Database error: " + sqlException.getMessage(), "Error",
