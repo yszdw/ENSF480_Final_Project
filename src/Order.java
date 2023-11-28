@@ -1,29 +1,11 @@
-/*
-Using this table as reference create a basic order class:
-CREATE TABLE `orders`  (
-  `OrderID` int NOT NULL AUTO_INCREMENT,
-  `Username` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `FlightID` int NOT NULL,
-  `AircraftModel` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `DepartureLocation` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `ArrivalLocation` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `DepartureTime` time NOT NULL,
-  `ArrivalTime` time NOT NULL,
-  `Class` enum('Economy','Business','Comfort') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `SeatNumber` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `Insurance` tinyint(1) NOT NULL,
-  `TotalPrice` decimal(10, 2) NOT NULL,
-  PRIMARY KEY (`OrderID`) USING BTREE,
-  INDEX `FlightID`(`FlightID` ASC) USING BTREE,
-  CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`FlightID`) REFERENCES `flights` (`FlightID`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
- */
+package src;
 
 public class Order {
     private int orderID;
+    private String email;
     private String username;
     private int flightID;
-    private Aircraft aircraftModel;
+    private String aircraftModel;
     private String departureLocation;
     private String arrivalLocation;
     private String departureTime;
@@ -33,10 +15,11 @@ public class Order {
     private boolean insurance;
     private double totalPrice;
 
-    public Order(int orderID, String username, int flightID, Aircraft aircraftModel, String departureLocation,
+    public Order(int orderID, String email, String username, int flightID, String aircraftModel, String departureLocation,
                  String arrivalLocation, String departureTime, String arrivalTime, String seatClass, String seatNumber,
                  boolean insurance, double totalPrice) {
         this.orderID = orderID;
+        this.email = email;
         this.username = username;
         this.flightID = flightID;
         this.aircraftModel = aircraftModel;
@@ -61,7 +44,7 @@ public class Order {
     public int getFlightID() {
         return flightID;
     }
-    public Aircraft getAircraftModel() {
+    public String getAircraftModel() {
         return aircraftModel;
     }
     public String getDepartureLocation() {
