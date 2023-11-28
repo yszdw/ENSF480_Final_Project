@@ -1,3 +1,4 @@
+package src;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
@@ -121,7 +122,7 @@ public class LoginFrame extends JFrame {
         ResultSet resultSet = null;
 
         try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ensf480", "root", "password");
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/ensf480", "root", "AbXy219!");
             String sql = "SELECT * FROM users WHERE Name = ? AND PasswordHash = ?";
             statement = connection.prepareStatement(sql);
             statement.setString(1, username);
@@ -1587,6 +1588,19 @@ public class LoginFrame extends JFrame {
             closeButton.addActionListener(e -> dispose());
             add(closeButton, BorderLayout.SOUTH);
 
+            try {
+                DBMS db = DBMS.getDBMS();
+                String email = db.getEmail(username);
+                Email_Controller.sendReceipt(username,email,(hasInsurance ? "Yes" : "No"),selectedFlight.getArrivalLocation(),totalprice);
+                Email_Controller.sendTicket(username,email,selectedFlight.getAircraft().getAircraftModel(),
+                                            selectedFlight.getDepartureLocation(),selectedFlight.getArrivalLocation(),
+                                            departurTime,arrivalTime,(isEconomy ? "Economy" : isBusiness ? "Business" : "Comfort"),
+                                            seatNumber);
+
+            }
+            catch(Exception e){
+                System.out.println(e);
+            }
             pack();
             setLocationRelativeTo(null);
             setVisible(true);
@@ -1606,7 +1620,7 @@ public class LoginFrame extends JFrame {
             // Define the JDBC URL.
             String jdbcURL = "jdbc:mysql://localhost:3306/ensf480";
             String dbUser = "root"; // Replace with your database username.
-            String dbPassword = "ensf480"; // Replace with your database password.
+            String dbPassword = "AbXy219!"; // Replace with your database password.
 
             // SQL query to insert a new order.
             String sql = "INSERT INTO orders (Username, FlightID, AircraftModel, DepartureLocation, ArrivalLocation, DepartureTime, ArrivalTime, Class, SeatNumber, Insurance, TotalPrice) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";

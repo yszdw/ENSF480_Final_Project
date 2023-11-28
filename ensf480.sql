@@ -216,7 +216,7 @@ INSERT into `promotions` VALUES (4,"Promotion 4","2024-01-01 12:00:00","2023-10-
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users`  (
   `UserID` int NOT NULL AUTO_INCREMENT,
-  `Name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `Name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL UNIQUE,
   `Address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `Email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `UserType` enum('passenger','tourism_agent','airline_agent','admin') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,

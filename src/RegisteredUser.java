@@ -1,4 +1,4 @@
-
+package src;
 public class RegisteredUser extends User {
 
     CreditCard creditCard;

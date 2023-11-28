@@ -1,7 +1,8 @@
-
+package src;
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.sql.SQLException;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -71,9 +72,8 @@ public class Email_Controller {
 
     }
 
-    public static void sendReceipt(User user, Flight flight) {
+    public static void sendReceipt(String username, String email,String insurance,String location,double price) {
 
-        String userEmail = user.getEmail();
 
         // For testing, place your own email in the line below
         // String userEmail = "aaron.dalbroi2002@gmail.com";
@@ -97,30 +97,85 @@ public class Email_Controller {
             Message message = new MimeMessage(session);
 
             // Set the sender's email address
-            message.setFrom(new InternetAddress(userEmail));
+            message.setFrom(new InternetAddress(email));
 
             // Set the recipient's email address
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(userEmail));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
 
             // Set the email subject and body
-            message.setSubject(String.format("Receipt for your flight to %s!", flight.getArrivalLocation()));
+            message.setSubject(String.format("Receipt for your flight to %s", location));
 
-            message.setText(String.format("Hello,\n\nThis is an email receipt for your flight on %s at %s\n\n"
-                    + "User name: %s\n"
-                    + "Departure: %s\n"
-                    + "Arrival: %s\n"
-                    + "Cost: %s\n",
-                    flight.getDepartureDate(), flight.getDepartureTime(), user.getUsername(),
-                    flight.getDepartureLocation(), flight.getArrivalLocation(), "100"));
+            message.setText(String.format("Hello,\n\nThis is an email receipt for your flight to %s\n\n"
+                    + "Username: %s\n"
+                    + "Insurance: %s\n"
+                            + "Cost: %s\n",
+                    location, username,insurance, price));
 
             // Send the email
             Transport.send(message);
 
-            System.out.println("Email sent successfully!");
+            System.out.println("Email sent successfully");
 
         } catch (MessagingException e) {
             e.printStackTrace();
         }
+
+    }
+
+    public static void sendTicket(String username,String email, String aircraft, String to, String from,
+                                    LocalTime departure, LocalTime arrive,String seatClass,String seat){
+
+        // For testing, place your own email in the line below
+        // String userEmail = "aaron.dalbroi2002@gmail.com";
+
+        Properties properties = new Properties();
+        properties.put("mail.smtp.auth", "true");
+        properties.put("mail.smtp.starttls.enable", "true");
+        properties.put("mail.smtp.host", "smtp.gmail.com");
+        properties.put("mail.smtp.port", "587");
+
+        // Create a session with the email server
+        Session session = Session.getInstance(properties, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(programEmail, emailPassword);
+            }
+        });
+
+        try {
+            // Create a MimeMessage object
+            Message message = new MimeMessage(session);
+
+            // Set the sender's email address
+            message.setFrom(new InternetAddress(email));
+
+            // Set the recipient's email address
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
+
+            // Set the email subject and body
+            message.setSubject(String.format("Ticket for your flight to %s", arrive));
+
+            message.setText(String.format("Hello,\n\nThis is your email ticket for your flight to %s\n\n"
+                            + "Username: %s\n"
+                            + "Flying from: %s\n"
+                            + "at: %s\n"
+                            + "Flying to: %s\n"
+                            + "Arriving at: %s\n"
+                            + "Aircraft: %s\n"
+                            + "Seat Class: %s\n"
+                            + "Seat: %s\n",
+                            arrive,username,from,departure,to,arrive,aircraft,seatClass,seat));
+
+            // Send the email
+            Transport.send(message);
+
+            System.out.println("Email sent successfully");
+
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+
+
 
     }
 

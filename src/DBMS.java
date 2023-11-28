@@ -1,4 +1,4 @@
-
+package src;
 import java.sql.*;
 import java.util.*;
 import java.time.*;
@@ -29,7 +29,7 @@ public class DBMS {
      */
     private DBMS() throws SQLException {
         // the connection info here will need to be changed depending on the user
-        dbConnect = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/ENSF480", "root", "password");
+        dbConnect = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/ENSF480", "root", "AbXy219!");
     }
 
     /**
@@ -59,6 +59,24 @@ public class DBMS {
 
     }
 
+
+    public String getEmail(String username) throws SQLException {
+        String email = null;
+
+        String query = "SELECT Email FROM Users WHERE Name = ?";
+        try (PreparedStatement pstmt = dbConnect.prepareStatement(query)) {
+            pstmt.setString(1, username);
+
+            try (ResultSet results = pstmt.executeQuery()) {
+                if (results.next()) {
+                    // Replace "your_email_column_name" with the actual column name for email
+                    email = results.getString("Email");
+                }
+            }
+        }
+
+        return email;
+    }
     /*
      * getAircraft list from database
      */
@@ -66,6 +84,11 @@ public class DBMS {
         ArrayList<Aircraft> aircrafts = new ArrayList<Aircraft>();
         Statement myStmt = dbConnect.createStatement();
         results = myStmt.executeQuery("SELECT * FROM Aircrafts");
+
+
+        Statement myStmt2 = dbConnect.createStatement();
+
+
         while (results.next()) {
             int aircraftID = results.getInt("AircraftID");
             String aircraftModel = results.getString("Model");
