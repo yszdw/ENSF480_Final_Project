@@ -63,6 +63,23 @@ public class AirlineFrame extends JFrame {
             }
         });
 
+        // // User is logged in so add logout button
+        JButton logoutButton = createStyledButton("Logout");
+        gbc.insets = new Insets(0, 0, 10, 0);
+        buttonPanel.add(logoutButton, gbc);
+
+        logoutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Hide the welcome frame
+                AirlineFrame.this.dispose(); // Optionally, you can dispose the WelcomeFrame
+
+                // Create and show the login frame
+                LoginFrame loginFrame = new LoginFrame();
+                loginFrame.setVisible(true);
+            }
+        });
+
         add(buttonPanel, BorderLayout.CENTER);
 
         pack();
