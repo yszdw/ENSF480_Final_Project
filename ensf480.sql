@@ -1,16 +1,16 @@
 /*
  Navicat Premium Data Transfer
- 
+
  Source Server         : 111
  Source Server Type    : MySQL
  Source Server Version : 80035 (8.0.35)
  Source Host           : localhost:3306orders
  Source Schema         : ensf480
- 
+
  Target Server Type    : MySQL
  Target Server Version : 80035 (8.0.35)
  File Encoding         : 65001
- 
+
  Date: 26/11/2023 08:30:42
  */
 DROP DATABASE IF EXISTS ENSF480;
@@ -549,7 +549,3 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- from orders;
 select *
 from users;
--- SELECT *
--- FROM Orders
--- WHERE Email = 'Aryan@gmail.com';
-
