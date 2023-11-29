@@ -3,12 +3,15 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 import java.time.*;
 import java.util.ArrayList;
+
+import src.AirlineFrame.*;
 
 public class LoginFrame extends JFrame {
 
@@ -107,12 +110,43 @@ public class LoginFrame extends JFrame {
                 String username = userTextField.getText();
                 String password = new String(passField.getPassword());
                 if (authenticate(username, password)) {
-                    // Login successful
-                    SwingUtilities.invokeLater(() -> {
-                        loginFrame.dispose(); // Close the login window
-                        WelcomeFrame welcomeFrame = new WelcomeFrame(username); // Pass the username to WelcomeFrame
-                        welcomeFrame.setVisible(true); // Show the welcome window
-                    });
+                    try {
+                        DBMS dbms = DBMS.getDBMS();
+                        String userType = dbms.getUserType(username);
+                        // Login successful
+                        if (userType.equals("passenger") || userType.equals("tourism_agent")) {
+                            SwingUtilities.invokeLater(() -> {
+                                loginFrame.dispose(); // Close the login window
+                                WelcomeFrame welcomeFrame = new WelcomeFrame(username); // Pass the username to
+                                                                                        // WelcomeFrame
+                                welcomeFrame.setVisible(true); // Show the welcome window
+                            });
+                        } else if (userType.equals("airline_agent")) {
+                            SwingUtilities.invokeLater(() -> {
+                                loginFrame.dispose(); // Close the login window
+                                AirlineFrame airlineFrame = new AirlineFrame(username); // Pass the username to
+                                airlineFrame.setVisible(true); // AirlineFrame
+
+                            });
+                        } else if (userType.equals("flight_attendant")) {
+                            SwingUtilities.invokeLater(() -> {
+                                loginFrame.dispose(); // Close the login window
+                                PassListFrame passListFrame = new PassListFrame(username); // Pass the username to
+                                passListFrame.setVisible(true); // PassListFrame
+                            });
+                        } else if (userType.equals("admin")) {
+                            SwingUtilities.invokeLater(() -> {
+                                loginFrame.dispose(); // Close the login window
+                                AdminFrame adminFrame = new AdminFrame(); // Create the Admin window
+                                adminFrame.setVisible(true); // Show the Admin window
+                            });
+                        }
+
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(null, "Error fetching flight data: " + ex.getMessage(),
+                                "Database Error", JOptionPane.ERROR_MESSAGE);
+                    }
                 } else {
                     // Login failed
                     JOptionPane.showMessageDialog(loginFrame, "Invalid username or password", "Login Failed",
@@ -237,7 +271,8 @@ public class LoginFrame extends JFrame {
                     });
                 } else {
                     // Login failed
-                    JOptionPane.showMessageDialog(null, "You do not have admin privileges.", "Access Denied",
+                    JOptionPane.showMessageDialog(null, "You do not have admin privileges.",
+                            "Access Denied",
                             JOptionPane.ERROR_MESSAGE);
                 }
             }
