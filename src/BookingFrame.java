@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import src.FlightInfoFrame;
 
 public class BookingFrame extends JFrame {
     private FlightInfoFrame flightInfoFrame;
@@ -247,6 +248,7 @@ public class BookingFrame extends JFrame {
                                 "Database Error",
                                 JOptionPane.ERROR_MESSAGE);
                     }
+                    System.out.println("Companion Tickets: " + companionTickets);
 
                     // if companion tickets are available, ask if user wants to use them to buy another seat
                     if (companionTickets > 0) {
@@ -517,9 +519,10 @@ public class BookingFrame extends JFrame {
     }
 
     class PaymentFrame extends JFrame {
+
         private double totalPrice;
         private String username;
-
+        private DBMS dbms;
         private FlightInfoFrame flightInfoFrame;
         private BookingFrame bookingFrame;
         private SeatSelectionFrame seatSelectionFrame;
@@ -537,6 +540,7 @@ public class BookingFrame extends JFrame {
         }
 
         public PaymentFrame(double totalPrice, SeatSelectionFrame seatSelectionFrame, String username) {
+
             // Initialize variables
             this.totalPrice = totalPrice;
             setSeatSelectionFrame(seatSelectionFrame);
@@ -557,34 +561,57 @@ public class BookingFrame extends JFrame {
             priceField.setText(String.format("$%.2f", totalPrice));
             priceField.setEditable(false);
             pricePanel.add(priceField);
+            boolean userHasCard = false;
+            String cardNumber = "";
+            try {
+                DBMS dbms = DBMS.getDBMS();
+                userHasCard = dbms.hasCreditCard(username);
+                if (userHasCard) {
+                    cardNumber = dbms.getCreditCardInfo(username);
+                    // Mask all but the last four digits of the card number for security
+                    cardNumber = cardNumber.replaceAll("\\w(?=\\w{4})", "*");
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this,
+                        "Error accessing database: " + ex.getMessage(),
+                        "Database Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
 
             // Panel for card information
-            JPanel cardPanel = null;
+            JPanel cardPanel = new JPanel();
             JTextField emailField = null;
-            // if user is guest also ask for name and address
-            if (username.equals("guest")) {
-                cardPanel = new JPanel(new GridLayout(6, 2, 5, 5));
-                cardPanel.add(new JLabel("Name:"));
-                JTextField nameField = new JTextField();
-                cardPanel.add(nameField);
-                cardPanel.add(new JLabel("Email:"));
-                emailField = new JTextField();
-                cardPanel.add(emailField);
-                cardPanel.add(new JLabel("Address:"));
-                JTextField addressField = new JTextField();
-                cardPanel.add(addressField);
+            if (userHasCard) {
+                cardPanel.setLayout(new GridLayout(1, 2, 5, 5));
+                cardPanel.add(new JLabel("Card Number:"));
+                cardPanel.add(new JLabel(cardNumber));
             } else {
-                cardPanel = new JPanel(new GridLayout(3, 2, 5, 5));
+                // if user is guest also ask for name and address
+                if (username.equals("guest")) {
+                    cardPanel = new JPanel(new GridLayout(6, 2, 5, 5));
+                    cardPanel.add(new JLabel("Name:"));
+                    JTextField nameField = new JTextField();
+                    cardPanel.add(nameField);
+                    cardPanel.add(new JLabel("Email:"));
+                    emailField = new JTextField();
+                    cardPanel.add(emailField);
+                    cardPanel.add(new JLabel("Address:"));
+                    JTextField addressField = new JTextField();
+                    cardPanel.add(addressField);
+                } else {
+                    cardPanel = new JPanel(new GridLayout(3, 2, 5, 5));
+                }
+                cardPanel.add(new JLabel("Card Number:"));
+                JTextField cardNumberField = new JTextField();
+                cardPanel.add(cardNumberField);
+                cardPanel.add(new JLabel("Expiry Date (MM/YY):"));
+                JTextField expiryField = new JTextField();
+                cardPanel.add(expiryField);
+                cardPanel.add(new JLabel("CVV:"));
+                JTextField cvvField = new JTextField();
+                cardPanel.add(cvvField);
             }
-            cardPanel.add(new JLabel("Card Number:"));
-            JTextField cardNumberField = new JTextField();
-            cardPanel.add(cardNumberField);
-            cardPanel.add(new JLabel("Expiry Date (MM/YY):"));
-            JTextField expiryField = new JTextField();
-            cardPanel.add(expiryField);
-            cardPanel.add(new JLabel("CVV:"));
-            JTextField cvvField = new JTextField();
-            cardPanel.add(cvvField);
 
             // Confirm button to submit payment
             JButton confirmButton = new JButton("Confirm Payment");
@@ -597,6 +624,7 @@ public class BookingFrame extends JFrame {
             setVisible(true);
             JPanel finalCardPanel = cardPanel;
             JTextField finalEmailField = emailField;
+
             confirmButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -651,7 +679,7 @@ public class BookingFrame extends JFrame {
                     } else {
                         // Handle failed payment case
                         JOptionPane.showMessageDialog(PaymentFrame.this, "Payment failed. Please" +
-                                " try again.",
+                                        " try again.",
                                 "Payment Error",
                                 JOptionPane.ERROR_MESSAGE);
                     }
@@ -669,7 +697,7 @@ public class BookingFrame extends JFrame {
                 String seatNumber, double totalPrice, LocalDate departureDate, LocalTime departureTime,
                 LocalDate arrivalDate, LocalTime arrivalTime) {
             setTitle("Booking Confirmation");
-            setSize(800, 300); // Adjust the size as needed
+            setSize(900, 300); // Adjust the size as needed
             setLayout(new BorderLayout());
             int orderID = -1;
             try {
