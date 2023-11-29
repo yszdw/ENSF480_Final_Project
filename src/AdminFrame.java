@@ -152,6 +152,24 @@ public class AdminFrame extends JFrame {
 
         add(buttonPanel, BorderLayout.CENTER);
 
+        JButton logoutButton = createStyledButton("Logout");
+        gbc.insets = new Insets(0, 0, 10, 0);
+        buttonPanel.add(logoutButton, gbc);
+
+        logoutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Hide the welcome frame
+                AdminFrame.this.dispose(); // Optionally, you can dispose the WelcomeFrame
+
+                // Create and show the login frame
+                LoginFrame loginFrame = new LoginFrame();
+                loginFrame.setVisible(true);
+            }
+        });
+
+
+
         pack();
         setVisible(true);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
