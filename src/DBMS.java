@@ -851,12 +851,13 @@ public class DBMS {
     public boolean registerUser(String username, String password, String email, String address) throws SQLException {
         PreparedStatement preparedStatement = null;
         try {
-            String sql = "INSERT INTO users (Name, Email, PasswordHash, Address) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO users (Name, Email, PasswordHash, Address, CompanionTickets) VALUES (?, ?, ?, ?, ?)";
             preparedStatement = dbConnect.prepareStatement(sql);
             preparedStatement.setString(1, username);
             preparedStatement.setString(2, email);
             preparedStatement.setString(3, password); // Password should be hashed + salted
             preparedStatement.setString(4, address);
+            preparedStatement.setInt(5, 1);
 
             int rowsInserted = preparedStatement.executeUpdate();
             if (rowsInserted > 0) {
