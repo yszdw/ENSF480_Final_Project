@@ -134,7 +134,7 @@ public class LoginFrame extends JFrame {
                         } else if (userType.equals("flight_attendant")) {
                             SwingUtilities.invokeLater(() -> {
                                 loginFrame.dispose(); // Close the login window
-                                PassListFrame passListFrame = new PassListFrame(username); // Pass the username to
+                                PassListFrame passListFrame = new PassListFrame(); // Pass the username to
                                 passListFrame.setVisible(true); // PassListFrame
                             });
                         } else if (userType.equals("admin")) {
