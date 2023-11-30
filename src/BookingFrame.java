@@ -180,17 +180,18 @@ public class BookingFrame extends JFrame {
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             setLayout(new BorderLayout());
 
-            int numRows = (int) Math.ceil((totalSeats - 5) / 5.0) + 1;
-            JPanel seatPanel = new JPanel(new GridLayout(numRows, 5, 10, 10));
+            int numRows = (int) Math.ceil((totalSeats) / 6.0);
+            JPanel seatPanel = new JPanel(new GridLayout(numRows, 7, 10, 10));
             seatPanel.setBorder(BorderFactory.createTitledBorder(seatType));
             for (int row = 0; row < numRows; row++) {
                 char seatChar = seatType.charAt(0);
-                for (int col = 0; col < 5; col++) {
-                    if (col == 2) {
+                for (int col = 0; col < 7; col++) {
+                    
+                    if (col == 3) {
                         seatPanel.add(Box.createRigidArea(new Dimension(50, 50))); // Gap after 2 seats
                     } else {
-                        int seatNumber = (col < 3) ? col + 1 : col; // Calculate seat number
-                        seatNumber += (row * 4); // Add the row offset
+                        int seatNumber = (col < 4) ? col + 1 : col; // Calculate seat number
+                        seatNumber += (row * 6); // Add the row offset
                         String seatLabel = String.valueOf(seatChar) + (seatNumber); // Convert to string
                         JButton seatButton = createSeatButton(seatLabel);
                         seatPanel.add(seatButton);
