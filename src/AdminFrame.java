@@ -71,8 +71,8 @@ public class AdminFrame extends JFrame {
                     DBMS dbms = DBMS.getDBMS(); // This will not create a new instance but will return the existing
                                                 // one.
                     ArrayList<Aircraft> aircrafts = dbms.getAircrafts();
-
-                    AircraftInfoFrame AircraftInfo = new AircraftInfoFrame(aircrafts);
+                    String title = "List of All Aircrafts";
+                    AircraftInfoFrame AircraftInfo = new AircraftInfoFrame(title, aircrafts);
                     AircraftInfo.setVisible(true);
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -137,7 +137,7 @@ public class AdminFrame extends JFrame {
                 try {
 
                     DBMS dbms = DBMS.getDBMS();
-                    ArrayList<User> users = dbms.getUsers();
+                    ArrayList<RegisteredUser> users = dbms.getRegisteredUsers();
 
                     DisplayUsers displayUsers = new DisplayUsers(users);
                     displayUsers.setVisible(true);
@@ -207,7 +207,8 @@ public class AdminFrame extends JFrame {
                                                 // one.
                     dbms.removeAircraft(aircraftID);
                     ArrayList<Aircraft> aircrafts = dbms.getAircrafts();
-                    AircraftInfoFrame aircraftInfo = new AircraftInfoFrame(aircrafts);
+                    String title = "Updated Aircraft List";
+                    AircraftInfoFrame aircraftInfo = new AircraftInfoFrame(title, aircrafts);
                     aircraftInfo.setVisible(true);
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -225,7 +226,7 @@ public class AdminFrame extends JFrame {
 
     private void addAircraftPanel() {
         JFrame browseFrame = new JFrame("Add Aircraft");
-        browseFrame.setSize(400, 300);
+        browseFrame.setSize(800, 600);
         browseFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         // Use GridBagLayout for center alignment
@@ -274,7 +275,8 @@ public class AdminFrame extends JFrame {
                             economyPrice, businessPrice);
 
                     ArrayList<Aircraft> aircrafts = dbms.getAircrafts();
-                    AircraftInfoFrame aircraftInfo = new AircraftInfoFrame(aircrafts);
+                    String title = "Updated Aircraft List";
+                    AircraftInfoFrame aircraftInfo = new AircraftInfoFrame(title, aircrafts);
 
                     aircraftInfo.setVisible(true);
                 } catch (NumberFormatException ex) {
@@ -308,8 +310,8 @@ public class AdminFrame extends JFrame {
     }
 
     private void updateCrewPanel() {
-        JFrame browseFrame = new JFrame("Browse Flights");
-        browseFrame.setSize(400, 300);
+        JFrame browseFrame = new JFrame("Update Crew");
+        browseFrame.setSize(600, 300);
         browseFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         browseFrame.setLayout(new GridLayout(5, 2, 10, 10));
 
@@ -338,7 +340,7 @@ public class AdminFrame extends JFrame {
                     dbms.updateCrew(crewID, flightID);
 
                     ArrayList<CrewMember> crew = dbms.getCrewMembers(flightID);
-                    CrewInfoFrame crewInfo = new CrewInfoFrame(crew);
+                    CrewInfoFrame crewInfo = new CrewInfoFrame(flightID, crew);
 
                     crewInfo.setVisible(true);
                 } catch (SQLException ex) {
@@ -379,7 +381,9 @@ public class AdminFrame extends JFrame {
                                                 // one.
                     ArrayList<Flight> flights = dbms.getFlights(date);
 
-                    AdminFlightInfoFrame flightInfo = new AdminFlightInfoFrame(flights);
+                    String title = "Flights on " + date.toString();
+
+                    AdminFlightInfoFrame flightInfo = new AdminFlightInfoFrame(title, flights);
                     flightInfo.setVisible(true);
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -396,7 +400,7 @@ public class AdminFrame extends JFrame {
     }
 
     private void crewListPanel() {
-        JFrame browseFrame = new JFrame("Browse Flights");
+        JFrame browseFrame = new JFrame("Browse Crew List for a Flight");
         browseFrame.setSize(400, 300);
         browseFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         browseFrame.setLayout(new GridLayout(5, 2, 10, 10));
@@ -419,7 +423,7 @@ public class AdminFrame extends JFrame {
                                                 // one.
                     ArrayList<CrewMember> crew = dbms.getCrewMembers(flightID);
 
-                    CrewInfoFrame crewInfo = new CrewInfoFrame(crew);
+                    CrewInfoFrame crewInfo = new CrewInfoFrame(flightID, crew);
                     crewInfo.setVisible(true);
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -557,7 +561,8 @@ public class AdminFrame extends JFrame {
                         DBMS dbms = DBMS.getDBMS(); // This will not create a new instance but will return the existing
                         dbms.removeFlight(flightID);
                         ArrayList<Flight> flights = dbms.getFlights();
-                        AdminFlightInfoFrame flightInfo = new AdminFlightInfoFrame(flights);
+                        String title = "Updated Flight List";
+                        AdminFlightInfoFrame flightInfo = new AdminFlightInfoFrame(title, flights);
                         flightInfo.setVisible(true);
 
                     } catch (SQLException ex) {
@@ -576,7 +581,7 @@ public class AdminFrame extends JFrame {
 
         private void addFlightPanel() {
             JFrame browseFrame = new JFrame("Add Flight");
-            browseFrame.setSize(400, 300);
+            browseFrame.setSize(600, 400);
             browseFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
             // Use GridBagLayout for center alignment
@@ -623,8 +628,9 @@ public class AdminFrame extends JFrame {
                         dbms.addFlight(aircraft, origin, destination, departureDate, departureTime, arrivalDate,
                                 arrivalTime);
 
-                        ArrayList<Flight> flights = dbms.getFlights(departureDate);
-                        AdminFlightInfoFrame flightInfo = new AdminFlightInfoFrame(flights);
+                        ArrayList<Flight> flights = dbms.getFlights();
+                        String title = "Updated Flight List";
+                        AdminFlightInfoFrame flightInfo = new AdminFlightInfoFrame(title, flights);
 
                         flightInfo.setVisible(true);
                     } catch (NumberFormatException ex) {
@@ -691,7 +697,7 @@ public class AdminFrame extends JFrame {
     }
 
     public class DisplayUsers extends JFrame {
-        public DisplayUsers(ArrayList<User> users) {
+        public DisplayUsers(ArrayList<RegisteredUser> users) {
             setTitle("Registered User Information");
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             setLayout(new BorderLayout());
@@ -721,6 +727,7 @@ public class AdminFrame extends JFrame {
             // Make the frame visible
             setVisible(true);
         }
+
     }
 
     public class DisplayFlight extends JFrame {
@@ -728,10 +735,10 @@ public class AdminFrame extends JFrame {
             setTitle("Updated Flight Information");
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             setLayout(new BorderLayout());
-            setSize(600, 400);
+            setSize(800, 400);
 
-            String[] columnNames = { "Flight ID", "Origin", "Destination", "Departure Date", "Departure Time",
-                    "Arrival Date", "Arrival Time" };
+            String[] columnNames = { "Flight ID", "Origin", "Destination", "Departure Date", "Time",
+                    "Arrival Date", "Time" };
             DefaultTableModel model = new DefaultTableModel(columnNames, 0);
 
             Object[] row = new Object[7]; // Adjusted to match the number of columns
@@ -756,8 +763,8 @@ public class AdminFrame extends JFrame {
     }
 
     public class AircraftInfoFrame extends JFrame {
-        public AircraftInfoFrame(ArrayList<Aircraft> aircrafts) {
-            setTitle("Aircraft Information");
+        public AircraftInfoFrame(String title, ArrayList<Aircraft> aircrafts) {
+            setTitle(title);
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             setLayout(new BorderLayout());
             setSize(800, 400);
@@ -790,20 +797,21 @@ public class AdminFrame extends JFrame {
     }
 
     public class CrewInfoFrame extends JFrame {
-        public CrewInfoFrame(ArrayList<CrewMember> crewList) {
-            setTitle("Crew Information");
+        public CrewInfoFrame(int flightID, ArrayList<CrewMember> crewList) {
+            setTitle("Crew Information for Flight " + flightID);
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             setLayout(new BorderLayout());
             setSize(600, 400);
 
-            String[] columnNames = { "Crew ID", "Name", "Position" };
+            String[] columnNames = { "Crew ID", "Name", "Position", "FlightID" };
             DefaultTableModel model = new DefaultTableModel(columnNames, 0);
 
             for (CrewMember crewMember : crewList) {
-                Object[] row = new Object[3];
+                Object[] row = new Object[4];
                 row[0] = crewMember.getCrewID();
                 row[1] = crewMember.getCrewName();
                 row[2] = crewMember.getCrewPos();
+                row[3] = crewMember.getFlightID();
                 model.addRow(row);
             }
 
@@ -819,20 +827,25 @@ public class AdminFrame extends JFrame {
     }
 
     public class AdminFlightInfoFrame extends JFrame {
-        public AdminFlightInfoFrame(ArrayList<Flight> flights) {
-            setTitle("Flight Information");
+        public AdminFlightInfoFrame(String title, ArrayList<Flight> flights) {
+            setTitle(title);
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             setLayout(new BorderLayout());
-            setSize(600, 400);
+            setSize(800, 600);
 
-            String[] columnNames = { "Flight ID", "Origin", "Destination" };
+            String[] columnNames = { "Flight ID", "Origin", "Destination", "Departure Date", "Time", "Arrival Date",
+                    "Time" };
             DefaultTableModel model = new DefaultTableModel(columnNames, 0);
 
             for (Flight flight : flights) {
-                Object[] row = new Object[3]; // Adjusted to match the number of columns
+                Object[] row = new Object[7]; // Adjusted to match the number of columns
                 row[0] = flight.getFlightID();
                 row[1] = flight.getDepartureLocation();
                 row[2] = flight.getArrivalLocation();
+                row[3] = flight.getDepartureDate();
+                row[4] = flight.getDepartureTime();
+                row[5] = flight.getArrivalDate();
+                row[6] = flight.getArrivalTime();
                 model.addRow(row);
             }
 

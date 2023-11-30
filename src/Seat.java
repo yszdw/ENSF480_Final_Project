@@ -1,4 +1,5 @@
 package src;
+
 public class Seat {
     // Assuming seat number is in format "A1", "B2", etc.
     final String SEATNUMBER;
@@ -15,7 +16,7 @@ public class Seat {
         this.passenger = null;
     }
 
-    /* Getters and Setters */
+    /* Getters */
     public String getSeatNumber() {
         return SEATNUMBER;
     }
@@ -36,26 +37,4 @@ public class Seat {
         return passenger;
     }
 
-    /* Methods */
-    public void bookSeat() {
-        this.isAvailable = false;
-    }
-
-    public void cancelSeat() {
-        this.isAvailable = true;
-    }
-
-    public void setPassenger(User passenger) {
-        this.passenger = passenger;
-        bookSeat();
-    }
-
-    public void removePassenger() {
-        this.passenger = null;
-        cancelSeat();
-    }
-
-    public void setAvailablibility(boolean isAvailable) {
-        this.isAvailable = isAvailable;
-    }
 }

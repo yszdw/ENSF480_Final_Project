@@ -1,4 +1,11 @@
 package src;
+
+/**
+ * The Aircraft class represents an aircraft used in the airline system.
+ * It stores information about the aircraft, such as its ID, model, number of
+ * seats, and prices.
+ * The class provides methods to access and modify the aircraft's information.
+ */
 public class Aircraft {
     final int AIRCRAFTID;
     final String AIRCRAFMODEL;
@@ -8,8 +15,9 @@ public class Aircraft {
     private double economyPrice;
     private double businessPrice;
 
-    boolean inUse;
-
+    /**
+     * Represents an aircraft with its properties and methods.
+     */
     public Aircraft(int aircraftID, String aircraftModel, int numEconomySeats, int numComfortSeats,
             int numBusinessSeats, double economyPrice, double businessPrice) {
         this.AIRCRAFTID = aircraftID;
@@ -19,29 +27,15 @@ public class Aircraft {
         this.numBusinessSeats = numBusinessSeats;
         this.economyPrice = economyPrice;
         this.businessPrice = businessPrice;
-        this.inUse = false;
     }
 
-    /* Getters and Setters */
+    /* Getters */
     public int getAircraftID() {
         return AIRCRAFTID;
     }
 
     public String getAircraftModel() {
         return AIRCRAFMODEL;
-    }
-
-    public boolean getInUse() {
-        return inUse;
-    }
-
-    /* Methods */
-    public void setInUse() {
-        this.inUse = true;
-    }
-
-    public void setNotInUse() {
-        this.inUse = false;
     }
 
     // New getters for the prices
@@ -55,16 +49,6 @@ public class Aircraft {
         return businessPrice;
     }
 
-    // New setters for the prices (if necessary)
-    public void setEconomyPrice(double price) {
-        this.economyPrice = price;
-    }
-
-    public void setBusinessPrice(double price) {
-        this.businessPrice = price;
-    }
-
-    // In Aircraft.java
     // Assuming that your Aircraft class already has the getters and setters,
     // You may want to add methods to retrieve seat information.
     public int getNumEconomySeats() {

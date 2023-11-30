@@ -6,8 +6,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.*;
-import java.util.ArrayList;
 
 public class AirlineFrame extends JFrame {
 
@@ -23,7 +21,7 @@ public class AirlineFrame extends JFrame {
 
     public AirlineFrame(String username) {
         setTitle("Airline Page");
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         setExtendedState(JFrame.MAXIMIZED_BOTH);
 
@@ -96,4 +94,5 @@ public class AirlineFrame extends JFrame {
         button.setFocusPainted(false);
         button.setBorderPainted(false);
         return button;
-    }}
+    }
+}

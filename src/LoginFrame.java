@@ -1,20 +1,14 @@
 package src;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
-import java.time.*;
 import java.util.ArrayList;
-
-import src.BookingFrame;
-import src.BookingFrame.*;
-
-import src.AirlineFrame.*;
 
 public class LoginFrame extends JFrame {
 
@@ -138,11 +132,9 @@ public class LoginFrame extends JFrame {
                                 passListFrame.setVisible(true); // PassListFrame
                             });
                         } else if (userType.equals("admin")) {
-                            SwingUtilities.invokeLater(() -> {
-                                loginFrame.dispose(); // Close the login window
-                                AdminFrame adminFrame = new AdminFrame(); // Create the Admin window
-                                adminFrame.setVisible(true); // Show the Admin window
-                            });
+                            JOptionPane.showMessageDialog(loginFrame, "Please select Admin Login if you are an admin",
+                                    "Login Failed",
+                                    JOptionPane.ERROR_MESSAGE);
                         }
 
                     } catch (SQLException ex) {
