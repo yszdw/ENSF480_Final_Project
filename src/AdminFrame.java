@@ -6,7 +6,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
-import java.time.LocalDate;
+import java.time.*;
 import java.util.ArrayList;
 
 public class AdminFrame extends JFrame {
@@ -167,8 +167,6 @@ public class AdminFrame extends JFrame {
                 loginFrame.setVisible(true);
             }
         });
-
-
 
         pack();
         setVisible(true);
@@ -454,6 +452,28 @@ public class AdminFrame extends JFrame {
             gbc.gridwidth = GridBagConstraints.REMAINDER;
             gbc.fill = GridBagConstraints.NONE;
 
+            JButton addFlightButton = createStyledButton("Add Flight");
+            gbc.insets = new Insets(10, 0, 10, 0);
+            buttonPanel.add(addFlightButton, gbc);
+
+            addFlightButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    addFlightPanel();
+                }
+            });
+
+            JButton removeFlightButton = createStyledButton("Remove Flight");
+            gbc.insets = new Insets(10, 0, 10, 0);
+            buttonPanel.add(removeFlightButton, gbc);
+
+            removeFlightButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    removeFlightPanel();
+                }
+            });
+
             JButton editOriButton = createStyledButton("Edit Origin");
             gbc.insets = new Insets(10, 0, 10, 0);
             buttonPanel.add(editOriButton, gbc);
@@ -513,6 +533,117 @@ public class AdminFrame extends JFrame {
             button.setFocusPainted(false);
             button.setBorderPainted(false);
             return button;
+        }
+
+        private void removeFlightPanel() {
+            JFrame browseFrame = new JFrame("Remove Flight");
+            browseFrame.setSize(400, 300);
+            browseFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            browseFrame.setLayout(new GridLayout(5, 2, 10, 10));
+
+            JLabel fromLabel = new JLabel("Enter flightID: ");
+            JTextField aircraftTextField = new JTextField();
+
+            browseFrame.add(fromLabel);
+            browseFrame.add(aircraftTextField);
+
+            JButton confirmButton = new JButton("Remove Flight");
+            confirmButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+
+                        int flightID = Integer.parseInt(aircraftTextField.getText());
+                        DBMS dbms = DBMS.getDBMS(); // This will not create a new instance but will return the existing
+                        dbms.removeFlight(flightID);
+                        ArrayList<Flight> flights = dbms.getFlights();
+                        AdminFlightInfoFrame flightInfo = new AdminFlightInfoFrame(flights);
+                        flightInfo.setVisible(true);
+
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(browseFrame, "Error fetching flight data: " + ex.getMessage(),
+                                "Database Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            });
+
+            browseFrame.add(new JLabel());
+            browseFrame.add(confirmButton);
+
+            browseFrame.setVisible(true);
+        }
+
+        private void addFlightPanel() {
+            JFrame browseFrame = new JFrame("Add Flight");
+            browseFrame.setSize(400, 300);
+            browseFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+            // Use GridBagLayout for center alignment
+            browseFrame.setLayout(new GridBagLayout());
+
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            gbc.insets = new Insets(5, 5, 5, 5); // Add some padding
+
+            JTextField originTextField = new JTextField(20);
+            JTextField destTextField = new JTextField(20);
+            JTextField departDateTimeTextField = new JTextField(20);
+            JTextField arrivalDateTimeTextField = new JTextField(20);
+            JTextField aircraftIDField = new JTextField(20);
+            browseFrame.add(createLabelAndTextField("Enter Origin: ", originTextField), gbc);
+            gbc.gridy++;
+            browseFrame.add(createLabelAndTextField("Enter Destination: ", destTextField), gbc);
+            gbc.gridy++;
+            browseFrame.add(createLabelAndTextField("Enter Departure Date and Time: ", departDateTimeTextField), gbc);
+            gbc.gridy++;
+            browseFrame.add(createLabelAndTextField("Enter Arrival Date and Time: ", arrivalDateTimeTextField), gbc);
+            gbc.gridy++;
+            browseFrame.add(createLabelAndTextField("Enter Aircraft ID: ", aircraftIDField), gbc);
+            gbc.gridy++;
+
+            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
+            JButton addButton = new JButton("Add Flight");
+            addButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        String origin = originTextField.getText();
+                        String destination = destTextField.getText();
+                        LocalDate departureDate = LocalDate.parse(departDateTimeTextField.getText().split(" ")[0]);
+                        LocalTime departureTime = LocalTime.parse(departDateTimeTextField.getText().split(" ")[1]);
+                        LocalDate arrivalDate = LocalDate.parse(arrivalDateTimeTextField.getText().split(" ")[0]);
+                        LocalTime arrivalTime = LocalTime.parse(arrivalDateTimeTextField.getText().split(" ")[1]);
+                        int aircraftID = Integer.parseInt(aircraftIDField.getText());
+
+                        DBMS dbms = DBMS.getDBMS();
+                        Aircraft aircraft = dbms.getAircraftbyID(aircraftID);
+                        dbms.addFlight(aircraft, origin, destination, departureDate, departureTime, arrivalDate,
+                                arrivalTime);
+
+                        ArrayList<Flight> flights = dbms.getFlights(departureDate);
+                        AdminFlightInfoFrame flightInfo = new AdminFlightInfoFrame(flights);
+
+                        flightInfo.setVisible(true);
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(browseFrame, "Please enter valid numeric values.", "Input Error",
+                                JOptionPane.ERROR_MESSAGE);
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(browseFrame, "Error fetching flight data: " + ex.getMessage(),
+                                "Database Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            });
+
+            buttonPanel.add(addButton);
+
+            browseFrame.add(new JLabel());
+            browseFrame.add(buttonPanel);
+
+            browseFrame.setVisible(true);
         }
 
         private void editFlightPanel(String indicator) {
