@@ -424,7 +424,8 @@ public class DBMS {
                     break;
                 case "passenger":
                     CreditCard card = new CreditCard(creditCardNumber, username, creditCardExpiry, creditCardCVV);
-                    RegisteredUser passenger = new RegisteredUser(userID, username, email, address, card, companionTickets);
+                    RegisteredUser passenger = new RegisteredUser(userID, username, email, address, card,
+                            companionTickets);
                     users.add(passenger);
                     break;
                 case "agent":
@@ -516,7 +517,8 @@ public class DBMS {
                             user = new CrewMember(userID, username, email, address, crewMemberPos);
                             break;
                         case "passenger":
-                            CreditCard card = new CreditCard(creditCardNumber, username, creditCardExpiry, creditCardCVV);
+                            CreditCard card = new CreditCard(creditCardNumber, username, creditCardExpiry,
+                                    creditCardCVV);
                             user = new RegisteredUser(userID, username, email, address, card, companionTickets);
                             break;
                         case "agent":
@@ -539,7 +541,8 @@ public class DBMS {
      */
     public void updateUser(User user) {
         try {
-            String updateQuery = "UPDATE users SET Name = ?, Address = ?, Email = ?, UserType = ?, CreditCardInfo = ?, " +
+            String updateQuery = "UPDATE users SET Name = ?, Address = ?, Email = ?, UserType = ?, CreditCardInfo = ?, "
+                    +
                     "CreditCardExpiry = ?, CreditCardCVV = ?, CompanionTickets = ? WHERE UserID = ?";
             try (PreparedStatement preparedStatement = dbConnect.prepareStatement(updateQuery)) {
                 preparedStatement.setString(1, user.getUsername());
@@ -971,6 +974,7 @@ public class DBMS {
         }
         return false;
     }
+
     public String getUserType(String username) throws SQLException {
         String sql = "SELECT UserType FROM users WHERE Name = ?";
         try (PreparedStatement statement = dbConnect.prepareStatement(sql)) {
@@ -980,6 +984,27 @@ public class DBMS {
                 return result.getString("UserType");
             } else {
                 System.out.println("Error getting user type");
+                return null;
+            }
+        }
+    }
+
+    public Aircraft getAircraftbyID(int aircraftID) throws SQLException {
+        String sql = "SELECT * FROM aircrafts WHERE AircraftID = ?";
+        try (PreparedStatement statement = dbConnect.prepareStatement(sql)) {
+            statement.setInt(1, aircraftID);
+            ResultSet result = statement.executeQuery();
+            if (result.next()) {
+                String aircraftModel = result.getString("Model");
+                int numEconomySeats = result.getInt("Ordinary");
+                int numComfortSeats = result.getInt("Comfort");
+                int numBusinessSeats = result.getInt("Business");
+                double economyPrice = result.getDouble("EconomyPrice");
+                double businessPrice = result.getDouble("BusinessPrice");
+                return new Aircraft(aircraftID, aircraftModel, numEconomySeats, numComfortSeats, numBusinessSeats,
+                        economyPrice, businessPrice);
+            } else {
+                System.out.println("Error getting aircraft");
                 return null;
             }
         }
