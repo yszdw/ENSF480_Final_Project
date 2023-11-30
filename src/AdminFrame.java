@@ -152,6 +152,32 @@ public class AdminFrame extends JFrame {
 
         add(buttonPanel, BorderLayout.CENTER);
 
+        JButton displayPromoButton = createStyledButton("Send Monthly Promotion");
+        gbc.insets = new Insets(10, 0, 10, 0);
+        buttonPanel.add(displayUsersButton, gbc);
+
+        displayPromoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    DBMS db = DBMS.getDBMS();
+                    Email_Controller email = new Email_Controller();
+
+                    email.notifyAboutPromotions(db.getCurrentPromotion());
+                    JOptionPane.showMessageDialog(null, "Promotion sent to users.", "Error",
+                            JOptionPane.INFORMATION_MESSAGE);
+
+                }catch(Exception error){
+                    JOptionPane.showMessageDialog(null, "Failed to send promotion.", "Error",
+                            JOptionPane.INFORMATION_MESSAGE);
+                }
+
+
+            }
+        });
+
+        buttonPanel.add(displayPromoButton,gbc);
+
         JButton logoutButton = createStyledButton("Logout");
         gbc.insets = new Insets(0, 0, 10, 0);
         buttonPanel.add(logoutButton, gbc);

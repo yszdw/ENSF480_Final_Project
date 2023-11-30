@@ -8,26 +8,23 @@ import java.util.Properties;
 
 public class Email_Controller {
 
-    private ArrayList<User> promoUsers;
+    private static ArrayList<User> promoUsers = new ArrayList<User>();
 
     private static String programEmail = "ensf480flightsystem@gmail.com";
     private static String emailPassword = "ggcw dwhn hjvd cdpr";
 
-    public Email_Controller() {
-        promoUsers = new ArrayList<User>();
-    }
+    public Email_Controller() {}
 
     public void registerForPromotion(User user) {
         this.promoUsers.add(user);
-
     }
 
     public void notifyAboutPromotions(String promotion) {
-        // Only send promo if its the first of the month
+        // Only send promo if it's the first of the month
         for (int i = 0; i < promoUsers.size(); i++) {
+
             // Get next user
             User currentUser = promoUsers.get(i);
-
             String userEmail = currentUser.getEmail();
 
             Properties properties = new Properties();
@@ -229,17 +226,6 @@ public class Email_Controller {
 
     }
 
-    // public static void main(String args[]) throws SQLException {
 
-    // DBMS db = DBMS.getDBMS();
-
-    // User user = db.getUsers().get(0);
-    // Flight flight = db.getFlights().get(0);
-    // Email_Controller emailController = new Email_Controller();
-
-    // emailController.registerForPromotion(user);
-    // emailController.notifyAboutPromotions(db.getCurrentPromotion());
-
-    // }
 
 }
