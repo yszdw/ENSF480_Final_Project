@@ -23,7 +23,7 @@ public class AirlineFrame extends JFrame {
 
     public AirlineFrame(String username) {
         setTitle("Airline Page");
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         setExtendedState(JFrame.MAXIMIZED_BOTH);
 
@@ -96,4 +96,5 @@ public class AirlineFrame extends JFrame {
         button.setFocusPainted(false);
         button.setBorderPainted(false);
         return button;
-    }}
+    }
+}
