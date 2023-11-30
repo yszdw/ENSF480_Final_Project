@@ -238,8 +238,6 @@ public class BookingFrame extends JFrame {
                         else {
                             // Close the seat selection frame and open the payment frame
                             SeatSelectionFrame.this.dispose();
-                            PaymentFrame paymentFrame = new PaymentFrame(totalPrice, SeatSelectionFrame.this, username);
-                            paymentFrame.setVisible(true);
                         }
                     } catch (SQLException ex) {
                         ex.printStackTrace();
@@ -622,16 +620,11 @@ public class BookingFrame extends JFrame {
 
             // pack();
             setVisible(true);
-            JPanel finalCardPanel = cardPanel;
             JTextField finalEmailField = emailField;
 
             confirmButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    // TODO: Validate the card information here (If user logged in then just check
-                    // with db)
-                    // TODO: Send Email confirmation
-                    // Let's assume the payment is processed successfully here
                     boolean paymentSuccess = true; // This should be the result of your payment processing logic
 
                     if (paymentSuccess) {
@@ -643,17 +636,15 @@ public class BookingFrame extends JFrame {
                         LocalDate departureDate = seatSelectionFrame.flightInfoFrame.getDepartureDate();
                         LocalTime departureTime = seatSelectionFrame.flightInfoFrame.getDepartureTime();
                         LocalDate arrivalDate = seatSelectionFrame.flightInfoFrame.getArrivalDate();
-                        LocalTime arrivaltime = seatSelectionFrame.flightInfoFrame.getArrivalTime();
+                        LocalTime arrivalTime = seatSelectionFrame.flightInfoFrame.getArrivalTime();
                         boolean isEconomy = seatSelectionFrame.bookingFrame.isEconomyClassSelected();
 
                         boolean isBusiness = seatSelectionFrame.bookingFrame.isBusinessClassSelected();
                         boolean hasInsurance = seatSelectionFrame.bookingFrame.isInsuranceSelected();
                         String seatNumber = seatSelectionFrame.getSelectedSeatNumber();
 
-                        // Close the payment frame and open the confirmation frame
-                        PaymentFrame.this.dispose();
-
                         String email = "";
+                        // getting email
                         if (username.equals("guest")) {
                             email = finalEmailField.getText();
                         } else {
@@ -668,14 +659,18 @@ public class BookingFrame extends JFrame {
                                         JOptionPane.ERROR_MESSAGE);
                             }
                         }
-                        System.out.println("Email: " + email);
-                        ConfirmationFrame confirmationFrame = new ConfirmationFrame(email, username, selectedFlight,
-                                isEconomy,
-                                isBusiness, hasInsurance, seatNumber, totalPrice, departureDate, departureTime,
-                                arrivalDate, arrivaltime);
-                        confirmationFrame.setVisible(true);
-                        // hide the payment frame
+                        
+                        // Close the payment frame
+                        PaymentFrame.this.setVisible(false);
+                        System.out.println("set payment frame to invisible");
                         PaymentFrame.this.dispose();
+
+                        System.out.println("Email: " + email);
+                        // open ConfirmationFrame
+                        ConfirmationFrame confirmationFrame = new ConfirmationFrame(email, username, selectedFlight,
+                                isEconomy,isBusiness, hasInsurance, seatNumber, totalPrice, departureDate,
+                                departureTime, arrivalDate, arrivalTime);
+                        confirmationFrame.setVisible(true);
                     } else {
                         // Handle failed payment case
                         JOptionPane.showMessageDialog(PaymentFrame.this, "Payment failed. Please" +
@@ -697,7 +692,7 @@ public class BookingFrame extends JFrame {
                 String seatNumber, double totalPrice, LocalDate departureDate, LocalTime departureTime,
                 LocalDate arrivalDate, LocalTime arrivalTime) {
             setTitle("Booking Confirmation");
-            setSize(900, 300); // Adjust the size as needed
+            setSize(400, 300); // Adjust the size as needed
             setLayout(new BorderLayout());
             int orderID = -1;
             try {
@@ -751,7 +746,7 @@ public class BookingFrame extends JFrame {
             } catch (Exception e) {
                 System.out.println(e);
             }
-            pack();
+
             setLocationRelativeTo(null);
             setVisible(true);
         }

@@ -510,12 +510,6 @@ INSERT INTO `users` VALUES (2, 'Jane Doe', '1234 5th Ave, Calgary, AB', 'janeDoe
 INSERT INTO `users` VALUES (6, 'sara', NULL, 'sara@gmail.com', 'passenger', 0, NULL,0606,123, '123456', 1);
 INSERT INTO `users` VALUES (7, 'admin', NULL, '00000', 'admin', 0, NULL,0606,123, '0000', 0);
 INSERT INTO `users` VALUES (8, 'Aryan', '1236 5th Ave, Calgary, AB', 'karadiaaryan@gmail.com', 'passenger', 0, '1234123412341234', 1024, 100, 'pass', 9);
-
-SET FOREIGN_KEY_CHECKS = 1;
-
-select * from orders;
-select * from users;
-SELECT * FROM Orders WHERE Email = 'karadiaaryan@gmail.com';
 INSERT INTO `users`
 VALUES (
     9,
@@ -544,6 +538,8 @@ VALUES (
     '0000',
     1
   );
+
+
 SET FOREIGN_KEY_CHECKS = 1;
 -- select *
 -- from orders;
