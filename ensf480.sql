@@ -79,7 +79,7 @@ CREATE TABLE `crews` (
 INSERT INTO `crews`
 VALUES (1, 'John Doe', 'pilot', 1);
 INSERT INTO `crews`
-VALUES (2, 'Jane Doe', 'pilot', 0);
+VALUES (2, 'Jane Doe', 'pilot', 5);
 INSERT INTO `crews`
 VALUES (3, 'J Doe', 'flight_attendant', 1);
 INSERT INTO `crews`
@@ -87,7 +87,23 @@ VALUES (4, 'Jane Doe', 'flight_attendant', 1);
 INSERT INTO `crews`
 VALUES (5, 'John Doe', 'engineer', 1);
 INSERT INTO `crews`
-VALUES (6, 'Jane Doe', 'engineer', 0);
+VALUES (6, 'Jane Doe', 'engineer', 4);
+INSERT INTO `crews`
+VALUES (7, 'Michael Johnson', 'pilot', 3);
+INSERT INTO `crews`
+VALUES (8, 'Amanda Williams', 'pilot', 0);
+INSERT INTO `crews`
+VALUES (9, 'Christopher Lee', 'flight_attendant', 2);
+INSERT INTO `crews`
+VALUES (10, 'Samantha Miller', 'flight_attendant', 3);
+INSERT INTO `crews`
+VALUES (11, 'Daniel White', 'engineer', 2);
+INSERT INTO `crews`
+VALUES (12, 'Olivia Brown', 'engineer', 3);
+INSERT INTO `crews`
+VALUES (13, 'Matthew Davis', 'pilot', 2);
+INSERT INTO `crews`
+VALUES (14, 'Ella Wilson', 'flight_attendant', 0);
 -- ----------------------------
 -- Table structure for flights
 -- ----------------------------

@@ -21,10 +21,10 @@ public class FlightInfoFrame extends JFrame {
         setTitle("Flight Information");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
-        setSize(600, 400);
+        setSize(800, 400);
         this.flights = flights; // Save the flights to the class variable
 
-        String[] columnNames = { "Flight ID", "Origin", "Destination", "Departure Time", "Arrival Time" };
+        String[] columnNames = { "Flight ID", "Origin", "Destination", "Departure Date/Time", "Arrival Date/Time" };
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
 
         for (Flight flight : this.flights) {
@@ -32,8 +32,8 @@ public class FlightInfoFrame extends JFrame {
             row[0] = flight.getFlightID();
             row[1] = flight.getDepartureLocation();
             row[2] = flight.getArrivalLocation();
-            row[3] = flight.getDepartureDate().toString() + " " + flight.getDepartureTime().toString();
-            row[4] = flight.getArrivalDate().toString() + " " + flight.getArrivalTime().toString();
+            row[3] = flight.getDepartureDate().toString() + "/" + flight.getDepartureTime().toString();
+            row[4] = flight.getArrivalDate().toString() + "/" + flight.getArrivalTime().toString();
             model.addRow(row);
         }
 

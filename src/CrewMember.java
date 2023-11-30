@@ -3,7 +3,7 @@ package src;
 public class CrewMember extends User {
     String crewMemberPos;
     int crewMemberID;
-    String flightID;
+    int flightID;
     String name;
 
     public CrewMember(int crewMemberID, String username, String email, String address, String crewMemberPos) {
@@ -11,10 +11,11 @@ public class CrewMember extends User {
         this.crewMemberPos = crewMemberPos;
     }
 
-    public CrewMember(int crewMemberID, String name, String crewMemberPos) {
+    public CrewMember(int crewMemberID, String name, String crewMemberPos, int flightID) {
         this.crewMemberID = crewMemberID;
         this.crewMemberPos = crewMemberPos;
         this.name = name;
+        this.flightID = flightID;
 
     }
 
@@ -42,6 +43,10 @@ public class CrewMember extends User {
 
     public String getCrewPos() {
         return crewMemberPos;
+    }
+
+    public int getFlightID() {
+        return flightID;
     }
 
     /* Methods */

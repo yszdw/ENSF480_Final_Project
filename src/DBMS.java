@@ -644,8 +644,9 @@ public class DBMS {
                     int crewID = results.getInt("CrewID");
                     String crewName = results.getString("Name");
                     String position = results.getString("Position");
+                    int flightID = results.getInt("FlightID");
 
-                    CrewMember crewMember = new CrewMember(crewID, crewName, position);
+                    CrewMember crewMember = new CrewMember(crewID, crewName, position, flightID);
                     crewMembers.add(crewMember);
                 }
             }
