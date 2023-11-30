@@ -24,11 +24,6 @@ public class CrewMember extends User {
         this.crewMemberPos = "";
     }
 
-    /* Getters and Setters */
-    public void setCrewMemberPos(String crewMemberPos) {
-        this.crewMemberPos = crewMemberPos;
-    }
-
     public String getCrewMemberPos() {
         return crewMemberPos;
     }

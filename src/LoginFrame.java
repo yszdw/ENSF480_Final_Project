@@ -2,20 +2,13 @@ package src;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
-import java.time.*;
 import java.util.ArrayList;
-
-import src.BookingFrame;
-import src.BookingFrame.*;
-
-import src.AirlineFrame.*;
 
 public class LoginFrame extends JFrame {
 

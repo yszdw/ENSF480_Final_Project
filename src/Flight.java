@@ -1,8 +1,8 @@
 package src;
+
 import java.util.HashMap;
 import java.time.*;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class Flight {
     // HashMap of seats, key is seat number, value is Seat object
@@ -49,61 +49,10 @@ public class Flight {
         }
 
         this.crew = new ArrayList<CrewMember>();
+
     }
 
-    /* Methods */
-
-    public void bookSeat(Seat seat, User username) {
-        if (seat.getIsAvailable() && seats.containsKey(seat.getSeatNumber())) {
-            seat.setPassenger(username);
-            seat.setAvailablibility(false);
-        }
-        if (!seats.containsKey(seat.getSeatNumber())) {
-            System.out.println("Seat does not exist");
-        }
-    }
-
-    // This method is used to cancel a seat
-    public void cancelSeat(String username) {
-        for (Seat seat : seats.values()) {
-            if (seat.getPassenger().getUsername().equals(username)) {
-                seat.removePassenger();
-            }
-        }
-    }
-
-    /* Getters and Setters */
-    public void setAircraft(Aircraft aircraft) {
-        this.aircraft = aircraft;
-    }
-
-    public void setFlightID(int flightID) {
-        this.flightID = flightID;
-    }
-
-    public void setDepartureTime(LocalTime departureTime) {
-        this.departureTime = departureTime;
-    }
-
-    public void setArrivalTime(LocalTime arrivalTime) {
-        this.arrivalTime = arrivalTime;
-    }
-
-    public void setDepartureLocation(String departureLocation) {
-        this.departureLocation = departureLocation;
-    }
-
-    public void setArrivalLocation(String arrivalLocation) {
-        this.arrivalLocation = arrivalLocation;
-    }
-
-    public void setDepartureDate(LocalDate departureDate) {
-        this.departureDate = departureDate;
-    }
-
-    public void setArrivalDate(LocalDate arrivalDate) {
-        this.arrivalDate = arrivalDate;
-    }
+    /* Getters */
 
     public Aircraft getAircraft() {
         return aircraft;

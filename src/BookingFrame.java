@@ -13,7 +13,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import src.FlightInfoFrame;
 
 public class BookingFrame extends JFrame {
     private FlightInfoFrame flightInfoFrame;
@@ -234,8 +233,7 @@ public class BookingFrame extends JFrame {
                         user = dbms.getUser(username);
                         if (user instanceof RegisteredUser) {
                             companionTickets = ((RegisteredUser) user).getCompanionTickets();
-                        }
-                        else {
+                        } else {
                             // Close the seat selection frame and open the payment frame
                             SeatSelectionFrame.this.dispose();
                         }
@@ -248,7 +246,8 @@ public class BookingFrame extends JFrame {
                     }
                     System.out.println("Companion Tickets: " + companionTickets);
 
-                    // if companion tickets are available, ask if user wants to use them to buy another seat
+                    // if companion tickets are available, ask if user wants to use them to buy
+                    // another seat
                     if (companionTickets > 0) {
                         int result = JOptionPane.showConfirmDialog(SeatSelectionFrame.this,
                                 "You have " + companionTickets + " companion tickets available. " +
@@ -261,7 +260,8 @@ public class BookingFrame extends JFrame {
                             // also close old seat selection frame
                             SeatSelectionFrame.this.dispose();
                             CompanionSelectionFrame companionSelectionFrame = new CompanionSelectionFrame(
-                                    totalSeats, seatType, totalPrice, flightInfoFrame, bookingFrame, username, SeatSelectionFrame.this);
+                                    totalSeats, seatType, totalPrice, flightInfoFrame, bookingFrame, username,
+                                    SeatSelectionFrame.this);
                             // Disable already selected seat the user initially selected
                             companionSelectionFrame.makeSeatUnavailable(getSelectedSeatNumber());
                             companionSelectionFrame.setVisible(true);
@@ -276,15 +276,13 @@ public class BookingFrame extends JFrame {
                                         "Database Error",
                                         JOptionPane.ERROR_MESSAGE);
                             }
-                        }
-                        else {
+                        } else {
                             // Close the seat selection frame and open the payment frame
                             SeatSelectionFrame.this.dispose();
                             PaymentFrame paymentFrame = new PaymentFrame(totalPrice, SeatSelectionFrame.this, username);
                             paymentFrame.setVisible(true);
                         }
-                    }
-                    else {
+                    } else {
                         // Close the seat selection frame and open the payment frame
                         SeatSelectionFrame.this.dispose();
                         PaymentFrame paymentFrame = new PaymentFrame(totalPrice, SeatSelectionFrame.this, username);
@@ -364,8 +362,9 @@ public class BookingFrame extends JFrame {
             }
         }
 
-        public CompanionSelectionFrame(int totalSeats, String seatType, double totalPrice, FlightInfoFrame flightInfoFrame,
-                                  BookingFrame bookingFrame, String username, SeatSelectionFrame seatSelectionFrame) {
+        public CompanionSelectionFrame(int totalSeats, String seatType, double totalPrice,
+                FlightInfoFrame flightInfoFrame,
+                BookingFrame bookingFrame, String username, SeatSelectionFrame seatSelectionFrame) {
             this.totalPrice = totalPrice;
             this.flightInfoFrame = flightInfoFrame;
             this.bookingFrame = bookingFrame;
@@ -423,8 +422,8 @@ public class BookingFrame extends JFrame {
                 public void actionPerformed(ActionEvent e) {
                     // add order to database for companion ticket and then close frame
                     try {
-                        String seatType = seatSelectionFrame.bookingFrame.isEconomyClassSelected() ? "Economy" :
-                                seatSelectionFrame.bookingFrame.isBusinessClassSelected() ? "Business" : "Comfort";
+                        String seatType = seatSelectionFrame.bookingFrame.isEconomyClassSelected() ? "Economy"
+                                : seatSelectionFrame.bookingFrame.isBusinessClassSelected() ? "Business" : "Comfort";
                         DBMS dbms = DBMS.getDBMS();
                         int order = dbms.addOrder(dbms.getEmail(username), username,
                                 flightInfoFrame.getSelectedFlight().getFlightID(),
@@ -439,7 +438,8 @@ public class BookingFrame extends JFrame {
                         System.out.println("Order added for companion ticket with id: " + order);
                         // Create small window for companion ticket if order id is not -1
                         if (order != -1) {
-                            // small window with "ok" button to close and open payment frame for original seat
+                            // small window with "ok" button to close and open payment frame for original
+                            // seat
                             JFrame frame = new JFrame();
                             frame.setTitle("Companion Ticket");
                             frame.setSize(600, 100);
@@ -464,7 +464,8 @@ public class BookingFrame extends JFrame {
                                     }
                                     frame.dispose();
                                     // open payment frame for original seat
-                                    PaymentFrame paymentFrame = new PaymentFrame(totalPrice, seatSelectionFrame, username);
+                                    PaymentFrame paymentFrame = new PaymentFrame(totalPrice, seatSelectionFrame,
+                                            username);
                                     paymentFrame.setVisible(true);
                                     // close companion selection frame
                                     CompanionSelectionFrame.this.dispose();
@@ -659,7 +660,7 @@ public class BookingFrame extends JFrame {
                                         JOptionPane.ERROR_MESSAGE);
                             }
                         }
-                        
+
                         // Close the payment frame
                         PaymentFrame.this.setVisible(false);
                         System.out.println("set payment frame to invisible");
@@ -668,13 +669,13 @@ public class BookingFrame extends JFrame {
                         System.out.println("Email: " + email);
                         // open ConfirmationFrame
                         ConfirmationFrame confirmationFrame = new ConfirmationFrame(email, username, selectedFlight,
-                                isEconomy,isBusiness, hasInsurance, seatNumber, totalPrice, departureDate,
+                                isEconomy, isBusiness, hasInsurance, seatNumber, totalPrice, departureDate,
                                 departureTime, arrivalDate, arrivalTime);
                         confirmationFrame.setVisible(true);
                     } else {
                         // Handle failed payment case
                         JOptionPane.showMessageDialog(PaymentFrame.this, "Payment failed. Please" +
-                                        " try again.",
+                                " try again.",
                                 "Payment Error",
                                 JOptionPane.ERROR_MESSAGE);
                     }

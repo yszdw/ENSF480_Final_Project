@@ -1,7 +1,7 @@
 package src;
+
 import javax.mail.*;
 import javax.mail.internet.*;
-import java.sql.SQLException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Properties;
@@ -72,8 +72,7 @@ public class Email_Controller {
 
     }
 
-    public static void sendReceipt(String username, String email,String insurance,String location,double price) {
-
+    public static void sendReceipt(String username, String email, String insurance, String location, double price) {
 
         // For testing, place your own email in the line below
         // String userEmail = "aaron.dalbroi2002@gmail.com";
@@ -108,8 +107,8 @@ public class Email_Controller {
             message.setText(String.format("Hello,\n\nThis is an email receipt for your flight to %s\n\n"
                     + "Username: %s\n"
                     + "Insurance: %s\n"
-                            + "Cost: %s\n",
-                    location, username,insurance, price));
+                    + "Cost: %s\n",
+                    location, username, insurance, price));
 
             // Send the email
             Transport.send(message);
@@ -122,8 +121,8 @@ public class Email_Controller {
 
     }
 
-    public static void sendTicket(String username,String email, String aircraft, String to, String from,
-                                    LocalTime departure, LocalTime arrive,String seatClass,String seat){
+    public static void sendTicket(String username, String email, String aircraft, String to, String from,
+            LocalTime departure, LocalTime arrive, String seatClass, String seat) {
 
         // For testing, place your own email in the line below
         // String userEmail = "aaron.dalbroi2002@gmail.com";
@@ -156,15 +155,15 @@ public class Email_Controller {
             message.setSubject(String.format("Ticket for your flight to %s", to));
 
             message.setText(String.format("Hello,\n\nThis is your email ticket for your flight to %s\n\n"
-                            + "Username: %s\n"
-                            + "Flying from: %s\n"
-                            + "at: %s\n"
-                            + "Flying to: %s\n"
-                            + "Arriving at: %s\n"
-                            + "Aircraft: %s\n"
-                            + "Seat Class: %s\n"
-                            + "Seat: %s\n",
-                            arrive,username,from,departure,to,arrive,aircraft,seatClass,seat));
+                    + "Username: %s\n"
+                    + "Flying from: %s\n"
+                    + "at: %s\n"
+                    + "Flying to: %s\n"
+                    + "Arriving at: %s\n"
+                    + "Aircraft: %s\n"
+                    + "Seat Class: %s\n"
+                    + "Seat: %s\n",
+                    arrive, username, from, departure, to, arrive, aircraft, seatClass, seat));
 
             // Send the email
             Transport.send(message);
@@ -175,15 +174,11 @@ public class Email_Controller {
             e.printStackTrace();
         }
 
-
-
     }
 
-    public static void sendCancellationEmail(int orderID,String email){
+    public static void sendCancellationEmail(int orderID, String email) {
         // For testing, place your own email in the line below
         // String userEmail = "aaron.dalbroi2002@gmail.com";
-
-
 
         Properties properties = new Properties();
         properties.put("mail.smtp.auth", "true");
@@ -214,9 +209,9 @@ public class Email_Controller {
             message.setSubject(String.format("Ticket Cancellation"));
 
             message.setText(String.format("Hello,\n\nYour ticket for your flight to %s has been cancelled\n\n"
-                            + "Seat Class: %s\n"
-                            + "Seat: %s\n",
-                    o.getArrivalLocation(),o.getSeatClass(),o.getSeatNumber()));
+                    + "Seat Class: %s\n"
+                    + "Seat: %s\n",
+                    o.getArrivalLocation(), o.getSeatClass(), o.getSeatNumber()));
 
             // Send the email
             Transport.send(message);

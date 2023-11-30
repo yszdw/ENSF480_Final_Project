@@ -1,4 +1,5 @@
 package src;
+
 public class RegisteredUser extends User {
 
     CreditCard creditCard;
@@ -6,7 +7,7 @@ public class RegisteredUser extends User {
     int companionTickets;
 
     public RegisteredUser(int userID, String username, String email, String address, CreditCard creditCard,
-                          int companionTickets) {
+            int companionTickets) {
         super(userID, username, email, address);
         this.creditCard = creditCard;
         this.companionTickets = companionTickets;

@@ -4,9 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class RegisterFrame extends JFrame {
@@ -70,7 +67,8 @@ public class RegisterFrame extends JFrame {
         passField.setFont(INPUT_FONT);
         passField.setBackground(INPUT_COLOR);
 
-        // Adding components to inputPanel in order of email, address, username, and password
+        // Adding components to inputPanel in order of email, address, username, and
+        // password
         gbc.gridx = 0;
         gbc.gridy = 0;
         inputPanel.add(emailLabel, gbc);

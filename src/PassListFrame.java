@@ -6,7 +6,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class PassListFrame extends JFrame {
@@ -46,36 +45,36 @@ public class PassListFrame extends JFrame {
 
         // Ensure visibility is set at the end of the constructor
         setVisible(true);
-       
+
     }
 
     public class DisplayFrame extends JFrame {
         public DisplayFrame(ArrayList<Order> orders) {
-        setTitle("Flight Passenger Information");
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLayout(new BorderLayout());
-        setSize(600, 400);
+            setTitle("Flight Passenger Information");
+            setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            setLayout(new BorderLayout());
+            setSize(600, 400);
 
-        String[] columnNames = { "Username", "Email", "SeatNumber" };
-        DefaultTableModel model = new DefaultTableModel(columnNames, 0);
+            String[] columnNames = { "Username", "Email", "SeatNumber" };
+            DefaultTableModel model = new DefaultTableModel(columnNames, 0);
 
-        for (Order o : orders) {
+            for (Order o : orders) {
 
-            Object[] row = new Object[3]; // Adjusted to match the number of columns
-            row[0] = o.getUsername();
-            row[1] = o.getEmail();
-            row[2] = o.getSeatNumber();
+                Object[] row = new Object[3]; // Adjusted to match the number of columns
+                row[0] = o.getUsername();
+                row[1] = o.getEmail();
+                row[2] = o.getSeatNumber();
 
-            model.addRow(row);
+                model.addRow(row);
+            }
+
+            JTable table = new JTable(model);
+            JScrollPane scrollPane = new JScrollPane(table);
+
+            // Add the JScrollPane to the frame
+            add(scrollPane, BorderLayout.CENTER);
+            // setVisible(true);
         }
+    }
 
-        JTable table = new JTable(model);
-        JScrollPane scrollPane = new JScrollPane(table);
-
-        // Add the JScrollPane to the frame
-        add(scrollPane, BorderLayout.CENTER);
-        // setVisible(true);
-            }}
-
-    
 }
