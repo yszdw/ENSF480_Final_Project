@@ -44,6 +44,7 @@ public class AirlineFrame extends JFrame {
         flightButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                AirlineFrame.this.dispose(); // Close the current window
                 LoginFrame loginFrame = new LoginFrame(); // Create an instance of LoginFrame
                 WelcomeFrame welcomeFrame = loginFrame.new WelcomeFrame(username); // Pass the username to WelcomeFrame
                 welcomeFrame.setVisible(true); // Show the welcome window
