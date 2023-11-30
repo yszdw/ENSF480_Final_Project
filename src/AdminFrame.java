@@ -137,7 +137,7 @@ public class AdminFrame extends JFrame {
                 try {
 
                     DBMS dbms = DBMS.getDBMS();
-                    ArrayList<User> users = dbms.getUsers();
+                    ArrayList<RegisteredUser> users = dbms.getRegisteredUsers();
 
                     DisplayUsers displayUsers = new DisplayUsers(users);
                     displayUsers.setVisible(true);
@@ -225,7 +225,7 @@ public class AdminFrame extends JFrame {
 
     private void addAircraftPanel() {
         JFrame browseFrame = new JFrame("Add Aircraft");
-        browseFrame.setSize(400, 300);
+        browseFrame.setSize(800, 600);
         browseFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         // Use GridBagLayout for center alignment
@@ -576,7 +576,7 @@ public class AdminFrame extends JFrame {
 
         private void addFlightPanel() {
             JFrame browseFrame = new JFrame("Add Flight");
-            browseFrame.setSize(400, 300);
+            browseFrame.setSize(600, 400);
             browseFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
             // Use GridBagLayout for center alignment
@@ -691,7 +691,7 @@ public class AdminFrame extends JFrame {
     }
 
     public class DisplayUsers extends JFrame {
-        public DisplayUsers(ArrayList<User> users) {
+        public DisplayUsers(ArrayList<RegisteredUser> users) {
             setTitle("Registered User Information");
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             setLayout(new BorderLayout());
@@ -721,6 +721,7 @@ public class AdminFrame extends JFrame {
             // Make the frame visible
             setVisible(true);
         }
+
     }
 
     public class DisplayFlight extends JFrame {

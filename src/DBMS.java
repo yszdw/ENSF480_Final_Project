@@ -382,17 +382,19 @@ public class DBMS {
         }
     }
 
-    /*
-     * TODO: bookFlight - THIS DOESNT WORK YET
-     * Books a flight and insert into database
-     */
+    // /*
+    // * TODO: bookFlight - THIS DOESNT WORK YET
+    // * Books a flight and insert into database
+    // */
 
-    public void bookFlight(int userID, int flightID, int seatID, LocalDateTime DateTime) throws SQLException {
-        Statement myStmt = dbConnect.createStatement();
-        String sql = "INSERT INTO Bookings (UserID, FlightID, SeatID, CancellationInsurance, BookingDateTime) VALUES ("
-                + userID + flightID + seatID + "0" + DateTime + ")";
-        myStmt.executeUpdate(sql);
-    }
+    // public void bookFlight(int userID, int flightID, int seatID, LocalDateTime
+    // DateTime) throws SQLException {
+    // Statement myStmt = dbConnect.createStatement();
+    // String sql = "INSERT INTO Bookings (UserID, FlightID, SeatID,
+    // CancellationInsurance, BookingDateTime) VALUES ("
+    // + userID + flightID + seatID + "0" + DateTime + ")";
+    // myStmt.executeUpdate(sql);
+    // }
 
     /*
      * getUser List from database
@@ -437,6 +439,33 @@ public class DBMS {
                     System.out.println("Invalid user type");
                     break;
             }
+        }
+        results.close();
+        return users;
+    }
+
+    /*
+     * getRegistered User List from database
+     */
+
+    public ArrayList<RegisteredUser> getRegisteredUsers() throws SQLException {
+        ArrayList<RegisteredUser> users = new ArrayList<RegisteredUser>();
+        Statement myStmt = dbConnect.createStatement();
+        results = myStmt.executeQuery("SELECT * FROM Users WHERE UserType = 'passenger'");
+        while (results.next()) {
+            int userID = results.getInt("UserID");
+            String username = results.getString("Name");
+            String address = results.getString("Address");
+            String email = results.getString("Email");
+            // String userType = results.getString("UserType");
+            String creditCardNumber = results.getString("CreditCardInfo");
+            int creditCardExpiry = results.getInt("CreditCardExpiry");
+            int creditCardCVV = results.getInt("CreditCardCVV");
+            int companionTickets = results.getInt("CompanionTickets");
+            CreditCard card = new CreditCard(creditCardNumber, username, creditCardExpiry, creditCardCVV);
+            RegisteredUser passenger = new RegisteredUser(userID, username, email, address, card,
+                    companionTickets);
+            users.add(passenger);
         }
         results.close();
         return users;
@@ -638,45 +667,47 @@ public class DBMS {
         }
     }
 
-    /*
-     * getBooking list from database
-     */
+    // /*
+    // * getBooking list from database
+    // */
 
-    public ArrayList<Booking> getBookings() throws SQLException {
-        ArrayList<Booking> bookings = new ArrayList<Booking>();
-        ArrayList<User> users = getUsers();
-        ArrayList<Flight> flights = getFlights();
-        Statement myStmt = dbConnect.createStatement();
-        results = myStmt.executeQuery("SELECT * FROM Bookings");
-        while (results.next()) {
-            int bookingID = results.getInt("BookingID");
-            int userID = results.getInt("UserID");
-            User user = null;
-            for (User u : users) {
-                if (u.getUserID() == userID) {
-                    user = u;
-                }
-            }
-            int flightID = results.getInt("FlightID");
-            Flight flight = null;
-            for (Flight f : flights) {
-                if (f.getFlightID() == flightID) {
-                    flight = f;
-                }
-            }
+    // public ArrayList<Booking> getBookings() throws SQLException {
+    // ArrayList<Booking> bookings = new ArrayList<Booking>();
+    // ArrayList<User> users = getUsers();
+    // ArrayList<Flight> flights = getFlights();
+    // Statement myStmt = dbConnect.createStatement();
+    // results = myStmt.executeQuery("SELECT * FROM Bookings");
+    // while (results.next()) {
+    // int bookingID = results.getInt("BookingID");
+    // int userID = results.getInt("UserID");
+    // User user = null;
+    // for (User u : users) {
+    // if (u.getUserID() == userID) {
+    // user = u;
+    // }
+    // }
+    // int flightID = results.getInt("FlightID");
+    // Flight flight = null;
+    // for (Flight f : flights) {
+    // if (f.getFlightID() == flightID) {
+    // flight = f;
+    // }
+    // }
 
-            int seatID = results.getInt("SeatID");
+    // int seatID = results.getInt("SeatID");
 
-            boolean cancellationInsurance = results.getBoolean("CancellationInsurance");
-            LocalDateTime bookingDateTime = results.getTimestamp("BookingDateTime").toLocalDateTime();
+    // boolean cancellationInsurance = results.getBoolean("CancellationInsurance");
+    // LocalDateTime bookingDateTime =
+    // results.getTimestamp("BookingDateTime").toLocalDateTime();
 
-            // TODO: Need to replace dummieSeat with actual seat
-            Booking booking = new Booking(bookingID, flight, user, seatID, cancellationInsurance, bookingDateTime);
-            bookings.add(booking);
-        }
-        results.close();
-        return bookings;
-    }
+    // // TODO: Need to replace dummieSeat with actual seat
+    // Booking booking = new Booking(bookingID, flight, user, seatID,
+    // cancellationInsurance, bookingDateTime);
+    // bookings.add(booking);
+    // }
+    // results.close();
+    // return bookings;
+    // }
 
     /*
      * Gets the most current promotion in the database
