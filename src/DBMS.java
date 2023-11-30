@@ -411,6 +411,7 @@ public class DBMS {
             String creditCardNumber = results.getString("CreditCardInfo");
             int creditCardExpiry = results.getInt("CreditCardExpiry");
             int creditCardCVV = results.getInt("CreditCardCVV");
+            int companionTickets = results.getInt("CompanionTickets");
             switch (userType) {
                 case "admin":
                     Admin admin = new Admin(userID, username, email, address);
@@ -423,7 +424,8 @@ public class DBMS {
                     break;
                 case "passenger":
                     CreditCard card = new CreditCard(creditCardNumber, username, creditCardExpiry, creditCardCVV);
-                    RegisteredUser passenger = new RegisteredUser(userID, username, email, address, card);
+                    RegisteredUser passenger = new RegisteredUser(userID, username, email, address, card,
+                            companionTickets);
                     users.add(passenger);
                     break;
                 case "agent":
@@ -446,7 +448,7 @@ public class DBMS {
     public void addUser(User user) throws SQLException {
         // SQL query for insertion using a prepared statement
         String insertQuery = "INSERT INTO Users (Name, Address, Email, UserType, CreditCardNumber, CreditCardExpiry," +
-                "CreditCardCVV) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                "CreditCardCVV, CompanionTickets) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         // Create a prepared statement
         try (PreparedStatement preparedStatement = dbConnect.prepareStatement(insertQuery)) {
@@ -470,6 +472,7 @@ public class DBMS {
                 preparedStatement.setString(5, card.getCardNumber());
                 preparedStatement.setInt(6, card.getExpiryDate());
                 preparedStatement.setInt(7, card.getCVV());
+                preparedStatement.setInt(8, ((RegisteredUser) user).getCompanionTickets());
             }
 
             // Execute the insertion
@@ -482,6 +485,92 @@ public class DBMS {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    /*
+     * Given a username, return the user object
+     */
+    public User getUser(String username) throws SQLException {
+        User user = null;
+
+        String query = "SELECT * FROM Users WHERE Name = ?";
+        try (PreparedStatement pstmt = dbConnect.prepareStatement(query)) {
+            pstmt.setString(1, username);
+
+            try (ResultSet results = pstmt.executeQuery()) {
+                if (results.next()) {
+                    int userID = results.getInt("UserID");
+                    String address = results.getString("Address");
+                    String email = results.getString("Email");
+                    String userType = results.getString("UserType");
+                    String creditCardNumber = results.getString("CreditCardInfo");
+                    int creditCardExpiry = results.getInt("CreditCardExpiry");
+                    int creditCardCVV = results.getInt("CreditCardCVV");
+                    int companionTickets = results.getInt("CompanionTickets");
+                    switch (userType) {
+                        case "admin":
+                            user = new Admin(userID, username, email, address);
+                            break;
+                        case "crew":
+                            String crewMemberPos = results.getString("CrewMemberPos");
+                            user = new CrewMember(userID, username, email, address, crewMemberPos);
+                            break;
+                        case "passenger":
+                            CreditCard card = new CreditCard(creditCardNumber, username, creditCardExpiry,
+                                    creditCardCVV);
+                            user = new RegisteredUser(userID, username, email, address, card, companionTickets);
+                            break;
+                        case "agent":
+                            user = new Agent(userID, username, email, address);
+                            break;
+
+                        default:
+                            System.out.println("Invalid user type");
+                            break;
+                    }
+                }
+            }
+        }
+
+        return user;
+    }
+
+    /*
+     * Update user information in database given user object
+     */
+    public void updateUser(User user) {
+        try {
+            String updateQuery = "UPDATE users SET Name = ?, Address = ?, Email = ?, UserType = ?, CreditCardInfo = ?, "
+                    +
+                    "CreditCardExpiry = ?, CreditCardCVV = ?, CompanionTickets = ? WHERE UserID = ?";
+            try (PreparedStatement preparedStatement = dbConnect.prepareStatement(updateQuery)) {
+                preparedStatement.setString(1, user.getUsername());
+                preparedStatement.setString(2, user.getAddress());
+                preparedStatement.setString(3, user.getEmail());
+                // get user type from user object
+                if (user instanceof Admin) {
+                    preparedStatement.setString(4, "admin");
+                } else if (user instanceof CrewMember) {
+                    preparedStatement.setString(4, "crew");
+                } else if (user instanceof RegisteredUser) {
+                    preparedStatement.setString(4, "passenger");
+                } else {
+                    System.out.println("Invalid user type");
+                }
+                // get credit card from user object if passenger
+                if (user instanceof RegisteredUser) {
+                    CreditCard card = ((RegisteredUser) user).getCreditCard();
+                    preparedStatement.setString(5, card.getCardNumber());
+                    preparedStatement.setInt(6, card.getExpiryDate());
+                    preparedStatement.setInt(7, card.getCVV());
+                    preparedStatement.setInt(8, ((RegisteredUser) user).getCompanionTickets());
+                }
+                preparedStatement.setInt(9, user.getUserID());
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle the exception according to your needs
         }
     }
 
@@ -765,12 +854,13 @@ public class DBMS {
     public boolean registerUser(String username, String password, String email, String address) throws SQLException {
         PreparedStatement preparedStatement = null;
         try {
-            String sql = "INSERT INTO users (Name, Email, PasswordHash, Address) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO users (Name, Email, PasswordHash, Address, CompanionTickets) VALUES (?, ?, ?, ?, ?)";
             preparedStatement = dbConnect.prepareStatement(sql);
             preparedStatement.setString(1, username);
             preparedStatement.setString(2, email);
             preparedStatement.setString(3, password); // Password should be hashed + salted
             preparedStatement.setString(4, address);
+            preparedStatement.setInt(5, 1);
 
             int rowsInserted = preparedStatement.executeUpdate();
             if (rowsInserted > 0) {
@@ -849,6 +939,42 @@ public class DBMS {
     }
     // SQL query to insert a new order.
 
+    public void updateCreditCardInfo(String username, String cardNumber, String expirationDate, String cvv)
+            throws SQLException {
+        String sql = "UPDATE users SET CreditCardInfo = ?, CreditCardExpiry = ?, CreditCardCVV = ? WHERE Name = ?";
+        try (PreparedStatement pstmt = dbConnect.prepareStatement(sql)) {
+            pstmt.setString(1, cardNumber);
+            pstmt.setString(2, expirationDate); // Format or convert this as required by your database schema
+            pstmt.setString(3, cvv);
+            pstmt.setString(4, username);
+            pstmt.executeUpdate();
+        }
+    }
+
+    public String getCreditCardInfo(String username) throws SQLException {
+        String query = "SELECT CreditCardInfo FROM Users WHERE Name = ?";
+        try (PreparedStatement pstmt = dbConnect.prepareStatement(query)) {
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("CreditCardInfo");
+            }
+        }
+        return null;
+    }
+
+    public boolean hasCreditCard(String username) throws SQLException {
+        String query = "SELECT COUNT(*) FROM Users WHERE Name = ? AND CreditCardInfo IS NOT NULL";
+        try (PreparedStatement pstmt = dbConnect.prepareStatement(query)) {
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        }
+        return false;
+    }
+
     public String getUserType(String username) throws SQLException {
         String sql = "SELECT UserType FROM users WHERE Name = ?";
         try (PreparedStatement statement = dbConnect.prepareStatement(sql)) {
@@ -863,4 +989,24 @@ public class DBMS {
         }
     }
 
+    public Aircraft getAircraftbyID(int aircraftID) throws SQLException {
+        String sql = "SELECT * FROM aircrafts WHERE AircraftID = ?";
+        try (PreparedStatement statement = dbConnect.prepareStatement(sql)) {
+            statement.setInt(1, aircraftID);
+            ResultSet result = statement.executeQuery();
+            if (result.next()) {
+                String aircraftModel = result.getString("Model");
+                int numEconomySeats = result.getInt("Ordinary");
+                int numComfortSeats = result.getInt("Comfort");
+                int numBusinessSeats = result.getInt("Business");
+                double economyPrice = result.getDouble("EconomyPrice");
+                double businessPrice = result.getDouble("BusinessPrice");
+                return new Aircraft(aircraftID, aircraftModel, numEconomySeats, numComfortSeats, numBusinessSeats,
+                        economyPrice, businessPrice);
+            } else {
+                System.out.println("Error getting aircraft");
+                return null;
+            }
+        }
+    }
 }

@@ -1,14 +1,18 @@
 package src;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
+import java.time.*;
 import java.util.ArrayList;
+
+import src.BookingFrame;
+import src.BookingFrame.*;
 
 import src.AirlineFrame.*;
 
@@ -130,7 +134,7 @@ public class LoginFrame extends JFrame {
                         } else if (userType.equals("flight_attendant")) {
                             SwingUtilities.invokeLater(() -> {
                                 loginFrame.dispose(); // Close the login window
-                                PassListFrame passListFrame = new PassListFrame(username); // Pass the username to
+                                PassListFrame passListFrame = new PassListFrame(); // Pass the username to
                                 passListFrame.setVisible(true); // PassListFrame
                             });
                         } else if (userType.equals("admin")) {
@@ -293,9 +297,9 @@ public class LoginFrame extends JFrame {
         public AddCreditCardFrame(String username) {
             this.username = username;
             setTitle("Add Credit Card");
-            setSize(400, 300);
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             setLayout(new BorderLayout());
+            setExtendedState(JFrame.MAXIMIZED_BOTH); // Set frame to full screen
 
             // Title Panel
             JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -317,20 +321,84 @@ public class LoginFrame extends JFrame {
             cardNumberField.setFont(INPUT_FONT);
             cardNumberField.setBackground(INPUT_COLOR);
 
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            inputPanel.add(cardNumberLabel, gbc);
+            gbc.gridx = 1;
+            inputPanel.add(cardNumberField, gbc);
+
             // Expiration Date
             JLabel expirationDateLabel = new JLabel("Expiration Date:");
             expirationDateLabel.setFont(INPUT_FONT);
-            expirationDateField = new JTextField(20);
+            expirationDateField = new JTextField(5); // Typically, expiration date is shorter
             expirationDateField.setFont(INPUT_FONT);
             expirationDateField.setBackground(INPUT_COLOR);
+
+            gbc.gridy = 1;
+            gbc.gridx = 0;
+            inputPanel.add(expirationDateLabel, gbc);
+            gbc.gridx = 1;
+            inputPanel.add(expirationDateField, gbc);
 
             // CVV
             JLabel cvvLabel = new JLabel("CVV:");
             cvvLabel.setFont(INPUT_FONT);
-            cvvField = new JTextField(20);
+            cvvField = new JTextField(3); // CVV is typically 3 digits
             cvvField.setFont(INPUT_FONT);
             cvvField.setBackground(INPUT_COLOR);
 
+            gbc.gridy = 2;
+            gbc.gridx = 0;
+            inputPanel.add(cvvLabel, gbc);
+            gbc.gridx = 1;
+            inputPanel.add(cvvField, gbc);
+
+            // Confirm Button
+            JButton confirmButton = new JButton("Confirm");
+            confirmButton.setFont(BUTTON_FONT);
+            confirmButton.setBackground(BUTTON_COLOR);
+            confirmButton.setForeground(BUTTON_TEXT_COLOR);
+            confirmButton.setFocusPainted(false);
+            confirmButton.setBorderPainted(false);
+
+            gbc.gridy = 3;
+            gbc.gridx = 0;
+            gbc.gridwidth = 2;
+            gbc.insets = new Insets(10, 10, 10, 10);
+            inputPanel.add(confirmButton, gbc);
+
+            // Add action listener to confirm button
+            // Here you can add the logic to handle credit card information submission
+            confirmButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String cardNumber = cardNumberField.getText();
+                    String expirationDate = expirationDateField.getText();
+                    String cvv = cvvField.getText();
+
+                    // Validate input fields (card number, expiration date, cvv)
+
+                    // Update the database with the new credit card information
+                    try {
+                        DBMS dbms = DBMS.getDBMS();
+                        dbms.updateCreditCardInfo(username, cardNumber, expirationDate, cvv);
+                        JOptionPane.showMessageDialog(AddCreditCardFrame.this, "Credit card updated successfully.");
+
+                        // Close the frame after successful update
+                        AddCreditCardFrame.this.dispose();
+
+                    } catch (SQLException ex) {
+                        JOptionPane.showMessageDialog(AddCreditCardFrame.this,
+                                "Failed to update credit card: " + ex.getMessage(), "Database Error",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            });
+
+            // Add panels to frame
+            add(titlePanel, BorderLayout.NORTH);
+            add(inputPanel, BorderLayout.CENTER);
+            setVisible(true);
         }
     }
 
@@ -785,7 +853,6 @@ public class LoginFrame extends JFrame {
         return button;
     }
 
-    // DBMS dbms = DBMS.getDBMS(); // Singleton instance
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             LoginFrame loginFrame = new LoginFrame();

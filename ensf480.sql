@@ -1,16 +1,16 @@
 /*
  Navicat Premium Data Transfer
- 
+
  Source Server         : 111
  Source Server Type    : MySQL
  Source Server Version : 80035 (8.0.35)
  Source Host           : localhost:3306orders
  Source Schema         : ensf480
- 
+
  Target Server Type    : MySQL
  Target Server Version : 80035 (8.0.35)
  File Encoding         : 65001
- 
+
  Date: 26/11/2023 08:30:42
  */
 DROP DATABASE IF EXISTS ENSF480;
@@ -498,116 +498,18 @@ CREATE TABLE `users` (
   `CreditCardExpiry` int,
   `CreditCardCVV` int,
   `PasswordHash` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `CompanionTickets` int DEFAULT 1,
   PRIMARY KEY (`UserID`) USING BTREE,
   UNIQUE INDEX `Email`(`Email` ASC) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 -- ----------------------------
 -- Records of users
 -- ----------------------------
-INSERT INTO `users`
-VALUES (
-    1,
-    'John Doe',
-    '1234 5th Ave, Calgary, AB',
-    'johnDoe@gmail.com',
-    'passenger',
-    0,
-    '1234-5678-9012-3456',
-    0101,
-    123,
-    ''
-  );
-INSERT INTO `users`
-VALUES (
-    2,
-    'Jane Doe',
-    '1234 5th Ave, Calgary, AB',
-    'janeDoe@gmail.com',
-    'passenger',
-    0,
-    '1234-5678-9012-3456',
-    0202,
-    123,
-    ''
-  );
-INSERT INTO `users`
-VALUES (
-    3,
-    'ysz',
-    NULL,
-    'sgg',
-    'passenger',
-    0,
-    NULL,
-    '123456',
-    0303,
-    123
-  );
-INSERT INTO `users`
-VALUES (
-    4,
-    'Hhf',
-    NULL,
-    'bgesrg',
-    'passenger',
-    0,
-    NULL,
-    '12345678',
-    0404,
-    123
-  );
-INSERT INTO `users`
-VALUES (
-    5,
-    'ryg',
-    NULL,
-    'wghtg',
-    'passenger',
-    0,
-    NULL,
-    '4545',
-    0505,
-    123
-  );
-INSERT INTO `users`
-VALUES (
-    6,
-    'sara',
-    NULL,
-    'sara@gmail.com',
-    'passenger',
-    0,
-    NULL,
-    0606,
-    123,
-    '123456'
-  );
-INSERT INTO `users`
-VALUES (
-    7,
-    'admin',
-    NULL,
-    '00000',
-    'admin',
-    0,
-    NULL,
-    0606,
-    123,
-    '0000'
-  );
-INSERT INTO `users`
-VALUES (
-    8,
-    'Aryan',
-    '1236 5th Ave, Calgary, AB',
-    'aryan@gmail.com',
-    'passenger',
-    0,
-    '1234123412341234',
-    1024,
-    100,
-    'pass'
-  );
+INSERT INTO `users` VALUES (1, 'John Doe', '1234 5th Ave, Calgary, AB', 'johnDoe@gmail.com', 'passenger', 0, '1234-5678-9012-3456',0101,123, '', 1);
+INSERT INTO `users` VALUES (2, 'Jane Doe', '1234 5th Ave, Calgary, AB', 'janeDoe@gmail.com', 'passenger', 0, '1234-5678-9012-3456',0202,123, '', 1);
+INSERT INTO `users` VALUES (6, 'sara', NULL, 'sara@gmail.com', 'passenger', 0, NULL,0606,123, '123456', 1);
+INSERT INTO `users` VALUES (7, 'admin', NULL, '00000', 'admin', 0, NULL,0606,123, '0000', 0);
+INSERT INTO `users` VALUES (8, 'Aryan', '1236 5th Ave, Calgary, AB', 'karadiaaryan@gmail.com', 'passenger', 0, '1234123412341234', 1024, 100, 'pass', 9);
 INSERT INTO `users`
 VALUES (
     9,
@@ -619,7 +521,8 @@ VALUES (
     '1234123412341234',
     1024,
     100,
-    '0000'
+    '0000',
+    1
   );
   INSERT INTO `users`
 VALUES (
@@ -632,13 +535,13 @@ VALUES (
     '1234123412341234',
     1024,
     100,
-    '0000'
+    '0000',
+    1
   );
+
+
 SET FOREIGN_KEY_CHECKS = 1;
 -- select *
 -- from orders;
--- select *
--- from users;
--- SELECT *
--- FROM Orders
--- WHERE Email = 'Aryan@gmail.com';
+select *
+from users;

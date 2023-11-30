@@ -11,19 +11,16 @@ import java.util.ArrayList;
 
 public class PassListFrame extends JFrame {
 
-    public PassListFrame(String username) {
-        JFrame browseFrame = new JFrame("Enter Flights");
-        browseFrame.setSize(400, 300);
-        browseFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        browseFrame.setLayout(new GridLayout(5, 2, 10, 10));
+    public PassListFrame() {
+        setTitle("Enter Flights");
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setSize(400, 300);
+        setLayout(new GridLayout(5, 2, 10, 10));
 
         JLabel flightIdLabel = new JLabel("Flight ID: ");
         JTextField flightIdText = new JTextField();
 
         JButton getButton = new JButton("Get Passenger List");
-
-        browseFrame.add(flightIdLabel);
-        browseFrame.add(flightIdText);
 
         getButton.addActionListener(new ActionListener() {
             @Override
@@ -32,7 +29,8 @@ public class PassListFrame extends JFrame {
                     int flightID = Integer.parseInt(flightIdText.getText());
                     DBMS dbms = DBMS.getDBMS();
                     ArrayList<Order> orders = dbms.getOrders(flightID);
-                    passListFrame(orders);
+                    DisplayFrame displayFrame = new DisplayFrame(orders);
+                    displayFrame.setVisible(true);
 
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -42,12 +40,17 @@ public class PassListFrame extends JFrame {
             }
         });
 
-        browseFrame.add(new JLabel());
-        browseFrame.add(getButton);
-        browseFrame.setVisible(true);
+        add(flightIdLabel);
+        add(flightIdText);
+        add(getButton);
+
+        // Ensure visibility is set at the end of the constructor
+        setVisible(true);
+       
     }
 
-    private void passListFrame(ArrayList<Order> orders) {
+    public class DisplayFrame extends JFrame {
+        public DisplayFrame(ArrayList<Order> orders) {
         setTitle("Flight Passenger Information");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
@@ -71,8 +74,8 @@ public class PassListFrame extends JFrame {
 
         // Add the JScrollPane to the frame
         add(scrollPane, BorderLayout.CENTER);
+        // setVisible(true);
+            }}
 
-        // Make the frame visible
-        setVisible(true);
-    }
+    
 }

@@ -23,7 +23,7 @@ public class Email_Controller {
     }
 
     public void notifyAboutPromotions(String promotion) {
-
+        // Only send promo if its the first of the month
         for (int i = 0; i < promoUsers.size(); i++) {
             // Get next user
             User currentUser = promoUsers.get(i);

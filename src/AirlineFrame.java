@@ -44,6 +44,7 @@ public class AirlineFrame extends JFrame {
         flightButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                AirlineFrame.this.dispose(); // Close the current window
                 LoginFrame loginFrame = new LoginFrame(); // Create an instance of LoginFrame
                 WelcomeFrame welcomeFrame = loginFrame.new WelcomeFrame(username); // Pass the username to WelcomeFrame
                 welcomeFrame.setVisible(true); // Show the welcome window
@@ -58,8 +59,25 @@ public class AirlineFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                PassListFrame passListFrame = new PassListFrame(username);
+                PassListFrame passListFrame = new PassListFrame();
                 passListFrame.setVisible(true);
+            }
+        });
+
+        // // User is logged in so add logout button
+        JButton logoutButton = createStyledButton("Logout");
+        gbc.insets = new Insets(0, 0, 10, 0);
+        buttonPanel.add(logoutButton, gbc);
+
+        logoutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Hide the welcome frame
+                AirlineFrame.this.dispose(); // Optionally, you can dispose the WelcomeFrame
+
+                // Create and show the login frame
+                LoginFrame loginFrame = new LoginFrame();
+                loginFrame.setVisible(true);
             }
         });
 
@@ -78,12 +96,4 @@ public class AirlineFrame extends JFrame {
         button.setFocusPainted(false);
         button.setBorderPainted(false);
         return button;
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            AdminFrame adminFrame = new AdminFrame();
-            adminFrame.setVisible(true);
-        });
-    }
-}
+    }}
