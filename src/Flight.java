@@ -48,7 +48,7 @@ public class Flight {
             this.seats.put(temp.getSeatNumber(), temp);
         }
 
-        this.crew = new ArrayList<CrewMember>();
+        this.crew = new ArrayList<>();
 
     }
 
@@ -84,14 +84,6 @@ public class Flight {
 
     public LocalDate getArrivalDate() {
         return arrivalDate;
-    }
-
-    public HashMap<String, Seat> getSeats() {
-        return seats;
-    }
-
-    public ArrayList<CrewMember> getCrew() {
-        return crew;
     }
 
     // Static method to find a Flight by its ID

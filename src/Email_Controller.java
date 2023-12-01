@@ -8,23 +8,22 @@ import java.util.Properties;
 
 public class Email_Controller {
 
-    private static ArrayList<User> promoUsers = new ArrayList<User>();
+    private static ArrayList<User> promoUsers = new ArrayList<>();
 
-    private static String programEmail = "ensf480flightsystem@gmail.com";
-    private static String emailPassword = "ggcw dwhn hjvd cdpr";
+    private static final String programEmail = "ensf480flightsystem@gmail.com";
+    private static final String emailPassword = "ggcw dwhn hjvd cdpr";
 
     public Email_Controller() {}
 
     public void registerForPromotion(User user) {
-        this.promoUsers.add(user);
+        promoUsers.add(user);
     }
 
     public void notifyAboutPromotions(String promotion) {
         // Only send promo if it's the first of the month
-        for (int i = 0; i < promoUsers.size(); i++) {
+        for (User currentUser : promoUsers) {
 
             // Get next user
-            User currentUser = promoUsers.get(i);
             String userEmail = currentUser.getEmail();
 
             Properties properties = new Properties();
@@ -101,10 +100,15 @@ public class Email_Controller {
             // Set the email subject and body
             message.setSubject(String.format("Receipt for your flight to %s", location));
 
-            message.setText(String.format("Hello,\n\nThis is an email receipt for your flight to %s\n\n"
-                    + "Username: %s\n"
-                    + "Insurance: %s\n"
-                    + "Cost: %s\n",
+            message.setText(String.format("""
+                            Hello,
+
+                            This is an email receipt for your flight to %s
+
+                            Username: %s
+                            Insurance: %s
+                            Cost: %s
+                            """,
                     location, username, insurance, price));
 
             // Send the email
@@ -151,15 +155,20 @@ public class Email_Controller {
             // Set the email subject and body
             message.setSubject(String.format("Ticket for your flight to %s", to));
 
-            message.setText(String.format("Hello,\n\nThis is your email ticket for your flight to %s\n\n"
-                    + "Username: %s\n"
-                    + "Flying from: %s\n"
-                    + "at: %s\n"
-                    + "Flying to: %s\n"
-                    + "Arriving at: %s\n"
-                    + "Aircraft: %s\n"
-                    + "Seat Class: %s\n"
-                    + "Seat: %s\n",
+            message.setText(String.format("""
+                            Hello,
+
+                            This is your email ticket for your flight to %s
+
+                            Username: %s
+                            Flying from: %s
+                            at: %s
+                            Flying to: %s
+                            Arriving at: %s
+                            Aircraft: %s
+                            Seat Class: %s
+                            Seat: %s
+                            """,
                     arrive, username, from, departure, to, arrive, aircraft, seatClass, seat));
 
             // Send the email
@@ -203,11 +212,16 @@ public class Email_Controller {
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
 
             // Set the email subject and body
-            message.setSubject(String.format("Ticket Cancellation"));
+            message.setSubject("Ticket Cancellation");
 
-            message.setText(String.format("Hello,\n\nYour ticket for your flight to %s has been cancelled\n\n"
-                    + "Seat Class: %s\n"
-                    + "Seat: %s\n",
+            message.setText(String.format("""
+                            Hello,
+
+                            Your ticket for your flight to %s has been cancelled
+
+                            Seat Class: %s
+                            Seat: %s
+                            """,
                     o.getArrivalLocation(), o.getSeatClass(), o.getSeatNumber()));
 
             // Send the email

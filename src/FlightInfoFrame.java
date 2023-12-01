@@ -2,8 +2,6 @@ package src;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -12,12 +10,10 @@ import javax.swing.table.DefaultTableModel;
 
 public class FlightInfoFrame extends JFrame {
 
-    private JTable table;
-    private ArrayList<Flight> flights;
-    private String username;
+    private final JTable table;
+    private final ArrayList<Flight> flights;
 
     public FlightInfoFrame(ArrayList<Flight> flights, String username) {
-        this.username = username;
         setTitle("Flight Information");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
@@ -53,42 +49,40 @@ public class FlightInfoFrame extends JFrame {
 
         add(selectFlightPanel, BorderLayout.SOUTH);
 
-        selectFlightButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int selectedRow = FlightInfoFrame.this.table.getSelectedRow();
-                if (selectedRow >= 0) {
-                    try {
-                        int flightID = (Integer) FlightInfoFrame.this.table.getValueAt(selectedRow, 0);
-                        Flight selectedFlight = Flight.getFlightByID(FlightInfoFrame.this.flights, flightID);
-                        Aircraft aircraft = selectedFlight.getAircraft(); // Get the Aircraft object
+        selectFlightButton.addActionListener(e -> {
+            int selectedRow = FlightInfoFrame.this.table.getSelectedRow();
+            if (selectedRow >= 0) {
+                try {
+                    int flightID = (Integer) FlightInfoFrame.this.table.getValueAt(selectedRow, 0);
+                    Flight selectedFlight = Flight.getFlightByID(FlightInfoFrame.this.flights, flightID);
+                    assert selectedFlight != null;
+                    Aircraft aircraft = selectedFlight.getAircraft(); // Get the Aircraft object
 
-                        DBMS dbms = DBMS.getDBMS(); // Singleton instance
-                        double economyPrice = dbms.getEconomyPrice(aircraft.getAircraftID());
-                        double businessPrice = dbms.getBusinessPrice(aircraft.getAircraftID());
-                        double insurancePrice = 50; // This can be a fixed value or also retrieved from the
-                                                    // database
+                    DBMS dbms = DBMS.getDBMS(); // Singleton instance
+                    double economyPrice = dbms.getEconomyPrice(aircraft.getAircraftID());
+                    double businessPrice = dbms.getBusinessPrice(aircraft.getAircraftID());
+                    double insurancePrice = 50; // This can be a fixed value or also retrieved from the
+                                                // database
 
-                        FlightInfoFrame.this.dispose(); // Close the current frame
+                    FlightInfoFrame.this.dispose(); // Close the current frame
 
-                        BookingFrame bookingFrame = new BookingFrame(FlightInfoFrame.this, aircraft, economyPrice,
-                                businessPrice,
-                                insurancePrice, username);
-                        bookingFrame.setVisible(true); // Display the booking frame
+                    BookingFrame bookingFrame = new BookingFrame(FlightInfoFrame.this, aircraft, economyPrice,
+                            businessPrice,
+                            insurancePrice, username);
+                    bookingFrame.setVisible(true); // Display the booking frame
 
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
-                        JOptionPane.showMessageDialog(FlightInfoFrame.this,
-                                "Error accessing database: " + ex.getMessage(),
-                                "Database Error",
-                                JOptionPane.ERROR_MESSAGE);
-                    }
-                } else {
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
                     JOptionPane.showMessageDialog(FlightInfoFrame.this,
-                            "Please select a flight to continue.",
-                            "No Flight Selected",
-                            JOptionPane.WARNING_MESSAGE);
+                            "Error accessing database: " + ex.getMessage(),
+                            "Database Error",
+                            JOptionPane.ERROR_MESSAGE);
                 }
+            } else {
+                JOptionPane.showMessageDialog(FlightInfoFrame.this,
+                        "Please select a flight to continue.",
+                        "No Flight Selected",
+                        JOptionPane.WARNING_MESSAGE);
             }
         });
 

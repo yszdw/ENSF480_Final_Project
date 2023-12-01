@@ -7,7 +7,6 @@ import java.time.*;
 /**
  * Database Management System, handles any interaction between the program and
  * the database
- *
  * DBMS instance - The global instance for our database manager (See Singleton
  * Design Pattern)
  * Connection dbConnect - SQL connection object for initializing connection with
@@ -19,13 +18,12 @@ import java.time.*;
 public class DBMS {
 
     private static DBMS instance;
-    private Connection dbConnect;
+    private final Connection dbConnect;
     private ResultSet results;
 
     /**
      * DBMS Constructor
-     *
-     * Called only when an instance does not yet exist, creates cnnection to local
+     * Called only when an instance does not yet exist, creates connection to local
      * database
      *
      */
@@ -36,7 +34,6 @@ public class DBMS {
 
     /**
      * DBMS Constructor
-     *
      * Ensures only one instance of database manager exists at once, returns DBMS
      * object
      *
@@ -51,14 +48,12 @@ public class DBMS {
 
     /**
      * closeConnection
-     *
      * Closes database connection, use at end of program
      *
      */
     public void closeConnection() throws SQLException {
         dbConnect.close();
         results.close();
-
     }
 
     /**
@@ -113,13 +108,12 @@ public class DBMS {
 
     /**
      * Retrieves the username associated with the given email from the database.
-     * 
-     * @param email the email of the user
+     *
      * @return the username associated with the email, or null if not found
      * @throws SQLException if a database access error occurs
      */
     public ArrayList<Aircraft> getAircrafts() throws SQLException {
-        ArrayList<Aircraft> aircrafts = new ArrayList<Aircraft>();
+        ArrayList<Aircraft> aircrafts = new ArrayList<>();
         Statement myStmt = dbConnect.createStatement();
         results = myStmt.executeQuery("SELECT * FROM Aircrafts");
 
@@ -188,12 +182,13 @@ public class DBMS {
      * Retrieves the aircraft ID associated with the given flight ID from the
      * database.
      * 
-     * @param flightID the ID of the flight
+     * @param origin the origin for which to retrieve flights
+     * @param destination the destination for which to retrieve flights
      * @return the aircraft ID associated with the flight ID, or -1 if not found
      * @throws SQLException if a database access error occurs
      */
     public ArrayList<Flight> getFlights(String origin, String destination) throws SQLException {
-        ArrayList<Flight> flights = new ArrayList<Flight>();
+        ArrayList<Flight> flights = new ArrayList<>();
         ArrayList<Aircraft> aircrafts = getAircrafts();
         String query = "SELECT * FROM Flights WHERE Origin = ? AND Destination = ?";
         PreparedStatement pstmt = dbConnect.prepareStatement(query);
@@ -211,6 +206,7 @@ public class DBMS {
                     break;
                 }
             }
+            assert aircraft != null;
             Flight flight = new Flight(aircraft, results.getInt("FlightID"), results.getString("Origin"),
                     results.getString("Destination"), departureDateTime.toLocalDate(),
                     departureDateTime.toLocalTime(), arrivalDateTime.toLocalDate(), arrivalDateTime.toLocalTime());
@@ -265,7 +261,7 @@ public class DBMS {
      * @throws SQLException if there is an error executing the SQL query
      */
     public ArrayList<Flight> getFlights(LocalDate selectedDate) throws SQLException {
-        ArrayList<Flight> flights = new ArrayList<Flight>();
+        ArrayList<Flight> flights = new ArrayList<>();
         ArrayList<Aircraft> aircrafts = getAircrafts();
         Statement myStmt = dbConnect.createStatement();
         results = myStmt.executeQuery("SELECT * FROM Flights");
@@ -280,13 +276,14 @@ public class DBMS {
                 }
             }
 
+            assert aircraft != null;
             Flight flight = new Flight(aircraft, results.getInt("FlightID"), results.getString("Origin"),
                     results.getString("Destination"), departureDateTime.toLocalDate(),
 
                     departureDateTime.toLocalTime(), arrivalDateTime.toLocalDate(), arrivalDateTime.toLocalTime());
             flights.add(flight);
         }
-        ArrayList<Flight> flightsOnDate = new ArrayList<Flight>();
+        ArrayList<Flight> flightsOnDate = new ArrayList<>();
         for (Flight f : flights) {
             if (f.getDepartureDate().equals(selectedDate)) {
                 flightsOnDate.add(f);
@@ -302,7 +299,7 @@ public class DBMS {
      * @throws SQLException if there is an error executing the SQL query.
      */
     public ArrayList<Flight> getFlights() throws SQLException {
-        ArrayList<Flight> flights = new ArrayList<Flight>();
+        ArrayList<Flight> flights = new ArrayList<>();
         ArrayList<Aircraft> aircrafts = getAircrafts();
         Statement myStmt = dbConnect.createStatement();
         results = myStmt.executeQuery("SELECT * FROM Flights");
@@ -317,6 +314,7 @@ public class DBMS {
                 }
             }
 
+            assert aircraft != null;
             Flight flight = new Flight(aircraft, results.getInt("FlightID"), results.getString("Origin"),
                     results.getString("Destination"), departureDateTime.toLocalDate(),
 
@@ -416,6 +414,7 @@ public class DBMS {
                     break;
                 }
             }
+            assert aircraft != null;
             returnFlight = new Flight(aircraft, results.getInt("FlightID"), results.getString("Origin"),
                     results.getString("Destination"), departureDateTime.toLocalDate(),
                     departureDateTime.toLocalTime(), arrivalDateTime.toLocalDate(), arrivalDateTime.toLocalTime());
@@ -475,7 +474,7 @@ public class DBMS {
      * @throws SQLException if there is an error executing the SQL query.
      */
     public ArrayList<User> getUsers() throws SQLException {
-        ArrayList<User> users = new ArrayList<User>();
+        ArrayList<User> users = new ArrayList<>();
         Statement myStmt = dbConnect.createStatement();
         results = myStmt.executeQuery("SELECT * FROM Users");
         while (results.next()) {
@@ -489,29 +488,26 @@ public class DBMS {
             int creditCardCVV = results.getInt("CreditCardCVV");
             int companionTickets = results.getInt("CompanionTickets");
             switch (userType) {
-                case "admin":
+                case "admin" -> {
                     Admin admin = new Admin(userID, username, email, address);
                     users.add(admin);
-                    break;
-                case "crew":
+                }
+                case "crew" -> {
                     String crewMemberPos = results.getString("CrewMemberPos");
                     CrewMember crewMember = new CrewMember(userID, username, email, address, crewMemberPos);
                     users.add(crewMember);
-                    break;
-                case "passenger":
+                }
+                case "passenger" -> {
                     CreditCard card = new CreditCard(creditCardNumber, username, creditCardExpiry, creditCardCVV);
                     RegisteredUser passenger = new RegisteredUser(userID, username, email, address, card,
                             companionTickets);
                     users.add(passenger);
-                    break;
-                case "agent":
+                }
+                case "agent" -> {
                     Agent agent = new Agent(userID, username, email, address);
                     users.add(agent);
-                    break;
-
-                default:
-                    System.out.println("Invalid user type");
-                    break;
+                }
+                default -> System.out.println("Invalid user type");
             }
         }
         results.close();
@@ -527,7 +523,7 @@ public class DBMS {
      * @throws SQLException if there is an error executing the SQL query.
      */
     public ArrayList<RegisteredUser> getRegisteredUsers() throws SQLException {
-        ArrayList<RegisteredUser> users = new ArrayList<RegisteredUser>();
+        ArrayList<RegisteredUser> users = new ArrayList<>();
         Statement myStmt = dbConnect.createStatement();
         results = myStmt.executeQuery("SELECT * FROM Users WHERE UserType = 'passenger'");
         while (results.next()) {
@@ -553,9 +549,8 @@ public class DBMS {
      * Adds a user to the database.
      * 
      * @param user the User object representing the user to be added
-     * @throws SQLException if there is an error executing the SQL query
      */
-    public void addUser(User user) throws SQLException {
+    public void addUser(User user) {
         // SQL query for insertion using a prepared statement
         String insertQuery = "INSERT INTO Users (Name, Address, Email, UserType, CreditCardNumber, CreditCardExpiry," +
                 "CreditCardCVV, CompanionTickets) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -619,25 +614,18 @@ public class DBMS {
                     int creditCardCVV = results.getInt("CreditCardCVV");
                     int companionTickets = results.getInt("CompanionTickets");
                     switch (userType) {
-                        case "admin":
-                            user = new Admin(userID, username, email, address);
-                            break;
-                        case "crew":
+                        case "admin" -> user = new Admin(userID, username, email, address);
+                        case "crew" -> {
                             String crewMemberPos = results.getString("CrewMemberPos");
                             user = new CrewMember(userID, username, email, address, crewMemberPos);
-                            break;
-                        case "passenger":
+                        }
+                        case "passenger" -> {
                             CreditCard card = new CreditCard(creditCardNumber, username, creditCardExpiry,
                                     creditCardCVV);
                             user = new RegisteredUser(userID, username, email, address, card, companionTickets);
-                            break;
-                        case "agent":
-                            user = new Agent(userID, username, email, address);
-                            break;
-
-                        default:
-                            System.out.println("Invalid user type");
-                            break;
+                        }
+                        case "agent" -> user = new Agent(userID, username, email, address);
+                        default -> System.out.println("Invalid user type");
                     }
                 }
             }
@@ -781,10 +769,11 @@ public class DBMS {
      */
     public String getCurrentPromotion() throws SQLException {
         Statement myStatement = dbConnect.createStatement();
-        results = myStatement.executeQuery("SELECT *\n" +
-                "FROM `promotions`\n" +
-                "ORDER BY `ValidOn` asc\n" +
-                "LIMIT 1;");
+        results = myStatement.executeQuery("""
+                SELECT *
+                FROM `promotions`
+                ORDER BY `ValidOn` asc
+                LIMIT 1;""");
 
         String promo = "NaN";
 
@@ -804,7 +793,7 @@ public class DBMS {
      * @throws SQLException if there is an error executing the SQL query
      */
     public ArrayList<Order> getOrders(int flightID) throws SQLException {
-        ArrayList<Order> orders = new ArrayList<Order>();
+        ArrayList<Order> orders = new ArrayList<>();
         Statement myStmt = dbConnect.createStatement();
         results = myStmt.executeQuery("SELECT * FROM Orders WHERE FlightID = " + flightID);
         while (results.next()) {
@@ -857,11 +846,10 @@ public class DBMS {
             String seatNumber = results.getString("SeatNumber");
             boolean insurance = results.getBoolean("Insurance");
             double totalPrice = results.getDouble("TotalPrice");
-            Order order = new Order(orderID, email, username, flightID2, aircraftModel, departureLocation,
+
+            return new Order(orderID, email, username, flightID2, aircraftModel, departureLocation,
                     arrivalLocation,
                     departureTime, arrivalTime, seatClass, seatNumber, insurance, totalPrice);
-
-            return order;
         }
         return null;
     }
@@ -874,7 +862,7 @@ public class DBMS {
      * @throws SQLException if there is an error executing the SQL query
      */
     public ArrayList<Order> getOrders(String email) throws SQLException {
-        ArrayList<Order> orders = new ArrayList<Order>();
+        ArrayList<Order> orders = new ArrayList<>();
         System.out.println("SELECT * FROM Orders WHERE Email = " + email);
         String query = "SELECT * FROM Orders WHERE Email = ?";
         PreparedStatement pstmt = dbConnect.prepareStatement(query);
@@ -920,30 +908,6 @@ public class DBMS {
     }
 
     /**
-     * Cancels a flight for a given flight ID and username.
-     * 
-     * @param flightID the ID of the flight to be cancelled
-     * @param username the username of the user cancelling the flight
-     * @return 0 if the cancellation is successful, 1 if not
-     */
-    public int cancelFlight(int flightID, String username) {
-        // returns 0 if successful, 1 if not
-        try {
-            String updateQuery = "DELETE FROM orders WHERE orderID = ? AND Username = ?";
-            try (PreparedStatement preparedStatement = dbConnect.prepareStatement(updateQuery)) {
-                preparedStatement.setInt(1, flightID);
-                preparedStatement.setString(2, username);
-                preparedStatement.executeUpdate();
-                return 0;
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace(); // Handle the exception according to your needs
-            return 1;
-        }
-    }
-
-    /**
      * Checks if the provided username and password match a user in the database.
      * 
      * @param username the username to check
@@ -965,7 +929,7 @@ public class DBMS {
 
             return resultSet.next(); // User found with matching username and password
         } finally {
-            // Close resources in a finally block
+            // Close resources in a final block
             if (resultSet != null) {
                 resultSet.close();
             }
@@ -1001,7 +965,7 @@ public class DBMS {
                 return true;
             }
         } finally {
-            // Close resources in a finally block
+            // Close resources in a final block
             if (preparedStatement != null) {
                 preparedStatement.close();
             }
@@ -1023,13 +987,13 @@ public class DBMS {
      * @param seatClass         the class of the seat for the order
      * @param seatNumber        the seat number for the order
      * @param hasInsurance      indicates whether the order has insurance or not
-     * @param totalprice        the total price of the order
+     * @param totalPrice        the total price of the order
      * @return the ID of the inserted order if successful, -1 otherwise
      * @throws SQLException if there is an error executing the SQL statements
      */
     public int addOrder(String email, String username, int flightID, String aircraftModel, String departureLocation,
             String arrivalLocation, Timestamp departureTime, Timestamp arrivalTime, String seatClass,
-            String seatNumber, boolean hasInsurance, double totalprice) throws SQLException {
+            String seatNumber, boolean hasInsurance, double totalPrice) throws SQLException {
 
         // SQL query to insert a new order.
         String sql = "INSERT INTO orders (Email, Username, FlightID, AircraftModel, DepartureLocation, ArrivalLocation, "
@@ -1051,7 +1015,7 @@ public class DBMS {
             statement.setString(9, seatClass);
             statement.setString(10, seatNumber);
             statement.setBoolean(11, hasInsurance);
-            statement.setDouble(12, totalprice);
+            statement.setDouble(12, totalPrice);
 
             // Execute the insert SQL statement.
             int rowsInserted = statement.executeUpdate();
@@ -1075,7 +1039,7 @@ public class DBMS {
             statement2.setString(9, seatClass);
             statement2.setString(10, seatNumber);
             statement2.setBoolean(11, hasInsurance);
-            statement2.setDouble(12, totalprice);
+            statement2.setDouble(12, totalPrice);
             ResultSet result = statement2.executeQuery();
             if (result.next()) {
                 return result.getInt("OrderID");

@@ -1,6 +1,6 @@
 package src;
 public class CreditCard {
-    String CARDNUMBER;
+    final String CARDNUMBER;
     final String CARDHOLDERNAME;
     final int EXPIRY;
     final int CVV;
@@ -15,10 +15,6 @@ public class CreditCard {
     /* Getters and Setters */
     public String getCardNumber() {
         return CARDNUMBER;
-    }
-
-    public String getCardHolderName() {
-        return CARDHOLDERNAME;
     }
 
     public int getExpiryDate() {

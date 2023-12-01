@@ -24,10 +24,6 @@ public class CrewMember extends User {
         this.crewMemberPos = "";
     }
 
-    public String getCrewMemberPos() {
-        return crewMemberPos;
-    }
-
     public int getCrewID() {
         return crewMemberID;
     }
