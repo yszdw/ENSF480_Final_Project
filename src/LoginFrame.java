@@ -5,8 +5,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -81,13 +79,10 @@ public class LoginFrame extends JFrame {
         backButton.setBorderPainted(false);
         buttonPanel.add(backButton);
 
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                loginFrame.dispose();
-                LoginFrame loginFrame = new LoginFrame();
-                loginFrame.setVisible(true);
-            }
+        backButton.addActionListener(e -> {
+            loginFrame.dispose();
+            LoginFrame loginFrame1 = new LoginFrame();
+            loginFrame1.setVisible(true);
         });
 
         // Login Button
@@ -100,53 +95,50 @@ public class LoginFrame extends JFrame {
         buttonPanel.add(loginButton);
 
         // Action listener for the login button
-        loginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Implement your login logic here
-                String username = userTextField.getText();
-                String password = new String(passField.getPassword());
-                if (authenticate(username, password)) {
-                    try {
-                        DBMS dbms = DBMS.getDBMS();
-                        String userType = dbms.getUserType(username);
-                        // Login successful
-                        if (userType.equals("passenger") || userType.equals("tourism_agent")) {
-                            SwingUtilities.invokeLater(() -> {
-                                loginFrame.dispose(); // Close the login window
-                                WelcomeFrame welcomeFrame = new WelcomeFrame(username); // Pass the username to
-                                                                                        // WelcomeFrame
-                                welcomeFrame.setVisible(true); // Show the welcome window
-                            });
-                        } else if (userType.equals("airline_agent")) {
-                            SwingUtilities.invokeLater(() -> {
-                                loginFrame.dispose(); // Close the login window
-                                AirlineFrame airlineFrame = new AirlineFrame(username); // Pass the username to
-                                airlineFrame.setVisible(true); // AirlineFrame
+        loginButton.addActionListener(e -> {
+            // Implement your login logic here
+            String username = userTextField.getText();
+            String password = new String(passField.getPassword());
+            if (authenticate(username, password)) {
+                try {
+                    DBMS dbms = DBMS.getDBMS();
+                    String userType = dbms.getUserType(username);
+                    // Login successful
+                    if (userType.equals("passenger") || userType.equals("tourism_agent")) {
+                        SwingUtilities.invokeLater(() -> {
+                            loginFrame.dispose(); // Close the login window
+                            WelcomeFrame welcomeFrame = new WelcomeFrame(username); // Pass the username to
+                            // WelcomeFrame
+                            welcomeFrame.setVisible(true); // Show the welcome window
+                        });
+                    } else if (userType.equals("airline_agent")) {
+                        SwingUtilities.invokeLater(() -> {
+                            loginFrame.dispose(); // Close the login window
+                            AirlineFrame airlineFrame = new AirlineFrame(username); // Pass the username to
+                            airlineFrame.setVisible(true); // AirlineFrame
 
-                            });
-                        } else if (userType.equals("flight_attendant")) {
-                            SwingUtilities.invokeLater(() -> {
-                                loginFrame.dispose(); // Close the login window
-                                PassListFrame passListFrame = new PassListFrame(); // Pass the username to
-                                passListFrame.setVisible(true); // PassListFrame
-                            });
-                        } else if (userType.equals("admin")) {
-                            JOptionPane.showMessageDialog(loginFrame, "Please select Admin Login if you are an admin",
-                                    "Login Failed",
-                                    JOptionPane.ERROR_MESSAGE);
-                        }
-
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
-                        JOptionPane.showMessageDialog(null, "Error fetching flight data: " + ex.getMessage(),
-                                "Database Error", JOptionPane.ERROR_MESSAGE);
+                        });
+                    } else if (userType.equals("flight_attendant")) {
+                        SwingUtilities.invokeLater(() -> {
+                            loginFrame.dispose(); // Close the login window
+                            PassListFrame passListFrame = new PassListFrame(); // Pass the username to
+                            passListFrame.setVisible(true); // PassListFrame
+                        });
+                    } else if (userType.equals("admin")) {
+                        JOptionPane.showMessageDialog(loginFrame, "Please select Admin Login if you are an admin",
+                                "Login Failed",
+                                JOptionPane.ERROR_MESSAGE);
                     }
-                } else {
-                    // Login failed
-                    JOptionPane.showMessageDialog(loginFrame, "Invalid username or password", "Login Failed",
-                            JOptionPane.ERROR_MESSAGE);
+
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Error fetching flight data: " + ex.getMessage(),
+                            "Database Error", JOptionPane.ERROR_MESSAGE);
                 }
+            } else {
+                // Login failed
+                JOptionPane.showMessageDialog(loginFrame, "Invalid username or password", "Login Failed",
+                        JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -231,13 +223,10 @@ public class LoginFrame extends JFrame {
         backButton.setBorderPainted(false);
         buttonPanel.add(backButton);
 
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                loginFrame.dispose();
-                LoginFrame loginFrame = new LoginFrame();
-                loginFrame.setVisible(true);
-            }
+        backButton.addActionListener(e -> {
+            loginFrame.dispose();
+            LoginFrame loginFrame1 = new LoginFrame();
+            loginFrame1.setVisible(true);
         });
 
         // Login Button
@@ -250,26 +239,23 @@ public class LoginFrame extends JFrame {
         buttonPanel.add(loginButton);
 
         // Action listener for the login button
-        loginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Implement your login logic here
-                String username = userTextField.getText();
-                String password = new String(passField.getPassword());
+        loginButton.addActionListener(e -> {
+            // Implement your login logic here
+            String username = userTextField.getText();
+            String password = new String(passField.getPassword());
 
-                if (authenticate(username, password) && username.equals("admin")) {
-                    // Login successful
-                    SwingUtilities.invokeLater(() -> {
-                        loginFrame.dispose(); // Close the login window
-                        AdminFrame adminFrame = new AdminFrame(); // Create the Admin window
-                        adminFrame.setVisible(true); // Show the Admin window
-                    });
-                } else {
-                    // Login failed
-                    JOptionPane.showMessageDialog(null, "You do not have admin privileges.",
-                            "Access Denied",
-                            JOptionPane.ERROR_MESSAGE);
-                }
+            if (authenticate(username, password) && username.equals("admin")) {
+                // Login successful
+                SwingUtilities.invokeLater(() -> {
+                    loginFrame.dispose(); // Close the login window
+                    AdminFrame adminFrame = new AdminFrame(); // Create the Admin window
+                    adminFrame.setVisible(true); // Show the Admin window
+                });
+            } else {
+                // Login failed
+                JOptionPane.showMessageDialog(null, "You do not have admin privileges.",
+                        "Access Denied",
+                        JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -281,13 +267,11 @@ public class LoginFrame extends JFrame {
     }
 
     public class AddCreditCardFrame extends JFrame {
-        private String username;
-        private JTextField cardNumberField;
-        private JTextField expirationDateField;
-        private JTextField cvvField;
+        private final JTextField cardNumberField;
+        private final JTextField expirationDateField;
+        private final JTextField cvvField;
 
         public AddCreditCardFrame(String username) {
-            this.username = username;
             setTitle("Add Credit Card");
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             setLayout(new BorderLayout());
@@ -361,29 +345,26 @@ public class LoginFrame extends JFrame {
 
             // Add action listener to confirm button
             // Here you can add the logic to handle credit card information submission
-            confirmButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    String cardNumber = cardNumberField.getText();
-                    String expirationDate = expirationDateField.getText();
-                    String cvv = cvvField.getText();
+            confirmButton.addActionListener(e -> {
+                String cardNumber = cardNumberField.getText();
+                String expirationDate = expirationDateField.getText();
+                String cvv = cvvField.getText();
 
-                    // Validate input fields (card number, expiration date, cvv)
+                // Validate input fields (card number, expiration date, cvv)
 
-                    // Update the database with the new credit card information
-                    try {
-                        DBMS dbms = DBMS.getDBMS();
-                        dbms.updateCreditCardInfo(username, cardNumber, expirationDate, cvv);
-                        JOptionPane.showMessageDialog(AddCreditCardFrame.this, "Credit card updated successfully.");
+                // Update the database with the new credit card information
+                try {
+                    DBMS dbms = DBMS.getDBMS();
+                    dbms.updateCreditCardInfo(username, cardNumber, expirationDate, cvv);
+                    JOptionPane.showMessageDialog(AddCreditCardFrame.this, "Credit card updated successfully.");
 
-                        // Close the frame after successful update
-                        AddCreditCardFrame.this.dispose();
+                    // Close the frame after successful update
+                    AddCreditCardFrame.this.dispose();
 
-                    } catch (SQLException ex) {
-                        JOptionPane.showMessageDialog(AddCreditCardFrame.this,
-                                "Failed to update credit card: " + ex.getMessage(), "Database Error",
-                                JOptionPane.ERROR_MESSAGE);
-                    }
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(AddCreditCardFrame.this,
+                            "Failed to update credit card: " + ex.getMessage(), "Database Error",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             });
 
@@ -395,16 +376,14 @@ public class LoginFrame extends JFrame {
     }
 
     public class WelcomeFrame extends JFrame {
-        private String username;
 
         public WelcomeFrame(String username) {
-            this.username = username;
             setTitle("Welcome");
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             setLayout(new BorderLayout());
             setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-            JLabel welcomeLabel = new JLabel("Welcome " + this.username + ", to our Flight Reservation System",
+            JLabel welcomeLabel = new JLabel("Welcome " + username + ", to our Flight Reservation System",
                     SwingConstants.CENTER);
             welcomeLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
             add(welcomeLabel, BorderLayout.NORTH);
@@ -419,11 +398,8 @@ public class LoginFrame extends JFrame {
             gbc.insets = new Insets(10, 0, 10, 0);
             buttonPanel.add(buyTicketsButton, gbc);
 
-            buyTicketsButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    createTicketPurchasePanel(username); // Pass the username to createTicketPurchasePanel
-                }
+            buyTicketsButton.addActionListener(e -> {
+                createTicketPurchasePanel(username); // Pass the username to createTicketPurchasePanel
             });
 
             JButton cancelFlightButton = createStyledButton("Cancel Flight");
@@ -441,13 +417,10 @@ public class LoginFrame extends JFrame {
                 // Back button to close the login window and show the welcome window
 
                 JButton backButton = createStyledButton("Login");
-                backButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        WelcomeFrame.this.dispose();
-                        LoginFrame loginFrame = new LoginFrame();
-                        loginFrame.setVisible(true);
-                    }
+                backButton.addActionListener(e -> {
+                    WelcomeFrame.this.dispose();
+                    LoginFrame loginFrame = new LoginFrame();
+                    loginFrame.setVisible(true);
                 });
             } else {
 
@@ -456,39 +429,33 @@ public class LoginFrame extends JFrame {
                 gbc.insets = new Insets(0, 0, 10, 0);
                 buttonPanel.add(addCreditCardButton, gbc);
 
-                addCreditCardButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
+                addCreditCardButton.addActionListener(e -> {
 
-                        // Create and show the login frame
-                        AddCreditCardFrame addCreditCardFrame = new AddCreditCardFrame(username);
-                        addCreditCardFrame.setVisible(true);
-                    }
+                    // Create and show the login frame
+                    AddCreditCardFrame addCreditCardFrame = new AddCreditCardFrame(username);
+                    addCreditCardFrame.setVisible(true);
                 });
 
                 JButton promoButton = createStyledButton("REGISTER FOR PROMOS");
                 gbc.insets = new Insets(0, 0, 10, 0);
                 buttonPanel.add(promoButton, gbc);
 
-                promoButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        // Hide the welcome frame
+                promoButton.addActionListener(e -> {
+                    // Hide the welcome frame
 
-                        try {
-                            User user = DBMS.getDBMS().getUser(username);
-                            Email_Controller email = new Email_Controller();
-                            email.registerForPromotion(user);
-                            JOptionPane.showMessageDialog(null, "You are now registered for monthly promotions! Every Month! Promotions!", "Confirmation!",
-                                    JOptionPane.INFORMATION_MESSAGE);
+                    try {
+                        User user = DBMS.getDBMS().getUser(username);
+                        Email_Controller email = new Email_Controller();
+                        email.registerForPromotion(user);
+                        JOptionPane.showMessageDialog(null, "You are now registered for monthly promotions! Every Month! Promotions!", "Confirmation!",
+                                JOptionPane.INFORMATION_MESSAGE);
 
-                        }catch(Exception error){
-                            JOptionPane.showMessageDialog(null, "Failed to register for promotions. Try again later.", "Error",
-                                    JOptionPane.INFORMATION_MESSAGE);
-                        }
-
-
+                    }catch(Exception error){
+                        JOptionPane.showMessageDialog(null, "Failed to register for promotions. Try again later.", "Error",
+                                JOptionPane.INFORMATION_MESSAGE);
                     }
+
+
                 });
 
 
@@ -497,47 +464,38 @@ public class LoginFrame extends JFrame {
                 gbc.insets = new Insets(0, 0, 10, 0);
                 buttonPanel.add(logoutButton, gbc);
 
-                logoutButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        // Hide the welcome frame
-                        WelcomeFrame.this.dispose(); // Optionally, you can dispose the WelcomeFrame
+                logoutButton.addActionListener(e -> {
+                    // Hide the welcome frame
+                    WelcomeFrame.this.dispose(); // Optionally, you can dispose the WelcomeFrame
 
-                        // Create and show the login frame
-                        LoginFrame loginFrame = new LoginFrame();
-                        loginFrame.setVisible(true);
-                    }
+                    // Create and show the login frame
+                    LoginFrame loginFrame = new LoginFrame();
+                    loginFrame.setVisible(true);
                 });
 
             }
-            cancelFlightButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        DBMS dbms = DBMS.getDBMS();
-                        if (username.equals("guest")) {
-                            cancelFlightPanel();
-                        } else {
-                            cancelFlightPanel(dbms.getEmail(username)); // Pass the username to cancelFlightPanel
-                        }
-                    } catch (SQLException ex) {
-                        throw new RuntimeException(ex);
+            cancelFlightButton.addActionListener(e -> {
+                try {
+                    DBMS dbms = DBMS.getDBMS();
+                    if (username.equals("guest")) {
+                        cancelFlightPanel();
+                    } else {
+                        cancelFlightPanel(dbms.getEmail(username)); // Pass the username to cancelFlightPanel
                     }
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
                 }
             });
 
             if (registerButton != null) {
-                registerButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        // Hide the welcome frame
-                        WelcomeFrame.this.setVisible(false);
-                        WelcomeFrame.this.dispose(); // Optionally, you can dispose the WelcomeFrame
+                registerButton.addActionListener(e -> {
+                    // Hide the welcome frame
+                    WelcomeFrame.this.setVisible(false);
+                    WelcomeFrame.this.dispose(); // Optionally, you can dispose the WelcomeFrame
 
-                        // Create and show the register frame
-                        RegisterFrame registerFrame = new RegisterFrame();
-                        registerFrame.setVisible(true);
-                    }
+                    // Create and show the register frame
+                    RegisterFrame registerFrame = new RegisterFrame();
+                    registerFrame.setVisible(true);
                 });
             }
 
@@ -622,31 +580,28 @@ public class LoginFrame extends JFrame {
                 buttonPanel.add(cancelButton);
                 browseFrame.add(buttonPanel, BorderLayout.SOUTH);
 
-                cancelButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        try {
-                            int selectedRow = table.getSelectedRow();
-                            if (selectedRow >= 0) {
-                                int orderID = (Integer) table.getValueAt(selectedRow, 0);
-                                // SEND EMAIL HERE
+                cancelButton.addActionListener(e -> {
+                    try {
+                        int selectedRow = table.getSelectedRow();
+                        if (selectedRow >= 0) {
+                            int orderID = (Integer) table.getValueAt(selectedRow, 0);
+                            // SEND EMAIL HERE
 
-                                String email = dbms.getEmail(orderID);
-                                Email_Controller.sendCancellationEmail(orderID, email);
+                            String email1 = dbms.getEmail(orderID);
+                            Email_Controller.sendCancellationEmail(orderID, email1);
 
-                                dbms.cancelOrder(orderID);
-                                JOptionPane.showMessageDialog(browseFrame, "Order cancelled successfully.",
-                                        "Order Cancelled", JOptionPane.INFORMATION_MESSAGE);
-                                model.removeRow(selectedRow); // Remove the canceled order from the table
-                            } else {
-                                JOptionPane.showMessageDialog(browseFrame, "Please select an order to cancel.",
-                                        "No Order Selected", JOptionPane.WARNING_MESSAGE);
-                            }
-                        } catch (SQLException ex) {
-                            ex.printStackTrace();
-                            JOptionPane.showMessageDialog(browseFrame, "Error cancelling order: " + ex.getMessage(),
-                                    "Database Error", JOptionPane.ERROR_MESSAGE);
+                            dbms.cancelOrder(orderID);
+                            JOptionPane.showMessageDialog(browseFrame, "Order cancelled successfully.",
+                                    "Order Cancelled", JOptionPane.INFORMATION_MESSAGE);
+                            model.removeRow(selectedRow); // Remove the canceled order from the table
+                        } else {
+                            JOptionPane.showMessageDialog(browseFrame, "Please select an order to cancel.",
+                                    "No Order Selected", JOptionPane.WARNING_MESSAGE);
                         }
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(browseFrame, "Error cancelling order: " + ex.getMessage(),
+                                "Database Error", JOptionPane.ERROR_MESSAGE);
                     }
                 });
             }
@@ -699,18 +654,15 @@ public class LoginFrame extends JFrame {
 
         // add action listener to confirm button
 
-        confirmButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String email = emailField.getText();
-                if (email.equals("")) {
-                    JOptionPane.showMessageDialog(browseFrame, "Please enter an email.",
-                            "No Email Entered", JOptionPane.WARNING_MESSAGE);
-                } else {
-                    // Hide the browse frame
-                    browseFrame.dispose();
-                    cancelFlightPanel(email);
-                }
+        confirmButton.addActionListener(e -> {
+            String email = emailField.getText();
+            if (email.equals("")) {
+                JOptionPane.showMessageDialog(browseFrame, "Please enter an email.",
+                        "No Email Entered", JOptionPane.WARNING_MESSAGE);
+            } else {
+                // Hide the browse frame
+                browseFrame.dispose();
+                cancelFlightPanel(email);
             }
         });
     }
@@ -737,44 +689,32 @@ public class LoginFrame extends JFrame {
         JButton userRegisterButton = createStyledButton("Register User");
 
         // Add action listeners to your buttons
-        userRegisterButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Hide the login frame
-                LoginFrame.this.dispose(); // Optionally, you can dispose the LoginFrame
+        userRegisterButton.addActionListener(e -> {
+            // Hide the login frame
+            LoginFrame.this.dispose(); // Optionally, you can dispose the LoginFrame
 
-                // Create and show the register frame
-                RegisterFrame registerFrame = new RegisterFrame();
-                registerFrame.setVisible(true);
-            }
+            // Create and show the register frame
+            RegisterFrame registerFrame = new RegisterFrame();
+            registerFrame.setVisible(true);
         });
 
-        userLoginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                createUserLoginPanel(); // Call the method to create the login panel
-                LoginFrame.this.dispose(); // Optionally, you can dispose the LoginFrame
-            }
+        userLoginButton.addActionListener(e -> {
+            createUserLoginPanel(); // Call the method to create the login panel
+            LoginFrame.this.dispose(); // Optionally, you can dispose the LoginFrame
         });
 
-        adminLoginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                createAdminLoginPanel(); // Call the method to create the login panel
-                LoginFrame.this.dispose(); // Optionally, you can dispose the LoginFrame
-            }
+        adminLoginButton.addActionListener(e -> {
+            createAdminLoginPanel(); // Call the method to create the login panel
+            LoginFrame.this.dispose(); // Optionally, you can dispose the LoginFrame
         });
 
-        guestLoginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Hide the login frame
-                LoginFrame.this.dispose(); // Optionally, you can dispose the LoginFrame
+        guestLoginButton.addActionListener(e -> {
+            // Hide the login frame
+            LoginFrame.this.dispose(); // Optionally, you can dispose the LoginFrame
 
-                // Create and show the welcome frame
-                WelcomeFrame welcomeFrame = new WelcomeFrame("guest");
-                welcomeFrame.setVisible(true);
-            }
+            // Create and show the welcome frame
+            WelcomeFrame welcomeFrame = new WelcomeFrame("guest");
+            welcomeFrame.setVisible(true);
         });
 
         gbc.gridy = 0;
@@ -833,27 +773,24 @@ public class LoginFrame extends JFrame {
         ticketFrame.add(toComboBox);
 
         JButton confirmButton = new JButton("Confirm");
-        confirmButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    // hide the ticket frame
-                    ticketFrame.dispose();
+        confirmButton.addActionListener(e -> {
+            try {
+                // hide the ticket frame
+                ticketFrame.dispose();
 
-                    String origin = (String) fromComboBox.getSelectedItem();
-                    String destination = (String) toComboBox.getSelectedItem();
+                String origin = (String) fromComboBox.getSelectedItem();
+                String destination = (String) toComboBox.getSelectedItem();
 
-                    DBMS dbms = DBMS.getDBMS(); // This will not create a new instance but will return the existing
-                                                // one.
-                    ArrayList<Flight> flights = dbms.getFlights(origin, destination);
+                DBMS dbms = DBMS.getDBMS(); // This will not create a new instance but will return the existing
+                                            // one.
+                ArrayList<Flight> flights = dbms.getFlights(origin, destination);
 
-                    FlightInfoFrame flightInfoFrame = new FlightInfoFrame(flights, username); // Pass the username here
-                    flightInfoFrame.setVisible(true);
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(ticketFrame, "Error fetching flight data: " + ex.getMessage(),
-                            "Database Error", JOptionPane.ERROR_MESSAGE);
-                }
+                FlightInfoFrame flightInfoFrame = new FlightInfoFrame(flights, username); // Pass the username here
+                flightInfoFrame.setVisible(true);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(ticketFrame, "Error fetching flight data: " + ex.getMessage(),
+                        "Database Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 

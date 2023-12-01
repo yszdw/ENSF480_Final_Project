@@ -468,53 +468,6 @@ public class DBMS {
     }
 
     /**
-     * Retrieves a list of users from the database.
-     * 
-     * @return An ArrayList of User objects representing the users in the database.
-     * @throws SQLException if there is an error executing the SQL query.
-     */
-    public ArrayList<User> getUsers() throws SQLException {
-        ArrayList<User> users = new ArrayList<>();
-        Statement myStmt = dbConnect.createStatement();
-        results = myStmt.executeQuery("SELECT * FROM Users");
-        while (results.next()) {
-            int userID = results.getInt("UserID");
-            String username = results.getString("Name");
-            String address = results.getString("Address");
-            String email = results.getString("Email");
-            String userType = results.getString("UserType");
-            String creditCardNumber = results.getString("CreditCardInfo");
-            int creditCardExpiry = results.getInt("CreditCardExpiry");
-            int creditCardCVV = results.getInt("CreditCardCVV");
-            int companionTickets = results.getInt("CompanionTickets");
-            switch (userType) {
-                case "admin" -> {
-                    Admin admin = new Admin(userID, username, email, address);
-                    users.add(admin);
-                }
-                case "crew" -> {
-                    String crewMemberPos = results.getString("CrewMemberPos");
-                    CrewMember crewMember = new CrewMember(userID, username, email, address, crewMemberPos);
-                    users.add(crewMember);
-                }
-                case "passenger" -> {
-                    CreditCard card = new CreditCard(creditCardNumber, username, creditCardExpiry, creditCardCVV);
-                    RegisteredUser passenger = new RegisteredUser(userID, username, email, address, card,
-                            companionTickets);
-                    users.add(passenger);
-                }
-                case "agent" -> {
-                    Agent agent = new Agent(userID, username, email, address);
-                    users.add(agent);
-                }
-                default -> System.out.println("Invalid user type");
-            }
-        }
-        results.close();
-        return users;
-    }
-
-    /**
      * Retrieves a list of registered users from the database.
      * Only users with the UserType 'passenger' are included in the list.
      * 
@@ -595,6 +548,9 @@ public class DBMS {
 
     /**
      * Represents a user in the system.
+     * @param username the username of the user
+     * @return the User object representing the user
+     * @throws SQLException if there is an error executing the SQL query
      */
     public User getUser(String username) throws SQLException {
         User user = null;
@@ -614,18 +570,25 @@ public class DBMS {
                     int creditCardCVV = results.getInt("CreditCardCVV");
                     int companionTickets = results.getInt("CompanionTickets");
                     switch (userType) {
-                        case "admin" -> user = new Admin(userID, username, email, address);
-                        case "crew" -> {
+                        case "admin":
+                            user = new Admin(userID, username, email, address);
+                            break;
+                        case "crew":
                             String crewMemberPos = results.getString("CrewMemberPos");
                             user = new CrewMember(userID, username, email, address, crewMemberPos);
-                        }
-                        case "passenger" -> {
+                            break;
+                        case "passenger":
                             CreditCard card = new CreditCard(creditCardNumber, username, creditCardExpiry,
                                     creditCardCVV);
                             user = new RegisteredUser(userID, username, email, address, card, companionTickets);
-                        }
-                        case "agent" -> user = new Agent(userID, username, email, address);
-                        default -> System.out.println("Invalid user type");
+                            break;
+                        case "agent":
+                            user = new Agent(userID, username, email, address);
+                            break;
+
+                        default:
+                            System.out.println("Invalid user type");
+                            break;
                     }
                 }
             }
@@ -769,11 +732,10 @@ public class DBMS {
      */
     public String getCurrentPromotion() throws SQLException {
         Statement myStatement = dbConnect.createStatement();
-        results = myStatement.executeQuery("""
-                SELECT *
-                FROM `promotions`
-                ORDER BY `ValidOn` asc
-                LIMIT 1;""");
+        results = myStatement.executeQuery("SELECT *\n" +
+                "FROM `promotions`\n" +
+                "ORDER BY `ValidOn` asc\n" +
+                "LIMIT 1;");
 
         String promo = "NaN";
 
