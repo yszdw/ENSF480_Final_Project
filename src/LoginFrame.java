@@ -450,6 +450,48 @@ public class LoginFrame extends JFrame {
                     }
                 });
             } else {
+
+                // also add "Add Credit Card" button
+                JButton addCreditCardButton = createStyledButton("Add Credit Card");
+                gbc.insets = new Insets(0, 0, 10, 0);
+                buttonPanel.add(addCreditCardButton, gbc);
+
+                addCreditCardButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+
+                        // Create and show the login frame
+                        AddCreditCardFrame addCreditCardFrame = new AddCreditCardFrame(username);
+                        addCreditCardFrame.setVisible(true);
+                    }
+                });
+
+                JButton promoButton = createStyledButton("REGISTER FOR PROMOS");
+                gbc.insets = new Insets(0, 0, 10, 0);
+                buttonPanel.add(promoButton, gbc);
+
+                promoButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        // Hide the welcome frame
+
+                        try {
+                            User user = DBMS.getDBMS().getUser(username);
+                            Email_Controller email = new Email_Controller();
+                            email.registerForPromotion(user);
+                            JOptionPane.showMessageDialog(null, "You are now registered for monthly promotions! Every Month! Promotions!", "Confirmation!",
+                                    JOptionPane.INFORMATION_MESSAGE);
+
+                        }catch(Exception error){
+                            JOptionPane.showMessageDialog(null, "Failed to register for promotions. Try again later.", "Error",
+                                    JOptionPane.INFORMATION_MESSAGE);
+                        }
+
+
+                    }
+                });
+
+
                 // // User is logged in so add logout button
                 JButton logoutButton = createStyledButton("Logout");
                 gbc.insets = new Insets(0, 0, 10, 0);
@@ -467,20 +509,6 @@ public class LoginFrame extends JFrame {
                     }
                 });
 
-                // also add "Add Credit Card" button
-                JButton addCreditCardButton = createStyledButton("Add Credit Card");
-                gbc.insets = new Insets(0, 0, 10, 0);
-                buttonPanel.add(addCreditCardButton, gbc);
-
-                addCreditCardButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-
-                        // Create and show the login frame
-                        AddCreditCardFrame addCreditCardFrame = new AddCreditCardFrame(username);
-                        addCreditCardFrame.setVisible(true);
-                    }
-                });
             }
             cancelFlightButton.addActionListener(new ActionListener() {
                 @Override
