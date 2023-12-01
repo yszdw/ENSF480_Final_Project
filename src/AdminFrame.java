@@ -3,8 +3,6 @@ package src;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.*;
 import java.time.*;
 import java.util.ArrayList;
@@ -12,14 +10,9 @@ import java.util.ArrayList;
 public class AdminFrame extends JFrame {
 
     private static final Font MAIN_FONT = new Font("Segoe UI", Font.BOLD, 18);
-    private static final Font BUTTON_FONT = new Font("Segoe UI", Font.PLAIN, 14);
-    private static final Font GROUP_FONT = new Font("Segoe UI", Font.PLAIN, 16);
     private static final Color BUTTON_COLOR = new Color(100, 149, 237); // Cornflower Blue
     private static final Color BUTTON_TEXT_COLOR = Color.WHITE;
-
-    private static final Font INPUT_FONT = new Font("Segoe UI", Font.PLAIN, 14);
     private static final Color BACKGROUND_COLOR = new Color(245, 245, 245); // Light Gray
-    private static final Color INPUT_COLOR = new Color(255, 255, 255); // White
 
     public AdminFrame() {
         setTitle("Admin Page");
@@ -41,44 +34,31 @@ public class AdminFrame extends JFrame {
         gbc.insets = new Insets(10, 0, 10, 0);
         buttonPanel.add(browseFlightButton, gbc);
 
-        browseFlightButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                browseFlightPanel();
-            }
-        });
+        browseFlightButton.addActionListener(e -> browseFlightPanel());
 
         JButton crewListButton = createStyledButton("Browse Crew List for a Flight");
         gbc.insets = new Insets(10, 0, 10, 0);
         buttonPanel.add(crewListButton, gbc);
 
-        crewListButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                crewListPanel();
-            }
-        });
+        crewListButton.addActionListener(e -> crewListPanel());
 
         JButton aircraftListButton = createStyledButton("List All Aircrafts");
         gbc.insets = new Insets(10, 0, 10, 0);
         buttonPanel.add(aircraftListButton, gbc);
 
-        aircraftListButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
+        aircraftListButton.addActionListener(e -> {
+            try {
 
-                    DBMS dbms = DBMS.getDBMS(); // This will not create a new instance but will return the existing
-                                                // one.
-                    ArrayList<Aircraft> aircrafts = dbms.getAircrafts();
-                    String title = "List of All Aircrafts";
-                    AircraftInfoFrame AircraftInfo = new AircraftInfoFrame(title, aircrafts);
-                    AircraftInfo.setVisible(true);
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Error fetching flight data: " + ex.getMessage(),
-                            "Database Error", JOptionPane.ERROR_MESSAGE);
-                }
+                DBMS dbms = DBMS.getDBMS(); // This will not create a new instance but will return the existing
+                                            // one.
+                ArrayList<Aircraft> aircrafts = dbms.getAircrafts();
+                String title = "List of All Aircrafts";
+                AircraftInfoFrame AircraftInfo = new AircraftInfoFrame(title, aircrafts);
+                AircraftInfo.setVisible(true);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Error fetching flight data: " + ex.getMessage(),
+                        "Database Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -86,67 +66,46 @@ public class AdminFrame extends JFrame {
         gbc.insets = new Insets(10, 0, 10, 0);
         buttonPanel.add(updateCrewButton, gbc);
 
-        updateCrewButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateCrewPanel();
-            }
-        });
+        updateCrewButton.addActionListener(e -> updateCrewPanel());
 
         JButton addAircraftButton = createStyledButton("Add an Aircraft");
         gbc.insets = new Insets(10, 0, 10, 0);
         buttonPanel.add(addAircraftButton, gbc);
 
-        addAircraftButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                addAircraftPanel();
-            }
-        });
+        addAircraftButton.addActionListener(e -> addAircraftPanel());
 
         JButton removeAircraftButton = createStyledButton("Remove Aircraft");
         gbc.insets = new Insets(10, 0, 10, 0);
         buttonPanel.add(removeAircraftButton, gbc);
 
-        removeAircraftButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                removeAircraftPanel();
-            }
-        });
+        removeAircraftButton.addActionListener(e -> removeAircraftPanel());
 
         JButton editFlightButton = createStyledButton("Edit flight");
         gbc.insets = new Insets(10, 0, 10, 0);
         buttonPanel.add(editFlightButton, gbc);
 
-        editFlightButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                FlightEditFrame flightEditFrame = new FlightEditFrame(); // Create the welcome window
-                flightEditFrame.setVisible(true); // Show the welcome window
-            }
+        editFlightButton.addActionListener(e -> {
+            FlightEditFrame flightEditFrame = new FlightEditFrame(); // Create the welcome window
+            flightEditFrame.setVisible(true); // Show the welcome window
         });
 
         JButton displayUsersButton = createStyledButton("List Registered Users");
         gbc.insets = new Insets(10, 0, 10, 0);
         buttonPanel.add(displayUsersButton, gbc);
 
-        displayUsersButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
+        displayUsersButton.addActionListener(e -> {
+            try {
 
-                    DBMS dbms = DBMS.getDBMS();
-                    ArrayList<RegisteredUser> users = dbms.getRegisteredUsers();
+                DBMS dbms = DBMS.getDBMS();
+                ArrayList<RegisteredUser> users = dbms.getRegisteredUsers();
 
-                    DisplayUsers displayUsers = new DisplayUsers(users);
-                    displayUsers.setVisible(true);
+                DisplayUsers displayUsers = new DisplayUsers(users);
+                displayUsers.setVisible(true);
 
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Error fetching flight data: " + ex.getMessage(),
-                            "Database Error", JOptionPane.ERROR_MESSAGE);
-                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Error fetching flight data: " + ex.getMessage(),
+                        "Database Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -156,24 +115,21 @@ public class AdminFrame extends JFrame {
         gbc.insets = new Insets(10, 0, 10, 0);
         buttonPanel.add(displayUsersButton, gbc);
 
-        displayPromoButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    DBMS db = DBMS.getDBMS();
-                    Email_Controller email = new Email_Controller();
+        displayPromoButton.addActionListener(e -> {
+            try {
+                DBMS db = DBMS.getDBMS();
+                Email_Controller email = new Email_Controller();
 
-                    email.notifyAboutPromotions(db.getCurrentPromotion());
-                    JOptionPane.showMessageDialog(null, "Promotion sent to users.", "Error",
-                            JOptionPane.INFORMATION_MESSAGE);
+                email.notifyAboutPromotions(db.getCurrentPromotion());
+                JOptionPane.showMessageDialog(null, "Promotion sent to users.", "Error",
+                        JOptionPane.INFORMATION_MESSAGE);
 
-                }catch(Exception error){
-                    JOptionPane.showMessageDialog(null, "Failed to send promotion.", "Error",
-                            JOptionPane.INFORMATION_MESSAGE);
-                }
-
-
+            }catch(Exception error){
+                JOptionPane.showMessageDialog(null, "Failed to send promotion.", "Error",
+                        JOptionPane.INFORMATION_MESSAGE);
             }
+
+
         });
 
         buttonPanel.add(displayPromoButton,gbc);
@@ -182,16 +138,13 @@ public class AdminFrame extends JFrame {
         gbc.insets = new Insets(0, 0, 10, 0);
         buttonPanel.add(logoutButton, gbc);
 
-        logoutButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Hide the welcome frame
-                AdminFrame.this.dispose(); // Optionally, you can dispose the WelcomeFrame
+        logoutButton.addActionListener(e -> {
+            // Hide the welcome frame
+            AdminFrame.this.dispose(); // Optionally, you can dispose the WelcomeFrame
 
-                // Create and show the login frame
-                LoginFrame loginFrame = new LoginFrame();
-                loginFrame.setVisible(true);
-            }
+            // Create and show the login frame
+            LoginFrame loginFrame = new LoginFrame();
+            loginFrame.setVisible(true);
         });
 
         pack();
@@ -222,25 +175,22 @@ public class AdminFrame extends JFrame {
         browseFrame.add(aircraftTextField);
 
         JButton confirmButton = new JButton("Remove Aircraft");
-        confirmButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
+        confirmButton.addActionListener(e -> {
+            try {
 
-                    int aircraftID = Integer.parseInt(aircraftTextField.getText());
+                int aircraftID = Integer.parseInt(aircraftTextField.getText());
 
-                    DBMS dbms = DBMS.getDBMS(); // This will not create a new instance but will return the existing
-                                                // one.
-                    dbms.removeAircraft(aircraftID);
-                    ArrayList<Aircraft> aircrafts = dbms.getAircrafts();
-                    String title = "Updated Aircraft List";
-                    AircraftInfoFrame aircraftInfo = new AircraftInfoFrame(title, aircrafts);
-                    aircraftInfo.setVisible(true);
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(browseFrame, "Error fetching flight data: " + ex.getMessage(),
-                            "Database Error", JOptionPane.ERROR_MESSAGE);
-                }
+                DBMS dbms = DBMS.getDBMS(); // This will not create a new instance but will return the existing
+                                            // one.
+                dbms.removeAircraft(aircraftID);
+                ArrayList<Aircraft> aircrafts = dbms.getAircrafts();
+                String title = "Updated Aircraft List";
+                AircraftInfoFrame aircraftInfo = new AircraftInfoFrame(title, aircrafts);
+                aircraftInfo.setVisible(true);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(browseFrame, "Error fetching flight data: " + ex.getMessage(),
+                        "Database Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -285,34 +235,31 @@ public class AdminFrame extends JFrame {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
         JButton addButton = new JButton("Add Aircraft");
-        addButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    String aircraftModel = modelTextField.getText();
-                    int numEconomySeats = Integer.parseInt(ecoTextField.getText());
-                    int numComfortSeats = Integer.parseInt(comfortTextField.getText());
-                    int numBusinessSeats = Integer.parseInt(businessTextField.getText());
-                    double economyPrice = Double.parseDouble(ecoPriceTextField.getText());
-                    double businessPrice = Double.parseDouble(businessPriceTextField.getText());
+        addButton.addActionListener(e -> {
+            try {
+                String aircraftModel = modelTextField.getText();
+                int numEconomySeats = Integer.parseInt(ecoTextField.getText());
+                int numComfortSeats = Integer.parseInt(comfortTextField.getText());
+                int numBusinessSeats = Integer.parseInt(businessTextField.getText());
+                double economyPrice = Double.parseDouble(ecoPriceTextField.getText());
+                double businessPrice = Double.parseDouble(businessPriceTextField.getText());
 
-                    DBMS dbms = DBMS.getDBMS();
-                    dbms.addAircraft(aircraftModel, numEconomySeats, numComfortSeats, numBusinessSeats,
-                            economyPrice, businessPrice);
+                DBMS dbms = DBMS.getDBMS();
+                dbms.addAircraft(aircraftModel, numEconomySeats, numComfortSeats, numBusinessSeats,
+                        economyPrice, businessPrice);
 
-                    ArrayList<Aircraft> aircrafts = dbms.getAircrafts();
-                    String title = "Updated Aircraft List";
-                    AircraftInfoFrame aircraftInfo = new AircraftInfoFrame(title, aircrafts);
+                ArrayList<Aircraft> aircrafts = dbms.getAircrafts();
+                String title = "Updated Aircraft List";
+                AircraftInfoFrame aircraftInfo = new AircraftInfoFrame(title, aircrafts);
 
-                    aircraftInfo.setVisible(true);
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(browseFrame, "Please enter valid numeric values.", "Input Error",
-                            JOptionPane.ERROR_MESSAGE);
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(browseFrame, "Error fetching flight data: " + ex.getMessage(),
-                            "Database Error", JOptionPane.ERROR_MESSAGE);
-                }
+                aircraftInfo.setVisible(true);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(browseFrame, "Please enter valid numeric values.", "Input Error",
+                        JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(browseFrame, "Error fetching flight data: " + ex.getMessage(),
+                        "Database Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -353,27 +300,24 @@ public class AdminFrame extends JFrame {
         browseFrame.add(flightTextField);
 
         JButton confirmButton = new JButton("Confirm");
-        confirmButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
+        confirmButton.addActionListener(e -> {
+            try {
 
-                    int crewID = Integer.parseInt(crewIDTextField.getText());
-                    int flightID = Integer.parseInt(flightTextField.getText());
+                int crewID = Integer.parseInt(crewIDTextField.getText());
+                int flightID = Integer.parseInt(flightTextField.getText());
 
-                    DBMS dbms = DBMS.getDBMS(); // This will not create a new instance but will return the existing
-                                                // one.
-                    dbms.updateCrew(crewID, flightID);
+                DBMS dbms = DBMS.getDBMS(); // This will not create a new instance but will return the existing
+                                            // one.
+                dbms.updateCrew(crewID, flightID);
 
-                    ArrayList<CrewMember> crew = dbms.getCrewMembers(flightID);
-                    CrewInfoFrame crewInfo = new CrewInfoFrame(flightID, crew);
+                ArrayList<CrewMember> crew = dbms.getCrewMembers(flightID);
+                CrewInfoFrame crewInfo = new CrewInfoFrame(flightID, crew);
 
-                    crewInfo.setVisible(true);
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(browseFrame, "Error fetching flight data: " + ex.getMessage(),
-                            "Database Error", JOptionPane.ERROR_MESSAGE);
-                }
+                crewInfo.setVisible(true);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(browseFrame, "Error fetching flight data: " + ex.getMessage(),
+                        "Database Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -396,26 +340,23 @@ public class AdminFrame extends JFrame {
         browseFrame.add(daTextField);
 
         JButton confirmButton = new JButton("Confirm");
-        confirmButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
+        confirmButton.addActionListener(e -> {
+            try {
 
-                    LocalDate date = LocalDate.parse(daTextField.getText());
+                LocalDate date = LocalDate.parse(daTextField.getText());
 
-                    DBMS dbms = DBMS.getDBMS(); // This will not create a new instance but will return the existing
-                                                // one.
-                    ArrayList<Flight> flights = dbms.getFlights(date);
+                DBMS dbms = DBMS.getDBMS(); // This will not create a new instance but will return the existing
+                                            // one.
+                ArrayList<Flight> flights = dbms.getFlights(date);
 
-                    String title = "Flights on " + date.toString();
+                String title = "Flights on " + date.toString();
 
-                    AdminFlightInfoFrame flightInfo = new AdminFlightInfoFrame(title, flights);
-                    flightInfo.setVisible(true);
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(browseFrame, "Error fetching flight data: " + ex.getMessage(),
-                            "Database Error", JOptionPane.ERROR_MESSAGE);
-                }
+                AdminFlightInfoFrame flightInfo = new AdminFlightInfoFrame(title, flights);
+                flightInfo.setVisible(true);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(browseFrame, "Error fetching flight data: " + ex.getMessage(),
+                        "Database Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -438,24 +379,21 @@ public class AdminFrame extends JFrame {
         browseFrame.add(flightTextField);
 
         JButton confirmButton = new JButton("Confirm");
-        confirmButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
+        confirmButton.addActionListener(e -> {
+            try {
 
-                    int flightID = Integer.parseInt(flightTextField.getText());
+                int flightID = Integer.parseInt(flightTextField.getText());
 
-                    DBMS dbms = DBMS.getDBMS(); // This will not create a new instance but will return the existing
-                                                // one.
-                    ArrayList<CrewMember> crew = dbms.getCrewMembers(flightID);
+                DBMS dbms = DBMS.getDBMS(); // This will not create a new instance but will return the existing
+                                            // one.
+                ArrayList<CrewMember> crew = dbms.getCrewMembers(flightID);
 
-                    CrewInfoFrame crewInfo = new CrewInfoFrame(flightID, crew);
-                    crewInfo.setVisible(true);
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(browseFrame, "Error fetching flight data: " + ex.getMessage(),
-                            "Database Error", JOptionPane.ERROR_MESSAGE);
-                }
+                CrewInfoFrame crewInfo = new CrewInfoFrame(flightID, crew);
+                crewInfo.setVisible(true);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(browseFrame, "Error fetching flight data: " + ex.getMessage(),
+                        "Database Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -486,67 +424,37 @@ public class AdminFrame extends JFrame {
             gbc.insets = new Insets(10, 0, 10, 0);
             buttonPanel.add(addFlightButton, gbc);
 
-            addFlightButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    addFlightPanel();
-                }
-            });
+            addFlightButton.addActionListener(e -> addFlightPanel());
 
             JButton removeFlightButton = createStyledButton("Remove Flight");
             gbc.insets = new Insets(10, 0, 10, 0);
             buttonPanel.add(removeFlightButton, gbc);
 
-            removeFlightButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    removeFlightPanel();
-                }
-            });
+            removeFlightButton.addActionListener(e -> removeFlightPanel());
 
             JButton editOriButton = createStyledButton("Edit Origin");
             gbc.insets = new Insets(10, 0, 10, 0);
             buttonPanel.add(editOriButton, gbc);
 
-            editOriButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    editFlightPanel("Origin");
-                }
-            });
+            editOriButton.addActionListener(e -> editFlightPanel("Origin"));
 
             JButton editDestButton = createStyledButton("Edit Destination");
             gbc.insets = new Insets(10, 0, 10, 0);
             buttonPanel.add(editDestButton, gbc);
 
-            editDestButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    editFlightPanel("Destination");
-                }
-            });
+            editDestButton.addActionListener(e -> editFlightPanel("Destination"));
 
             JButton editDepartDateTimeButton = createStyledButton("Edit Destination Date and Time");
             gbc.insets = new Insets(10, 0, 10, 0);
             buttonPanel.add(editDepartDateTimeButton, gbc);
 
-            editDepartDateTimeButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    editFlightPanel("DepartureDateTime");
-                }
-            });
+            editDepartDateTimeButton.addActionListener(e -> editFlightPanel("DepartureDateTime"));
 
             JButton editArrivalDateTimeButton = createStyledButton("Edit Arrival Date and Time");
             gbc.insets = new Insets(10, 0, 10, 0);
             buttonPanel.add(editArrivalDateTimeButton, gbc);
 
-            editArrivalDateTimeButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    editFlightPanel("ArrivalDateTime");
-                }
-            });
+            editArrivalDateTimeButton.addActionListener(e -> editFlightPanel("ArrivalDateTime"));
 
             add(buttonPanel, BorderLayout.CENTER);
 
@@ -578,24 +486,21 @@ public class AdminFrame extends JFrame {
             browseFrame.add(aircraftTextField);
 
             JButton confirmButton = new JButton("Remove Flight");
-            confirmButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    try {
+            confirmButton.addActionListener(e -> {
+                try {
 
-                        int flightID = Integer.parseInt(aircraftTextField.getText());
-                        DBMS dbms = DBMS.getDBMS(); // This will not create a new instance but will return the existing
-                        dbms.removeFlight(flightID);
-                        ArrayList<Flight> flights = dbms.getFlights();
-                        String title = "Updated Flight List";
-                        AdminFlightInfoFrame flightInfo = new AdminFlightInfoFrame(title, flights);
-                        flightInfo.setVisible(true);
+                    int flightID = Integer.parseInt(aircraftTextField.getText());
+                    DBMS dbms = DBMS.getDBMS(); // This will not create a new instance but will return the existing
+                    dbms.removeFlight(flightID);
+                    ArrayList<Flight> flights = dbms.getFlights();
+                    String title = "Updated Flight List";
+                    AdminFlightInfoFrame flightInfo = new AdminFlightInfoFrame(title, flights);
+                    flightInfo.setVisible(true);
 
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
-                        JOptionPane.showMessageDialog(browseFrame, "Error fetching flight data: " + ex.getMessage(),
-                                "Database Error", JOptionPane.ERROR_MESSAGE);
-                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(browseFrame, "Error fetching flight data: " + ex.getMessage(),
+                            "Database Error", JOptionPane.ERROR_MESSAGE);
                 }
             });
 
@@ -637,36 +542,33 @@ public class AdminFrame extends JFrame {
             JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
             JButton addButton = new JButton("Add Flight");
-            addButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        String origin = originTextField.getText();
-                        String destination = destTextField.getText();
-                        LocalDate departureDate = LocalDate.parse(departDateTimeTextField.getText().split(" ")[0]);
-                        LocalTime departureTime = LocalTime.parse(departDateTimeTextField.getText().split(" ")[1]);
-                        LocalDate arrivalDate = LocalDate.parse(arrivalDateTimeTextField.getText().split(" ")[0]);
-                        LocalTime arrivalTime = LocalTime.parse(arrivalDateTimeTextField.getText().split(" ")[1]);
-                        int aircraftID = Integer.parseInt(aircraftIDField.getText());
+            addButton.addActionListener(e -> {
+                try {
+                    String origin = originTextField.getText();
+                    String destination = destTextField.getText();
+                    LocalDate departureDate = LocalDate.parse(departDateTimeTextField.getText().split(" ")[0]);
+                    LocalTime departureTime = LocalTime.parse(departDateTimeTextField.getText().split(" ")[1]);
+                    LocalDate arrivalDate = LocalDate.parse(arrivalDateTimeTextField.getText().split(" ")[0]);
+                    LocalTime arrivalTime = LocalTime.parse(arrivalDateTimeTextField.getText().split(" ")[1]);
+                    int aircraftID = Integer.parseInt(aircraftIDField.getText());
 
-                        DBMS dbms = DBMS.getDBMS();
-                        Aircraft aircraft = dbms.getAircraftbyID(aircraftID);
-                        dbms.addFlight(aircraft, origin, destination, departureDate, departureTime, arrivalDate,
-                                arrivalTime);
+                    DBMS dbms = DBMS.getDBMS();
+                    Aircraft aircraft = dbms.getAircraftbyID(aircraftID);
+                    dbms.addFlight(aircraft, origin, destination, departureDate, departureTime, arrivalDate,
+                            arrivalTime);
 
-                        ArrayList<Flight> flights = dbms.getFlights();
-                        String title = "Updated Flight List";
-                        AdminFlightInfoFrame flightInfo = new AdminFlightInfoFrame(title, flights);
+                    ArrayList<Flight> flights = dbms.getFlights();
+                    String title = "Updated Flight List";
+                    AdminFlightInfoFrame flightInfo = new AdminFlightInfoFrame(title, flights);
 
-                        flightInfo.setVisible(true);
-                    } catch (NumberFormatException ex) {
-                        JOptionPane.showMessageDialog(browseFrame, "Please enter valid numeric values.", "Input Error",
-                                JOptionPane.ERROR_MESSAGE);
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
-                        JOptionPane.showMessageDialog(browseFrame, "Error fetching flight data: " + ex.getMessage(),
-                                "Database Error", JOptionPane.ERROR_MESSAGE);
-                    }
+                    flightInfo.setVisible(true);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(browseFrame, "Please enter valid numeric values.", "Input Error",
+                            JOptionPane.ERROR_MESSAGE);
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(browseFrame, "Error fetching flight data: " + ex.getMessage(),
+                            "Database Error", JOptionPane.ERROR_MESSAGE);
                 }
             });
 
@@ -691,23 +593,20 @@ public class AdminFrame extends JFrame {
 
             JButton editButton = new JButton("Edit Flight");
 
-            editButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        int flightID = Integer.parseInt(flightIdText.getText());
-                        String data = dataText.getText();
-                        DBMS dbms = DBMS.getDBMS();
-                        dbms.editFlightLocation(flightID, indicator, data);
-                        Flight flight = dbms.getFlights(flightID);
-                        DisplayFlight displayFlight = new DisplayFlight(flight);
-                        displayFlight.setVisible(true);
+            editButton.addActionListener(e -> {
+                try {
+                    int flightID = Integer.parseInt(flightIdText.getText());
+                    String data = dataText.getText();
+                    DBMS dbms = DBMS.getDBMS();
+                    dbms.editFlightLocation(flightID, indicator, data);
+                    Flight flight = dbms.getFlights(flightID);
+                    DisplayFlight displayFlight = new DisplayFlight(flight);
+                    displayFlight.setVisible(true);
 
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
-                        JOptionPane.showMessageDialog(null, "Error fetching flight data: " + ex.getMessage(),
-                                "Database Error", JOptionPane.ERROR_MESSAGE);
-                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(null, "Error fetching flight data: " + ex.getMessage(),
+                            "Database Error", JOptionPane.ERROR_MESSAGE);
                 }
             });
 
@@ -729,17 +628,18 @@ public class AdminFrame extends JFrame {
             setLayout(new BorderLayout());
             setSize(600, 400);
 
-            String[] columnNames = { "User ID", "Username", "Email", "Address", "Has Insurance", };
+            String[] columnNames = { "User ID", "Username", "Email", "Address", "Has Insurance", "Companion Tickets"};
             DefaultTableModel model = new DefaultTableModel(columnNames, 0);
 
-            for (User u : users) {
+            for (RegisteredUser u : users) {
 
-                Object[] row = new Object[5]; // Adjusted to match the number of columns
+                Object[] row = new Object[6]; // Adjusted to match the number of columns
                 row[0] = u.getUserID();
                 row[1] = u.getUsername();
                 row[2] = u.getEmail();
                 row[3] = u.getAddress();
                 row[4] = u.getHasInsurance();
+                row[5] = u.getCompanionTickets();
 
                 model.addRow(row);
             }
