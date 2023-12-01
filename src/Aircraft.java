@@ -12,8 +12,8 @@ public class Aircraft {
     int numEconomySeats;
     int numComfortSeats;
     int numBusinessSeats;
-    private double economyPrice;
-    private double businessPrice;
+    private final double economyPrice;
+    private final double businessPrice;
 
     /**
      * Represents an aircraft with its properties and methods.

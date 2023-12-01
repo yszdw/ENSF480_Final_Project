@@ -10,14 +10,9 @@ import java.awt.event.ActionListener;
 public class AirlineFrame extends JFrame {
 
     private static final Font MAIN_FONT = new Font("Segoe UI", Font.BOLD, 18);
-    private static final Font BUTTON_FONT = new Font("Segoe UI", Font.PLAIN, 14);
-    private static final Font GROUP_FONT = new Font("Segoe UI", Font.PLAIN, 16);
     private static final Color BUTTON_COLOR = new Color(100, 149, 237); // Cornflower Blue
     private static final Color BUTTON_TEXT_COLOR = Color.WHITE;
-
-    private static final Font INPUT_FONT = new Font("Segoe UI", Font.PLAIN, 14);
     private static final Color BACKGROUND_COLOR = new Color(245, 245, 245); // Light Gray
-    private static final Color INPUT_COLOR = new Color(255, 255, 255); // White
 
     public AirlineFrame(String username) {
         setTitle("Airline Page");
@@ -39,27 +34,21 @@ public class AirlineFrame extends JFrame {
         gbc.insets = new Insets(10, 0, 10, 0);
         buttonPanel.add(flightButton, gbc);
 
-        flightButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                AirlineFrame.this.dispose(); // Close the current window
-                LoginFrame loginFrame = new LoginFrame(); // Create an instance of LoginFrame
-                WelcomeFrame welcomeFrame = loginFrame.new WelcomeFrame(username); // Pass the username to WelcomeFrame
-                welcomeFrame.setVisible(true); // Show the welcome window
-            }
+        flightButton.addActionListener(e -> {
+            AirlineFrame.this.dispose(); // Close the current window
+            LoginFrame loginFrame = new LoginFrame(); // Create an instance of LoginFrame
+            WelcomeFrame welcomeFrame = loginFrame.new WelcomeFrame(username); // Pass the username to WelcomeFrame
+            welcomeFrame.setVisible(true); // Show the welcome window
         });
 
         JButton displayPassButton = createStyledButton("Display Passenger List");
         gbc.insets = new Insets(10, 0, 10, 0);
         buttonPanel.add(displayPassButton, gbc);
 
-        displayPassButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        displayPassButton.addActionListener(e -> {
 
-                PassListFrame passListFrame = new PassListFrame();
-                passListFrame.setVisible(true);
-            }
+            PassListFrame passListFrame = new PassListFrame();
+            passListFrame.setVisible(true);
         });
 
         // // User is logged in so add logout button
@@ -67,16 +56,13 @@ public class AirlineFrame extends JFrame {
         gbc.insets = new Insets(0, 0, 10, 0);
         buttonPanel.add(logoutButton, gbc);
 
-        logoutButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Hide the welcome frame
-                AirlineFrame.this.dispose(); // Optionally, you can dispose the WelcomeFrame
+        logoutButton.addActionListener(e -> {
+            // Hide the welcome frame
+            AirlineFrame.this.dispose(); // Optionally, you can dispose the WelcomeFrame
 
-                // Create and show the login frame
-                LoginFrame loginFrame = new LoginFrame();
-                loginFrame.setVisible(true);
-            }
+            // Create and show the login frame
+            LoginFrame loginFrame = new LoginFrame();
+            loginFrame.setVisible(true);
         });
 
         add(buttonPanel, BorderLayout.CENTER);
