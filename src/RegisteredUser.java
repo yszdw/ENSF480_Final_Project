@@ -14,9 +14,6 @@ public class RegisteredUser extends User {
     }
 
     /* Getters and Setters */
-    public void setCreditCard(CreditCard creditCard) {
-        this.creditCard = creditCard;
-    }
 
     public CreditCard getCreditCard() {
         return creditCard;

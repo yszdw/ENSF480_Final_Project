@@ -3,8 +3,6 @@ package src;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -21,21 +19,18 @@ public class PassListFrame extends JFrame {
 
         JButton getButton = new JButton("Get Passenger List");
 
-        getButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    int flightID = Integer.parseInt(flightIdText.getText());
-                    DBMS dbms = DBMS.getDBMS();
-                    ArrayList<Order> orders = dbms.getOrders(flightID);
-                    DisplayFrame displayFrame = new DisplayFrame(orders);
-                    displayFrame.setVisible(true);
+        getButton.addActionListener(e -> {
+            try {
+                int flightID = Integer.parseInt(flightIdText.getText());
+                DBMS dbms = DBMS.getDBMS();
+                ArrayList<Order> orders = dbms.getOrders(flightID);
+                DisplayFrame displayFrame = new DisplayFrame(orders);
+                displayFrame.setVisible(true);
 
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "Error fetching flight data: " + ex.getMessage(),
-                            "Database Error", JOptionPane.ERROR_MESSAGE);
-                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Error fetching flight data: " + ex.getMessage(),
+                        "Database Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 

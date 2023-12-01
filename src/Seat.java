@@ -20,21 +20,4 @@ public class Seat {
     public String getSeatNumber() {
         return SEATNUMBER;
     }
-
-    public String getSeatClass() {
-        return CLASS;
-    }
-
-    public boolean getIsAvailable() {
-        return isAvailable;
-    }
-
-    public int getPrice() {
-        return price;
-    }
-
-    public User getPassenger() {
-        return passenger;
-    }
-
 }

@@ -1,29 +1,26 @@
 package src;
 
 public class Order {
-    private int orderID;
-    private String email;
-    private String username;
-    private int flightID;
-    private String aircraftModel;
-    private String departureLocation;
-    private String arrivalLocation;
-    private String departureTime;
-    private String arrivalTime;
-    private String seatClass;
-    private String seatNumber;
-    private boolean insurance;
-    private double totalPrice;
+    private final int orderID;
+    private final String email;
+    private final String username;
+    private final int flightID;
+    private final String departureLocation;
+    private final String arrivalLocation;
+    private final String departureTime;
+    private final String arrivalTime;
+    private final String seatClass;
+    private final String seatNumber;
+    private final boolean insurance;
+    private final double totalPrice;
 
-    public Order(int orderID, String email, String username, int flightID, String aircraftModel,
-            String departureLocation,
+    public Order(int orderID, String email, String username, int flightID, String departureLocation,
             String arrivalLocation, String departureTime, String arrivalTime, String seatClass, String seatNumber,
             boolean insurance, double totalPrice) {
         this.orderID = orderID;
         this.email = email;
         this.username = username;
         this.flightID = flightID;
-        this.aircraftModel = aircraftModel;
         this.departureLocation = departureLocation;
         this.arrivalLocation = arrivalLocation;
         this.departureTime = departureTime;
@@ -46,10 +43,6 @@ public class Order {
 
     public int getFlightID() {
         return flightID;
-    }
-
-    public String getAircraftModel() {
-        return aircraftModel;
     }
 
     public String getDepartureLocation() {

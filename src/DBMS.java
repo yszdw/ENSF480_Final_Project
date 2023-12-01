@@ -772,7 +772,7 @@ public class DBMS {
             String seatNumber = results.getString("SeatNumber");
             boolean insurance = results.getBoolean("Insurance");
             double totalPrice = results.getDouble("TotalPrice");
-            Order order = new Order(orderID, email, username, flightID2, aircraftModel, departureLocation,
+            Order order = new Order(orderID, email, username, flightID2, departureLocation,
                     arrivalLocation,
                     departureTime, arrivalTime, seatClass, seatNumber, insurance, totalPrice);
             orders.add(order);
@@ -809,7 +809,7 @@ public class DBMS {
             boolean insurance = results.getBoolean("Insurance");
             double totalPrice = results.getDouble("TotalPrice");
 
-            return new Order(orderID, email, username, flightID2, aircraftModel, departureLocation,
+            return new Order(orderID, email, username, flightID2, departureLocation,
                     arrivalLocation,
                     departureTime, arrivalTime, seatClass, seatNumber, insurance, totalPrice);
         }
@@ -845,7 +845,7 @@ public class DBMS {
             String seatNumber = results.getString("SeatNumber");
             boolean insurance = results.getBoolean("Insurance");
             double totalPrice = results.getDouble("TotalPrice");
-            Order order = new Order(orderID, email, username, flightID2, aircraftModel, departureLocation,
+            Order order = new Order(orderID, email, username, flightID2, departureLocation,
                     arrivalLocation,
                     departureTime, arrivalTime, seatClass, seatNumber, insurance, totalPrice);
             orders.add(order);

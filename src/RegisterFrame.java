@@ -2,8 +2,6 @@ package src;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.SQLException;
 
 public class RegisterFrame extends JFrame {
@@ -14,11 +12,11 @@ public class RegisterFrame extends JFrame {
     private static final Color INPUT_COLOR = new Color(255, 255, 255); // White
 
     // Input fields
-    private JTextField userTextField;
-    private JPasswordField passField;
-    private JTextField emailTextField;
+    private final JTextField userTextField;
+    private final JPasswordField passField;
+    private final JTextField emailTextField;
 
-    private JTextField addressTextField;
+    private final JTextField addressTextField;
 
     public RegisterFrame() {
         setTitle("User Registration");
@@ -95,20 +93,17 @@ public class RegisterFrame extends JFrame {
         inputPanel.add(passField, gbc);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        // back button to login
+        // back button to log in
         JButton backButton = new JButton("Back");
         backButton.setFont(INPUT_FONT);
         backButton.setBackground(new Color(100, 149, 237)); // Cornflower Blue
         backButton.setForeground(Color.WHITE);
         backButton.setFocusPainted(false);
         backButton.setBorderPainted(false);
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                LoginFrame loginFrame = new LoginFrame();
-                loginFrame.setVisible(true);
-                dispose();
-            }
+        backButton.addActionListener(e -> {
+            LoginFrame loginFrame = new LoginFrame();
+            loginFrame.setVisible(true);
+            dispose();
         });
         buttonPanel.add(backButton);
 
@@ -122,12 +117,7 @@ public class RegisterFrame extends JFrame {
         buttonPanel.add(registerButton);
 
         // Action listener for the register button
-        registerButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                registerUser();
-            }
-        });
+        registerButton.addActionListener(e -> registerUser());
 
         // Add panels to frame
         add(titlePanel, BorderLayout.NORTH);
