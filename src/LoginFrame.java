@@ -94,6 +94,10 @@ public class LoginFrame extends JFrame {
         loginButton.setBorderPainted(false);
         buttonPanel.add(loginButton);
 
+        // Add ActionListener to the text fields to trigger login on pressing ENTER
+        userTextField.addActionListener(e -> loginButton.doClick());
+        passField.addActionListener(e -> loginButton.doClick());
+
         // Action listener for the login button
         loginButton.addActionListener(e -> {
             // Implement your login logic here
