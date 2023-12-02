@@ -785,11 +785,4 @@ public class AdminFrame extends JFrame {
             setVisible(true);
         }
     }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            AdminFrame adminFrame = new AdminFrame();
-            adminFrame.setVisible(true);
-        });
-    }
 }
