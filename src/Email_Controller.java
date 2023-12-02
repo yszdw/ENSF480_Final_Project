@@ -117,7 +117,7 @@ public class Email_Controller {
 
     }
 
-    public static void sendTicket(String username, String email, String aircraft, String to, String from,
+    public static void sendTicket(String username, String email, String aircraft, String from, String to,
                                   LocalTime departure, LocalTime arrive, String seatClass, String seat) {
 
         // For testing, place your own email in the line below
@@ -159,7 +159,7 @@ public class Email_Controller {
                             + "Aircraft: %s\n"
                             + "Seat Class: %s\n"
                             + "Seat: %s\n",
-                    arrive, username, from, departure, to, arrive, aircraft, seatClass, seat));
+                    to, username, from, departure, to, arrive, aircraft, seatClass, seat));
 
             // Send the email
             Transport.send(message);
